@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Kyle Rudd — Void Scribe Studios" description="Kyle Rudd, founder of Void Scribe Studios.">
+  <section class="profile">
+    <h1>Kyle Rudd</h1>
+    <p class="role">Founder, Void Scribe Studios</p>
+
+    <p class="bio">
+      Bio coming soon.
+    </p>
+
+    <section class="portfolio">
+      <h2>Portfolio</h2>
+      <a
+        class="project"
+        href="https://voidscribestudios.itch.io/mtg-simulator?REDACTED"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="project-title">MTG Simulator</span>
+        <span class="project-meta">Play on itch.io &rarr;</span>
+      </a>
+    </section>
+  </section>
+</Layout>
+
+<style>
+  h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    margin: 0 0 0.25rem;
+  }
+
+  .role {
+    color: var(--color-text-dim);
+    margin: 0 0 2rem;
+  }
+
+  .bio {
+    max-width: 34rem;
+  }
+
+  .portfolio {
+    margin-top: 3rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    margin: 0 0 1rem;
+  }
+
+  .project {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-bg-raised);
+    text-decoration: none;
+  }
+
+  .project:hover,
+  .project:focus-visible {
+    border-color: var(--color-accent);
+  }
+
+  .project-title {
+    font-family: var(--font-display);
+    color: var(--color-text);
+    font-size: 1.05rem;
+  }
+
+  .project-meta {
+    color: var(--color-accent-bright);
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+</style>

@@ -30,12 +30,14 @@
   const fits = (maxHeight: number) => descriptionElement!.scrollHeight <= maxHeight + 1;
 
   // Trims `full` down to the longest prefix that, together with the
-  // "... Show more" tail, still fits in three lines. Always measures with
-  // the tail in place so "... Show more" lands flush at the end of line
-  // three.
+  // "... Show more" tail, still fits within --description-lines lines.
+  // Always measures with the tail in place so "... Show more" lands flush
+  // at the end of the last line.
   const trim = () => {
     if (!descriptionElement || !textElement || !tailElement) return;
-    const maxHeight = parseFloat(getComputedStyle(descriptionElement).lineHeight) * 3;
+    const styles = getComputedStyle(descriptionElement);
+    const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
+    const maxHeight = parseFloat(styles.lineHeight) * lines;
 
     tailElement.hidden = true;
     textElement.textContent = full;
@@ -184,9 +186,7 @@
   }
 
   .project:hover,
-  .project:focus-visible,
-  .project--expandable:hover,
-  .project--expandable:focus-within {
+  .project:focus-within {
     border-color: var(--color-accent);
   }
 
@@ -204,9 +204,7 @@
   }
 
   .project:hover .project-icon,
-  .project:focus-visible .project-icon,
-  .project--expandable:hover .project-icon,
-  .project--expandable:focus-within .project-icon {
+  .project:focus-within .project-icon {
     fill: var(--color-accent);
   }
 
@@ -224,29 +222,32 @@
   }
 
   .project-description {
+    --description-lines: 3;
     margin: 0.4rem 0 0;
     color: var(--color-text-dim);
     font-size: 0.9rem;
     line-height: 1.5;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: var(--description-lines);
     -webkit-box-orient: vertical;
   }
 
   /* Applied once JS takes over. A description short enough to fit as-is
      renders identically in this layout, so it's safe to apply unconditionally
      rather than only to descriptions that end up truncated. */
-  .project-description.is-trimmed {
+  .project-description.is-trimmed,
+  .project-description.is-expanded {
     display: block;
     -webkit-line-clamp: unset;
-    max-height: calc(1.5em * 3);
+  }
+
+  .project-description.is-trimmed {
+    max-height: calc(1em * 1.5 * var(--description-lines));
     overflow: hidden;
   }
 
   .project-description.is-expanded {
-    display: block;
-    -webkit-line-clamp: unset;
     max-height: none;
   }
 
@@ -293,6 +294,7 @@
 
     .project-content {
       padding-right: 0;
+      order: 1;
     }
 
     .project-main {
@@ -320,10 +322,6 @@
 
     .project-link {
       display: contents;
-    }
-
-    .project-content {
-      order: 1;
     }
 
     .project-expand {

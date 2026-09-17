@@ -17,6 +17,8 @@
   --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   --content-width: 46rem;
+  --gutter: 1.5rem;
+  --measure: 34rem;
 }
 
 *,

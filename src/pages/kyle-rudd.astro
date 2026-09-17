@@ -37,9 +37,82 @@ import Layout from '../layouts/Layout.astro';
         </span>
         <span class="project-meta">Play on itch.io &rarr;</span>
       </a>
+      <div class="project project--expandable">
+        <a
+          class="project-link"
+          href="https://www.youtube.com/watch?v=tcXh7IcB0-I"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div class="project-content">
+            <span class="project-main">
+              <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              <span class="project-title">Family Trip Mix 2 (Sellout Edition)</span>
+            </span>
+            <p class="project-description" id="project-description-family-trip-mix-2">
+              A psychedelic satire of the modern advertising hellscape, expressed through a genre-bending collage of image and sound.
+            </p>
+          </div>
+          <span class="project-meta">Watch on YouTube &rarr;</span>
+        </a>
+        <button
+          type="button"
+          class="project-expand"
+          aria-expanded="false"
+          aria-controls="project-description-family-trip-mix-2"
+          hidden
+        >
+          Show more
+        </button>
+      </div>
     </section>
   </section>
 </Layout>
+
+<script>
+  const COLLAPSED_LINES = 2;
+
+  const getControlledButton = (description: HTMLElement) =>
+    document.querySelector<HTMLButtonElement>(`.project-expand[aria-controls="${description.id}"]`);
+
+  const updateClamping = (description: HTMLElement) => {
+    const button = getControlledButton(description);
+    if (!button || description.classList.contains('is-expanded')) {
+      return;
+    }
+
+    // Measure the description's true natural height rather than trusting a
+    // -webkit-line-clamp box's own scrollHeight/clientHeight: that legacy
+    // box model can misreport those values, causing false "it's truncated"
+    // positives even when every word is already visible.
+    description.classList.remove('is-clamped');
+    const lineHeight = parseFloat(getComputedStyle(description).lineHeight);
+    const maxHeight = lineHeight * COLLAPSED_LINES;
+    const needsClamp = description.scrollHeight > maxHeight + lineHeight / 2;
+
+    description.classList.toggle('is-clamped', needsClamp);
+    button.hidden = !needsClamp;
+  };
+
+  document.querySelectorAll<HTMLElement>('.project-description').forEach((description) => {
+    // ResizeObserver's callback always runs after layout has settled, unlike a
+    // synchronous check on script load, which can measure before final layout.
+    new ResizeObserver(() => updateClamping(description)).observe(description);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.project-expand').forEach((button) => {
+    button.addEventListener('click', () => {
+      const id = button.getAttribute('aria-controls');
+      const description = id ? document.getElementById(id) : null;
+      if (!description) return;
+
+      const expanded = description.classList.toggle('is-expanded');
+      description.classList.toggle('is-clamped', !expanded);
+      button.textContent = expanded ? 'Show less' : 'Show more';
+      button.setAttribute('aria-expanded', String(expanded));
+    });
+  });
+</script>
 
 <style>
   h1 {
@@ -77,12 +150,32 @@ import Layout from '../layouts/Layout.astro';
     text-decoration: none;
   }
 
+  .project-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    text-decoration: none;
+  }
+
+  .project-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-right: 1.5rem;
+  }
+
+  .project--expandable {
+    display: block;
+  }
+
   .project + .project {
     margin-top: 0.75rem;
   }
 
   .project:hover,
-  .project:focus-visible {
+  .project:focus-visible,
+  .project--expandable:hover,
+  .project--expandable:focus-within {
     border-color: var(--color-accent);
   }
 
@@ -100,7 +193,9 @@ import Layout from '../layouts/Layout.astro';
   }
 
   .project:hover .project-icon,
-  .project:focus-visible .project-icon {
+  .project:focus-visible .project-icon,
+  .project--expandable:hover .project-icon,
+  .project--expandable:focus-within .project-icon {
     fill: var(--color-accent);
   }
 
@@ -114,5 +209,42 @@ import Layout from '../layouts/Layout.astro';
     color: var(--color-accent-bright);
     font-size: 0.9rem;
     white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .project-description {
+    margin: 0.4rem 0 0;
+    color: var(--color-text-dim);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .project-description.is-clamped {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .project-expand[hidden] {
+    display: none;
+  }
+
+  .project-expand {
+    display: inline-block;
+    margin-top: 0.4rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-accent-bright);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .project-expand:hover,
+  .project-expand:focus-visible {
+    text-decoration: underline;
   }
 </style>

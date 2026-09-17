@@ -1,5 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const itchAccessValue = decodeURIComponent(import.meta.env.ITCH_ACCESS_CODE ?? '');
+const itchAccessCodes = [...itchAccessValue].map((char) => char.charCodeAt(0));
+const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
 ---
 
 <Layout title="Kyle Rudd — Void Scribe Studios" description="Kyle Rudd, founder of Void Scribe Studios.">
@@ -42,8 +46,9 @@ import Layout from '../layouts/Layout.astro';
         </button>
       </div>
       <a
+        id="mtg-simulator-link"
         class="project"
-        href="https://voidscribestudios.itch.io/mtg-simulator?REDACTED"
+        href="https://voidscribestudios.itch.io/mtg-simulator"
         target="_blank"
         rel="noopener noreferrer nofollow"
       >
@@ -84,6 +89,15 @@ import Layout from '../layouts/Layout.astro';
     </section>
   </section>
 </Layout>
+
+<script is:inline define:vars={{ itchAccessCodes, itchQueryKeyCodes }}>
+  const mtgLink = document.getElementById('mtg-simulator-link');
+  if (mtgLink && itchAccessCodes.length) {
+    const key = String.fromCharCode(...itchQueryKeyCodes);
+    const value = String.fromCharCode(...itchAccessCodes);
+    mtgLink.href = `${mtgLink.href}?${key}=${encodeURIComponent(value)}`;
+  }
+</script>
 
 <script>
   type ExpandableState = {

@@ -11,6 +11,8 @@ npm run dev
 
 Dev server: `http://localhost:4321`.
 
+Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded — e.g. `encodeURIComponent(value)`) to fully render the MTG Simulator portfolio link. Without it, the link still builds but points to the unlocked base itch.io URL. Use the same encoded value for the `ITCH_ACCESS_CODE` build variable in Cloudflare Pages.
+
 ## Scripts
 
 - `npm run dev` / `npm run start` — start the dev server.

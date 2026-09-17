@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && svelte-check --tsconfig ./tsconfig.json && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "svelte-check": "^4.7.6",
     "typescript": "^6.0.3"
   }
 }

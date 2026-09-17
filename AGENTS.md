@@ -2,6 +2,10 @@
 
 See [README.md](./README.md) for the project overview, scripts, and testing procedure.
 
+## Branching
+
+This project uses trunk-based development. Commit directly to `main` unless told otherwise.
+
 ## Testing changes
 
 Do the README's browser check yourself, using the `claude-in-chrome` tools: start the dev server, load `localhost:4321`, and verify rendering, console, and interactions.

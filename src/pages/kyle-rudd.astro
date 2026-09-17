@@ -70,34 +70,22 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  const COLLAPSED_LINES = 2;
-
   const getControlledButton = (description: HTMLElement) =>
     document.querySelector<HTMLButtonElement>(`.project-expand[aria-controls="${description.id}"]`);
 
-  const updateClamping = (description: HTMLElement) => {
+  const updateButtonVisibility = (description: HTMLElement) => {
     const button = getControlledButton(description);
     if (!button || description.classList.contains('is-expanded')) {
       return;
     }
 
-    // Measure the description's true natural height rather than trusting a
-    // -webkit-line-clamp box's own scrollHeight/clientHeight: that legacy
-    // box model can misreport those values, causing false "it's truncated"
-    // positives even when every word is already visible.
-    description.classList.remove('is-clamped');
-    const lineHeight = parseFloat(getComputedStyle(description).lineHeight);
-    const maxHeight = lineHeight * COLLAPSED_LINES;
-    const needsClamp = description.scrollHeight > maxHeight + lineHeight / 2;
-
-    description.classList.toggle('is-clamped', needsClamp);
-    button.hidden = !needsClamp;
+    button.hidden = description.scrollHeight <= description.clientHeight + 1;
   };
 
   document.querySelectorAll<HTMLElement>('.project-description').forEach((description) => {
     // ResizeObserver's callback always runs after layout has settled, unlike a
     // synchronous check on script load, which can measure before final layout.
-    new ResizeObserver(() => updateClamping(description)).observe(description);
+    new ResizeObserver(() => updateButtonVisibility(description)).observe(description);
   });
 
   document.querySelectorAll<HTMLButtonElement>('.project-expand').forEach((button) => {
@@ -107,7 +95,6 @@ import Layout from '../layouts/Layout.astro';
       if (!description) return;
 
       const expanded = description.classList.toggle('is-expanded');
-      description.classList.toggle('is-clamped', !expanded);
       button.textContent = expanded ? 'Show less' : 'Show more';
       button.setAttribute('aria-expanded', String(expanded));
     });
@@ -217,9 +204,6 @@ import Layout from '../layouts/Layout.astro';
     color: var(--color-text-dim);
     font-size: 0.9rem;
     line-height: 1.5;
-  }
-
-  .project-description.is-clamped {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -227,12 +211,12 @@ import Layout from '../layouts/Layout.astro';
     -webkit-box-orient: vertical;
   }
 
-  .project-expand[hidden] {
-    display: none;
+  .project-description.is-expanded {
+    display: block;
+    -webkit-line-clamp: unset;
   }
 
   .project-expand {
-    display: inline-block;
     margin-top: 0.4rem;
     padding: 0;
     border: none;

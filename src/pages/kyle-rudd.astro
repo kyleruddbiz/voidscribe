@@ -86,34 +86,174 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  const getControlledButton = (description: HTMLElement) =>
-    document.querySelector<HTMLButtonElement>(`.project-expand[aria-controls="${description.id}"]`);
-
-  const updateButtonVisibility = (description: HTMLElement) => {
-    const button = getControlledButton(description);
-    if (!button || description.classList.contains('is-expanded')) {
-      return;
-    }
-
-    button.hidden = description.scrollHeight <= description.clientHeight + 1;
+  type ExpandableState = {
+    description: HTMLParagraphElement;
+    textNode: Text;
+    tail: HTMLSpanElement;
+    inlineToggle: HTMLSpanElement;
+    blockButton: HTMLButtonElement | null;
+    full: string;
+    lastWidth: number;
+    measuring: boolean;
   };
 
-  document.querySelectorAll<HTMLElement>('.project-description').forEach((description) => {
+  const fits = (description: HTMLParagraphElement, maxHeight: number) =>
+    description.scrollHeight <= maxHeight + 1;
+
+  // Trims `state.full` down to the longest prefix that, together with the
+  // "... Show more" tail, still fits in three lines. Returns whether the
+  // description ended up truncated. Always measures with the description in
+  // block layout (`is-trimmed`) rather than a `-webkit-line-clamp` box, since
+  // that legacy box model can misreport scrollHeight/clientHeight.
+  const trim = (state: ExpandableState): boolean => {
+    const { description, textNode, tail, full } = state;
+    const maxHeight = parseFloat(getComputedStyle(description).lineHeight) * 3;
+
+    // Does the whole thing fit with no tail at all? A description that
+    // already fits keeps its current behavior exactly: full text, no "...",
+    // no "Show more".
+    tail.hidden = true;
+    textNode.textContent = full;
+    if (fits(description, maxHeight)) {
+      return false;
+    }
+
+    // Binary-search the longest character prefix that fits alongside the
+    // tail, so "... Show more" always lands flush at the end of line three.
+    tail.hidden = false;
+    let lo = 0;
+    let hi = full.length;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      textNode.textContent = full.slice(0, mid);
+      if (fits(description, maxHeight)) {
+        lo = mid;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    textNode.textContent = full.slice(0, lo).replace(/\s+$/, '');
+    return true;
+  };
+
+  const collapse = (state: ExpandableState) => {
+    const { description, blockButton, inlineToggle } = state;
+    description.classList.remove('is-expanded');
+    if (blockButton) {
+      blockButton.hidden = true;
+      blockButton.setAttribute('aria-expanded', 'false');
+    }
+    inlineToggle.setAttribute('aria-expanded', 'false');
+    trim(state);
+  };
+
+  const expand = (state: ExpandableState) => {
+    const { description, textNode, tail, blockButton, inlineToggle, full } = state;
+    textNode.textContent = full;
+    tail.hidden = true;
+    description.classList.add('is-expanded');
+    inlineToggle.setAttribute('aria-expanded', 'true');
+    if (blockButton) {
+      blockButton.hidden = false;
+      blockButton.textContent = 'Show less';
+      blockButton.setAttribute('aria-expanded', 'true');
+    }
+  };
+
+  // Trimming only ever changes the description's height, never its width, so
+  // gating re-measurement on width prevents an expand/collapse feedback loop:
+  // our own text mutations can't produce a resize that triggers another trim.
+  const updateOnResize = (state: ExpandableState, width: number) => {
+    if (state.measuring || width === state.lastWidth) {
+      return;
+    }
+    state.lastWidth = width;
+    if (state.description.classList.contains('is-expanded')) {
+      return;
+    }
+    state.measuring = true;
+    trim(state);
+    state.measuring = false;
+  };
+
+  document.querySelectorAll<HTMLParagraphElement>('.project-description').forEach((description) => {
+    // Astro's scoped styles work by stamping a data-astro-cid-* attribute onto
+    // every element the template renders and compiling selectors to match it.
+    // Elements created here at runtime don't get that attribute for free, so
+    // their scoped styles (the tail's nowrap, the inline toggle's color) would
+    // silently no-op unless we copy it over explicitly.
+    const scopeAttrs = description.getAttributeNames().filter((name) => name.startsWith('data-astro-cid'));
+    const bringIntoScope = (el: HTMLElement) => {
+      scopeAttrs.forEach((name) => el.setAttribute(name, ''));
+    };
+
+    const full = description.textContent!.trim();
+    description.textContent = '';
+    description.classList.add('is-trimmed');
+
+    const textNode = document.createTextNode(full);
+    description.appendChild(textNode);
+
+    const tail = document.createElement('span');
+    tail.className = 'project-description-tail';
+    tail.hidden = true;
+    bringIntoScope(tail);
+
+    const ellipsis = document.createElement('span');
+    ellipsis.className = 'project-description-ellipsis';
+    ellipsis.setAttribute('aria-hidden', 'true');
+    ellipsis.textContent = '...';
+    bringIntoScope(ellipsis);
+
+    const inlineToggle = document.createElement('span');
+    inlineToggle.className = 'project-expand-inline';
+    inlineToggle.setAttribute('role', 'button');
+    inlineToggle.tabIndex = 0;
+    inlineToggle.setAttribute('aria-expanded', 'false');
+    inlineToggle.setAttribute('aria-controls', description.id);
+    inlineToggle.textContent = 'Show more';
+    bringIntoScope(inlineToggle);
+
+    tail.append(ellipsis, inlineToggle);
+    description.appendChild(tail);
+
+    const blockButton = document.querySelector<HTMLButtonElement>(
+      `.project-expand[aria-controls="${description.id}"]`
+    );
+
+    const state: ExpandableState = {
+      description,
+      textNode,
+      tail,
+      inlineToggle,
+      blockButton,
+      full,
+      lastWidth: -1,
+      measuring: false,
+    };
+
+    const activate = (event: Event) => {
+      // The description sits inside the card's <a>; stop the click/keypress
+      // from reaching it so "Show more" expands instead of navigating.
+      event.preventDefault();
+      event.stopPropagation();
+      expand(state);
+    };
+    inlineToggle.addEventListener('click', activate);
+    inlineToggle.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        activate(event);
+      }
+    });
+
+    blockButton?.addEventListener('click', () => collapse(state));
+
     // ResizeObserver's callback always runs after layout has settled, unlike a
     // synchronous check on script load, which can measure before final layout.
-    new ResizeObserver(() => updateButtonVisibility(description)).observe(description);
-  });
-
-  document.querySelectorAll<HTMLButtonElement>('.project-expand').forEach((button) => {
-    button.addEventListener('click', () => {
-      const id = button.getAttribute('aria-controls');
-      const description = id ? document.getElementById(id) : null;
-      if (!description) return;
-
-      const expanded = description.classList.toggle('is-expanded');
-      button.textContent = expanded ? 'Show less' : 'Show more';
-      button.setAttribute('aria-expanded', String(expanded));
-    });
+    // It also fires once immediately on observe(), which covers the initial trim.
+    new ResizeObserver((entries) => updateOnResize(state, entries[0].contentRect.width)).observe(
+      description
+    );
   });
 </script>
 
@@ -221,15 +361,43 @@ import Layout from '../layouts/Layout.astro';
     font-size: 0.9rem;
     line-height: 1.5;
     overflow: hidden;
-    text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
   }
 
+  /* Applied once JS takes over. A description short enough to fit as-is
+     renders identically in this layout, so it's safe to apply unconditionally
+     rather than only to descriptions that end up truncated. */
+  .project-description.is-trimmed {
+    display: block;
+    -webkit-line-clamp: unset;
+    max-height: calc(1.5em * 3);
+    overflow: hidden;
+  }
+
   .project-description.is-expanded {
     display: block;
     -webkit-line-clamp: unset;
+    max-height: none;
+  }
+
+  /* Keeps "... Show more" together at the end of the last line: it can
+     never wrap onto a line of its own, and the trim routine only accepts a
+     cut point where the whole tail still fits alongside the visible text. */
+  .project-description-tail {
+    white-space: nowrap;
+  }
+
+  .project-expand-inline {
+    margin-left: 0.3em;
+    color: var(--color-accent-bright);
+    cursor: pointer;
+  }
+
+  .project-expand-inline:hover,
+  .project-expand-inline:focus-visible {
+    text-decoration: underline;
   }
 
   .project-expand {

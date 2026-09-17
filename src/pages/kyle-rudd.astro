@@ -1,9 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import PortfolioItem from '../components/PortfolioItem.svelte';
 
-const itchAccessValue = decodeURIComponent(import.meta.env.ITCH_ACCESS_CODE ?? '');
-const itchAccessCodes = [...itchAccessValue].map((char) => char.charCodeAt(0));
 const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
+const itchQueryKey = String.fromCharCode(...itchQueryKeyCodes);
+const itchAccessCode = decodeURIComponent(import.meta.env.ITCH_ACCESS_CODE ?? '');
+const mtgSimulatorHref = itchAccessCode
+  ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
+  : 'https://voidscribestudios.itch.io/mtg-simulator';
 ---
 
 <Layout title="Kyle Rudd — Void Scribe Studios" description="Kyle Rudd, founder of Void Scribe Studios.">
@@ -17,275 +21,39 @@ const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
 
     <section class="portfolio">
       <h2>Portfolio</h2>
-      <div class="project project--expandable">
-        <a
-          class="project-link"
+      <div class="portfolio-list">
+        <PortfolioItem
+          client:load
           href="https://www.linkedin.com/in/kyle-n-rudd/"
-          target="_blank"
-          rel="noopener noreferrer"
+          callToAction="View profile"
+          icon="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+          description="Business, business, business."
         >
-          <div class="project-content">
-            <span class="project-main">
-              <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              <span class="project-title">LinkedIn</span>
-            </span>
-            <p class="project-description" id="project-description-linkedin">
-              Business, business, business.
-            </p>
-          </div>
-          <span class="project-meta">View profile &rarr;</span>
-        </a>
-        <button
-          type="button"
-          class="project-expand"
-          aria-expanded="false"
-          aria-controls="project-description-linkedin"
-          hidden
-        >
-          Show more
-        </button>
-      </div>
-      <div class="project project--expandable">
-        <a
-          id="mtg-simulator-link"
-          class="project-link"
-          href="https://voidscribestudios.itch.io/mtg-simulator"
-          target="_blank"
+          <Fragment slot="title">LinkedIn</Fragment>
+        </PortfolioItem>
+        <PortfolioItem
+          client:load
+          href={mtgSimulatorHref}
           rel="noopener noreferrer nofollow"
+          callToAction="Play on itch.io"
+          icon="M3.13 1.338C2.08 1.96.02 4.328 0 4.95v1.03c0 1.303 1.22 2.45 2.325 2.45 1.33 0 2.436-1.102 2.436-2.41 0 1.308 1.07 2.41 2.4 2.41 1.328 0 2.362-1.102 2.362-2.41 0 1.308 1.137 2.41 2.466 2.41h.024c1.33 0 2.466-1.102 2.466-2.41 0 1.308 1.034 2.41 2.363 2.41 1.33 0 2.4-1.102 2.4-2.41 0 1.308 1.106 2.41 2.435 2.41C22.78 8.43 24 7.282 24 5.98V4.95c-.02-.62-2.082-2.99-3.13-3.612-3.253-.114-5.508-.134-8.87-.133-3.362 0-7.945.053-8.87.133zm6.376 6.477a2.74 2.74 0 0 1-.468.602c-.5.49-1.19.795-1.947.795a2.786 2.786 0 0 1-1.95-.795c-.182-.178-.32-.37-.446-.59-.127.222-.303.412-.486.59a2.788 2.788 0 0 1-1.95.795c-.092 0-.187-.025-.264-.052-.107 1.113-.152 2.176-.168 2.95v.005l-.006 1.167c.02 2.334-.23 7.564 1.03 8.85 1.952.454 5.545.662 9.15.663 3.605 0 7.198-.21 9.15-.664 1.26-1.284 1.01-6.514 1.03-8.848l-.006-1.167v-.004c-.016-.775-.06-1.838-.168-2.95-.077.026-.172.052-.263.052a2.788 2.788 0 0 1-1.95-.795c-.184-.178-.36-.368-.486-.59-.127.22-.265.412-.447.59a2.786 2.786 0 0 1-1.95.794c-.76 0-1.446-.303-1.948-.793a2.74 2.74 0 0 1-.468-.602 2.738 2.738 0 0 1-.463.602 2.787 2.787 0 0 1-1.95.794h-.16a2.787 2.787 0 0 1-1.95-.793 2.738 2.738 0 0 1-.464-.602zm-2.004 2.59v.002c.795.002 1.5 0 2.373.953.687-.072 1.406-.108 2.125-.107.72 0 1.438.035 2.125.107.873-.953 1.578-.95 2.372-.953.376 0 1.876 0 2.92 2.934l1.123 4.028c.832 2.995-.266 3.068-1.636 3.07-2.03-.075-3.156-1.55-3.156-3.025-1.124.184-2.436.276-3.748.277-1.312 0-2.624-.093-3.748-.277 0 1.475-1.125 2.95-3.156 3.026-1.37-.004-2.468-.077-1.636-3.072l1.122-4.027c1.045-2.934 2.545-2.934 2.92-2.934zM12 12.714c-.002.002-2.14 1.964-2.523 2.662l1.4-.056v1.22c0 .056.56.033 1.123.007.562.026 1.124.05 1.124-.008v-1.22l1.4.055C14.138 14.677 12 12.713 12 12.713z"
+          description="A learning project to practice Unity 3D, online multiplayer, and game architecture."
         >
-          <div class="project-content">
-            <span class="project-main">
-              <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.13 1.338C2.08 1.96.02 4.328 0 4.95v1.03c0 1.303 1.22 2.45 2.325 2.45 1.33 0 2.436-1.102 2.436-2.41 0 1.308 1.07 2.41 2.4 2.41 1.328 0 2.362-1.102 2.362-2.41 0 1.308 1.137 2.41 2.466 2.41h.024c1.33 0 2.466-1.102 2.466-2.41 0 1.308 1.034 2.41 2.363 2.41 1.33 0 2.4-1.102 2.4-2.41 0 1.308 1.106 2.41 2.435 2.41C22.78 8.43 24 7.282 24 5.98V4.95c-.02-.62-2.082-2.99-3.13-3.612-3.253-.114-5.508-.134-8.87-.133-3.362 0-7.945.053-8.87.133zm6.376 6.477a2.74 2.74 0 0 1-.468.602c-.5.49-1.19.795-1.947.795a2.786 2.786 0 0 1-1.95-.795c-.182-.178-.32-.37-.446-.59-.127.222-.303.412-.486.59a2.788 2.788 0 0 1-1.95.795c-.092 0-.187-.025-.264-.052-.107 1.113-.152 2.176-.168 2.95v.005l-.006 1.167c.02 2.334-.23 7.564 1.03 8.85 1.952.454 5.545.662 9.15.663 3.605 0 7.198-.21 9.15-.664 1.26-1.284 1.01-6.514 1.03-8.848l-.006-1.167v-.004c-.016-.775-.06-1.838-.168-2.95-.077.026-.172.052-.263.052a2.788 2.788 0 0 1-1.95-.795c-.184-.178-.36-.368-.486-.59-.127.22-.265.412-.447.59a2.786 2.786 0 0 1-1.95.794c-.76 0-1.446-.303-1.948-.793a2.74 2.74 0 0 1-.468-.602 2.738 2.738 0 0 1-.463.602 2.787 2.787 0 0 1-1.95.794h-.16a2.787 2.787 0 0 1-1.95-.793 2.738 2.738 0 0 1-.464-.602zm-2.004 2.59v.002c.795.002 1.5 0 2.373.953.687-.072 1.406-.108 2.125-.107.72 0 1.438.035 2.125.107.873-.953 1.578-.95 2.372-.953.376 0 1.876 0 2.92 2.934l1.123 4.028c.832 2.995-.266 3.068-1.636 3.07-2.03-.075-3.156-1.55-3.156-3.025-1.124.184-2.436.276-3.748.277-1.312 0-2.624-.093-3.748-.277 0 1.475-1.125 2.95-3.156 3.026-1.37-.004-2.468-.077-1.636-3.072l1.122-4.027c1.045-2.934 2.545-2.934 2.92-2.934zM12 12.714c-.002.002-2.14 1.964-2.523 2.662l1.4-.056v1.22c0 .056.56.033 1.123.007.562.026 1.124.05 1.124-.008v-1.22l1.4.055C14.138 14.677 12 12.713 12 12.713z"/></svg>
-              <span class="project-title"><i>Magic: The Gathering</i> Simulator</span>
-            </span>
-            <p class="project-description" id="project-description-mtg-simulator">
-              A learning project to practice Unity 3D, online multiplayer, and game architecture.
-            </p>
-          </div>
-          <span class="project-meta">Play on itch.io &rarr;</span>
-        </a>
-        <button
-          type="button"
-          class="project-expand"
-          aria-expanded="false"
-          aria-controls="project-description-mtg-simulator"
-          hidden
-        >
-          Show more
-        </button>
-      </div>
-      <div class="project project--expandable">
-        <a
-          class="project-link"
+          <Fragment slot="title"><i>Magic: The Gathering</i> Simulator</Fragment>
+        </PortfolioItem>
+        <PortfolioItem
+          client:load
           href="https://www.youtube.com/watch?v=tcXh7IcB0-I"
-          target="_blank"
-          rel="noopener noreferrer"
+          callToAction="Watch on YouTube"
+          icon="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+          description="A psychedelic satire of the modern advertising hellscape, expressed through a genre-bending collage of image and sound. That... plus Pink Floyd vibes."
         >
-          <div class="project-content">
-            <span class="project-main">
-              <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              <span class="project-title">Family Trip Mix 2 (Sellout Edition)</span>
-            </span>
-            <p class="project-description" id="project-description-family-trip-mix-2">
-              A psychedelic satire of the modern advertising hellscape, expressed through a genre-bending collage of image and sound. That... plus Pink Floyd vibes.
-            </p>
-          </div>
-          <span class="project-meta">Watch on YouTube &rarr;</span>
-        </a>
-        <button
-          type="button"
-          class="project-expand"
-          aria-expanded="false"
-          aria-controls="project-description-family-trip-mix-2"
-          hidden
-        >
-          Show more
-        </button>
+          <Fragment slot="title">Family Trip Mix 2 (Sellout Edition)</Fragment>
+        </PortfolioItem>
       </div>
     </section>
   </section>
 </Layout>
-
-<script is:inline define:vars={{ itchAccessCodes, itchQueryKeyCodes }}>
-  const mtgLink = document.getElementById('mtg-simulator-link');
-  if (mtgLink && itchAccessCodes.length) {
-    const key = String.fromCharCode(...itchQueryKeyCodes);
-    const value = String.fromCharCode(...itchAccessCodes);
-    mtgLink.href = `${mtgLink.href}?${key}=${encodeURIComponent(value)}`;
-  }
-</script>
-
-<script>
-  type ExpandableState = {
-    description: HTMLParagraphElement;
-    textNode: Text;
-    tail: HTMLSpanElement;
-    inlineToggle: HTMLSpanElement;
-    blockButton: HTMLButtonElement | null;
-    full: string;
-    lastWidth: number;
-    measuring: boolean;
-  };
-
-  const fits = (description: HTMLParagraphElement, maxHeight: number) =>
-    description.scrollHeight <= maxHeight + 1;
-
-  // Trims `state.full` down to the longest prefix that, together with the
-  // "... Show more" tail, still fits in three lines. Returns whether the
-  // description ended up truncated. Always measures with the description in
-  // block layout (`is-trimmed`) rather than a `-webkit-line-clamp` box, since
-  // that legacy box model can misreport scrollHeight/clientHeight.
-  const trim = (state: ExpandableState): boolean => {
-    const { description, textNode, tail, full } = state;
-    const maxHeight = parseFloat(getComputedStyle(description).lineHeight) * 3;
-
-    // Does the whole thing fit with no tail at all? A description that
-    // already fits keeps its current behavior exactly: full text, no "...",
-    // no "Show more".
-    tail.hidden = true;
-    textNode.textContent = full;
-    if (fits(description, maxHeight)) {
-      return false;
-    }
-
-    // Binary-search the longest character prefix that fits alongside the
-    // tail, so "... Show more" always lands flush at the end of line three.
-    tail.hidden = false;
-    let lo = 0;
-    let hi = full.length;
-    while (lo < hi) {
-      const mid = Math.ceil((lo + hi) / 2);
-      textNode.textContent = full.slice(0, mid);
-      if (fits(description, maxHeight)) {
-        lo = mid;
-      } else {
-        hi = mid - 1;
-      }
-    }
-    textNode.textContent = full.slice(0, lo).replace(/\s+$/, '');
-    return true;
-  };
-
-  const collapse = (state: ExpandableState) => {
-    const { description, blockButton, inlineToggle } = state;
-    description.classList.remove('is-expanded');
-    if (blockButton) {
-      blockButton.hidden = true;
-      blockButton.setAttribute('aria-expanded', 'false');
-    }
-    inlineToggle.setAttribute('aria-expanded', 'false');
-    trim(state);
-  };
-
-  const expand = (state: ExpandableState) => {
-    const { description, textNode, tail, blockButton, inlineToggle, full } = state;
-    textNode.textContent = full;
-    tail.hidden = true;
-    description.classList.add('is-expanded');
-    inlineToggle.setAttribute('aria-expanded', 'true');
-    if (blockButton) {
-      blockButton.hidden = false;
-      blockButton.textContent = 'Show less';
-      blockButton.setAttribute('aria-expanded', 'true');
-    }
-  };
-
-  // Trimming only ever changes the description's height, never its width, so
-  // gating re-measurement on width prevents an expand/collapse feedback loop:
-  // our own text mutations can't produce a resize that triggers another trim.
-  const updateOnResize = (state: ExpandableState, width: number) => {
-    if (state.measuring || width === state.lastWidth) {
-      return;
-    }
-    state.lastWidth = width;
-    if (state.description.classList.contains('is-expanded')) {
-      return;
-    }
-    state.measuring = true;
-    trim(state);
-    state.measuring = false;
-  };
-
-  document.querySelectorAll<HTMLParagraphElement>('.project-description').forEach((description) => {
-    // Astro's scoped styles work by stamping a data-astro-cid-* attribute onto
-    // every element the template renders and compiling selectors to match it.
-    // Elements created here at runtime don't get that attribute for free, so
-    // their scoped styles (the tail's nowrap, the inline toggle's color) would
-    // silently no-op unless we copy it over explicitly.
-    const scopeAttrs = description.getAttributeNames().filter((name) => name.startsWith('data-astro-cid'));
-    const bringIntoScope = (el: HTMLElement) => {
-      scopeAttrs.forEach((name) => el.setAttribute(name, ''));
-    };
-
-    const full = description.textContent!.trim();
-    description.textContent = '';
-    description.classList.add('is-trimmed');
-
-    const textNode = document.createTextNode(full);
-    description.appendChild(textNode);
-
-    const tail = document.createElement('span');
-    tail.className = 'project-description-tail';
-    tail.hidden = true;
-    bringIntoScope(tail);
-
-    const ellipsis = document.createElement('span');
-    ellipsis.className = 'project-description-ellipsis';
-    ellipsis.setAttribute('aria-hidden', 'true');
-    ellipsis.textContent = '...';
-    bringIntoScope(ellipsis);
-
-    const inlineToggle = document.createElement('span');
-    inlineToggle.className = 'project-expand-inline';
-    inlineToggle.setAttribute('role', 'button');
-    inlineToggle.tabIndex = 0;
-    inlineToggle.setAttribute('aria-expanded', 'false');
-    inlineToggle.setAttribute('aria-controls', description.id);
-    inlineToggle.textContent = 'Show more';
-    bringIntoScope(inlineToggle);
-
-    tail.append(ellipsis, inlineToggle);
-    description.appendChild(tail);
-
-    const blockButton = document.querySelector<HTMLButtonElement>(
-      `.project-expand[aria-controls="${description.id}"]`
-    );
-
-    const state: ExpandableState = {
-      description,
-      textNode,
-      tail,
-      inlineToggle,
-      blockButton,
-      full,
-      lastWidth: -1,
-      measuring: false,
-    };
-
-    const activate = (event: Event) => {
-      // The description sits inside the card's <a>; stop the click/keypress
-      // from reaching it so "Show more" expands instead of navigating.
-      event.preventDefault();
-      event.stopPropagation();
-      expand(state);
-    };
-    inlineToggle.addEventListener('click', activate);
-    inlineToggle.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        activate(event);
-      }
-    });
-
-    blockButton?.addEventListener('click', () => collapse(state));
-
-    // ResizeObserver's callback always runs after layout has settled, unlike a
-    // synchronous check on script load, which can measure before final layout.
-    // It also fires once immediately on observe(), which covers the initial trim.
-    new ResizeObserver((entries) => updateOnResize(state, entries[0].contentRect.width)).observe(
-      description
-    );
-  });
-</script>
 
 <style>
   h1 {
@@ -311,190 +79,9 @@ const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
     margin: 0 0 1rem;
   }
 
-  .project {
+  .portfolio-list {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    background: var(--color-bg-raised);
-    text-decoration: none;
-  }
-
-  .project-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    text-decoration: none;
-  }
-
-  .project-content {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding-right: 1.5rem;
-  }
-
-  .project--expandable {
-    display: block;
-  }
-
-  .project + .project {
-    margin-top: 0.75rem;
-  }
-
-  .project:hover,
-  .project:focus-visible,
-  .project--expandable:hover,
-  .project--expandable:focus-within {
-    border-color: var(--color-accent);
-  }
-
-  .project-main {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-  }
-
-  .project-icon {
-    width: 1.15rem;
-    height: 1.15rem;
-    flex-shrink: 0;
-    fill: var(--color-text-dim);
-  }
-
-  .project:hover .project-icon,
-  .project:focus-visible .project-icon,
-  .project--expandable:hover .project-icon,
-  .project--expandable:focus-within .project-icon {
-    fill: var(--color-accent);
-  }
-
-  .project-title {
-    font-family: var(--font-display);
-    color: var(--color-text);
-    font-size: 1.05rem;
-  }
-
-  .project-meta {
-    color: var(--color-accent-bright);
-    font-size: 0.9rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .project-description {
-    margin: 0.4rem 0 0;
-    color: var(--color-text-dim);
-    font-size: 0.9rem;
-    line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-
-  /* Applied once JS takes over. A description short enough to fit as-is
-     renders identically in this layout, so it's safe to apply unconditionally
-     rather than only to descriptions that end up truncated. */
-  .project-description.is-trimmed {
-    display: block;
-    -webkit-line-clamp: unset;
-    max-height: calc(1.5em * 3);
-    overflow: hidden;
-  }
-
-  .project-description.is-expanded {
-    display: block;
-    -webkit-line-clamp: unset;
-    max-height: none;
-  }
-
-  /* Keeps "... Show more" together at the end of the last line: it can
-     never wrap onto a line of its own, and the trim routine only accepts a
-     cut point where the whole tail still fits alongside the visible text. */
-  .project-description-tail {
-    white-space: nowrap;
-  }
-
-  .project-expand-inline {
-    margin-left: 0.3em;
-    color: var(--color-accent-bright);
-    cursor: pointer;
-  }
-
-  .project-expand-inline:hover,
-  .project-expand-inline:focus-visible {
-    text-decoration: underline;
-  }
-
-  .project-expand {
-    margin-top: 0.4rem;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--color-accent-bright);
-    font-family: inherit;
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
-
-  .project-expand:hover,
-  .project-expand:focus-visible {
-    text-decoration: underline;
-  }
-
-  @media (max-width: 480px) {
-    .project,
-    .project-link {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .project-content {
-      padding-right: 0;
-    }
-
-    .project-main {
-      justify-content: center;
-    }
-
-    .project-description {
-      text-align: center;
-    }
-
-    .project-meta {
-      margin-top: 0.75rem;
-      text-align: center;
-      white-space: normal;
-    }
-
-    /* Flattens the anchor so its content/meta reorder alongside the
-       show-more button, which lives outside the anchor in the markup. */
-    .project--expandable {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      justify-content: flex-start;
-    }
-
-    .project-link {
-      display: contents;
-    }
-
-    .project-content {
-      order: 1;
-    }
-
-    .project-expand {
-      order: 2;
-      align-self: center;
-    }
-
-    .project-meta {
-      order: 3;
-    }
+    flex-direction: column;
+    gap: 0.75rem;
   }
 </style>

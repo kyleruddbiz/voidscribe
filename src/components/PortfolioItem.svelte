@@ -24,6 +24,7 @@
 
   let mounted = $state(false);
   let expanded = $state(false);
+  let truncated = $state(false);
   let lastWidth = -1;
   let measuring = false;
 
@@ -32,7 +33,9 @@
   // Trims `full` down to the longest prefix that, together with the
   // "... Show more" tail, still fits within --description-lines lines.
   // Always measures with the tail in place so "... Show more" lands flush
-  // at the end of the last line.
+  // at the end of the last line. Runs even while expanded so `truncated`
+  // stays current, which lets "Show less" disappear once a resize makes
+  // the full text fit without it, and reappear if it later doesn't.
   const trim = () => {
     if (!descriptionElement || !textElement || !tailElement) return;
     const styles = getComputedStyle(descriptionElement);
@@ -41,7 +44,8 @@
 
     tailElement.hidden = true;
     textElement.textContent = full;
-    if (fits(maxHeight)) return;
+    truncated = !fits(maxHeight);
+    if (expanded || !truncated) return;
 
     tailElement.hidden = false;
     let low = 0;
@@ -90,7 +94,6 @@
   const onResize = (width: number) => {
     if (measuring || width === lastWidth) return;
     lastWidth = width;
-    if (expanded) return;
     measuring = true;
     trim();
     measuring = false;
@@ -146,7 +149,7 @@
       class="project-expand"
       aria-expanded={expanded}
       aria-controls={descriptionId}
-      hidden={!expanded}
+      hidden={!expanded || !truncated}
       onclick={collapse}
     >
       Show less

@@ -8,16 +8,25 @@
     "start": "astro dev",
     "build": "astro check && svelte-check --tsconfig ./tsconfig.json && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "@astrojs/svelte": "^9.0.1",
-    "astro": "^7.3.1",
+    "astro": "^7.3.3",
     "svelte": "^5.57.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "prettier": "^3.9.8",
+    "prettier-plugin-astro": "^1.0.1",
+    "prettier-plugin-svelte": "^4.1.1",
     "svelte-check": "^4.7.6",
     "typescript": "^6.0.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }

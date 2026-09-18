@@ -1,53 +1,64 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PortfolioItem from '../components/PortfolioItem.svelte';
-import { itchIoIconPath, linkedinIconPath, youtubeIconPath } from '../lib/icon-paths';
+import {
+  itchIoIconPath,
+  linkedinIconPath,
+  youtubeIconPath,
+} from '../lib/icon-paths';
+import { ITCH_ACCESS_CODE } from 'astro:env/server';
 
 const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
 const itchQueryKey = String.fromCharCode(...itchQueryKeyCodes);
-const itchAccessCode = decodeURIComponent(import.meta.env.ITCH_ACCESS_CODE ?? '');
+const itchAccessCode = decodeURIComponent(ITCH_ACCESS_CODE ?? '');
 const mtgSimulatorHref = itchAccessCode
   ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
   : 'https://voidscribestudios.itch.io/mtg-simulator';
 ---
 
-<Layout title="Kyle Rudd — Void Scribe Studios" description="Kyle Rudd, founder of Void Scribe Studios.">
+<Layout
+  title="Kyle Rudd — Void Scribe Studios"
+  description="Kyle Rudd, founder of Void Scribe Studios."
+>
   <section class="profile">
     <h1>Kyle Rudd</h1>
     <p class="role">Founder, Void Scribe Studios</p>
 
-    <p class="bio">
-      Bio coming soon.
-    </p>
+    <p class="bio">Bio coming soon.</p>
 
     <section class="portfolio">
       <h2>Portfolio</h2>
       <div class="portfolio-list">
         <PortfolioItem
-          client:load
+          client:visible
           href="https://www.linkedin.com/in/kyle-n-rudd/"
           callToAction="View profile"
           icon={linkedinIconPath}
           description="Business, business, business."
+          titleLabel="LinkedIn"
         >
           <Fragment slot="title">LinkedIn</Fragment>
         </PortfolioItem>
         <PortfolioItem
-          client:load
+          client:visible
           href={mtgSimulatorHref}
           rel="noopener noreferrer nofollow"
           callToAction="Play on itch.io"
           icon={itchIoIconPath}
           description="A learning project to practice Unity 3D, online multiplayer, and game architecture."
+          titleLabel="Magic: The Gathering Simulator"
         >
-          <Fragment slot="title"><i>Magic: The Gathering</i> Simulator</Fragment>
+          <Fragment slot="title">
+            <i>Magic: The Gathering</i> Simulator
+          </Fragment>
         </PortfolioItem>
         <PortfolioItem
-          client:load
+          client:visible
           href="https://www.youtube.com/watch?v=tcXh7IcB0-I"
           callToAction="Watch on YouTube"
           icon={youtubeIconPath}
           description="A psychedelic satire of the modern advertising hellscape, expressed through a genre-bending collage of image and sound. That... plus Pink Floyd vibes."
+          titleLabel="Family Trip Mix 2"
         >
           <Fragment slot="title">Family Trip Mix 2 (Sellout Edition)</Fragment>
         </PortfolioItem>

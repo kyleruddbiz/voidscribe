@@ -9,14 +9,29 @@
     icon: string;
     description?: string;
     title: Snippet;
+    titleLabel?: string;
   }
 
-  let { href, rel = 'noopener noreferrer', callToAction, icon, description, title }: Props = $props();
+  let {
+    href,
+    rel = 'noopener noreferrer',
+    callToAction,
+    icon,
+    description,
+    title,
+    titleLabel,
+  }: Props = $props();
 
   const instanceId = $props.id();
   const descriptionId = `project-description-${instanceId}`;
   const full = (description ?? '').trim();
   const hasDescription = full.length > 0;
+  const showMoreLabel = $derived(
+    titleLabel ? `Show more about ${titleLabel}` : 'Show more',
+  );
+  const showLessLabel = $derived(
+    titleLabel ? `Show less about ${titleLabel}` : 'Show less',
+  );
 
   let descriptionElement: HTMLParagraphElement | undefined;
   let textElement: HTMLSpanElement | undefined;
@@ -28,7 +43,8 @@
   let lastWidth = -1;
   let measuring = false;
 
-  const fits = (maxHeight: number) => descriptionElement!.scrollHeight <= maxHeight + 1;
+  const fits = (maxHeight: number) =>
+    descriptionElement!.scrollHeight <= maxHeight + 1;
 
   // Trims `full` down to the longest prefix that, together with the
   // "... Show more" tail, still fits within --description-lines lines.
@@ -73,20 +89,6 @@
     if (tailElement) tailElement.hidden = true;
   };
 
-  const activateInline = (event: Event) => {
-    // The toggle sits inside the card's <a>; stop the click/keypress from
-    // reaching it so "Show more" expands instead of navigating.
-    event.preventDefault();
-    event.stopPropagation();
-    expand();
-  };
-
-  const onInlineKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      activateInline(event);
-    }
-  };
-
   // Trimming only ever changes the description's height, never its width,
   // so gating re-measurement on width prevents an expand/collapse feedback
   // loop: our own text mutations can't produce a resize that triggers
@@ -102,19 +104,25 @@
   onMount(() => {
     if (!hasDescription || !descriptionElement) return;
     mounted = true;
-    const observer = new ResizeObserver((entries) => onResize(entries[0].contentRect.width));
+    const observer = new ResizeObserver((entries) =>
+      onResize(entries[0].contentRect.width),
+    );
     observer.observe(descriptionElement);
     return () => observer.disconnect();
   });
 </script>
 
-<div class="project" class:project--expandable={hasDescription}>
-  <a class="project-link" {href} target="_blank" {rel}>
+<div class="project">
+  <div class="project-row">
     <div class="project-content">
-      <span class="project-main">
-        <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={icon} /></svg>
-        <span class="project-title">{@render title()}</span>
-      </span>
+      <a class="project-link" {href} target="_blank" {rel}>
+        <span class="project-main">
+          <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"
+            ><path d={icon} /></svg
+          >
+          <span class="project-title">{@render title()}</span>
+        </span>
+      </a>
       {#if hasDescription}
         <p
           class="project-description"
@@ -123,32 +131,40 @@
           id={descriptionId}
           bind:this={descriptionElement}
         >
-          <span bind:this={textElement}>{full}</span>
+          {#if mounted && truncated && !expanded}
+            <span class="sr-only">{full}</span>
+          {/if}
+          <span
+            aria-hidden={mounted && truncated && !expanded}
+            bind:this={textElement}>{full}</span
+          >
           <span class="project-description-tail" bind:this={tailElement} hidden>
-            <span class="project-description-ellipsis" aria-hidden="true">...</span>
-            <span
+            <span class="project-description-ellipsis" aria-hidden="true"
+              >...</span
+            >
+            <button
+              type="button"
               class="project-expand-inline"
-              role="button"
-              tabindex="0"
               aria-expanded={expanded}
               aria-controls={descriptionId}
-              onclick={activateInline}
-              onkeydown={onInlineKeydown}
+              aria-label={showMoreLabel}
+              onclick={expand}
             >
               Show more
-            </span>
+            </button>
           </span>
         </p>
       {/if}
     </div>
     <span class="project-meta">{callToAction} &rarr;</span>
-  </a>
+  </div>
   {#if hasDescription}
     <button
       type="button"
       class="project-expand"
       aria-expanded={expanded}
       aria-controls={descriptionId}
+      aria-label={showLessLabel}
       hidden={!expanded || !truncated}
       onclick={collapse}
     >
@@ -159,23 +175,23 @@
 
 <style>
   .project {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
+    position: relative;
     padding: 1rem 1.25rem;
     border: 1px solid var(--color-border);
     border-radius: 4px;
     background: var(--color-bg-raised);
-    text-decoration: none;
   }
 
-  .project-link {
+  .project:hover,
+  .project:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  .project-row {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
-    text-decoration: none;
   }
 
   .project-content {
@@ -184,13 +200,18 @@
     padding-right: 1.5rem;
   }
 
-  .project--expandable {
-    display: block;
+  .project-link {
+    text-decoration: none;
   }
 
-  .project:hover,
-  .project:focus-within {
-    border-color: var(--color-accent);
+  /* Stretches the click target to the whole card while keeping the anchor
+     itself scoped to the icon/title, so it never contains another
+     interactive element (the "Show more"/"Show less" buttons live outside
+     it as ordinary siblings). */
+  .project-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
   }
 
   .project-main {
@@ -254,6 +275,16 @@
     max-height: none;
   }
 
+  /* No JS means .is-trimmed never applies, so the -webkit-line-clamp above
+     clamps the text with no way to reveal the rest. Lift the clamp instead. */
+  @media (scripting: none) {
+    .project-description {
+      display: block;
+      -webkit-line-clamp: unset;
+      max-height: none;
+    }
+  }
+
   /* Keeps "... Show more" together at the end of the last line: it can
      never wrap onto a line of its own, and the trim routine only accepts a
      cut point where the whole tail still fits alongside the visible text. */
@@ -262,8 +293,15 @@
   }
 
   .project-expand-inline {
+    position: relative;
+    z-index: 1;
     margin-left: 0.3em;
+    padding: 0;
+    border: none;
+    background: none;
     color: var(--color-accent-bright);
+    font-family: inherit;
+    font-size: inherit;
     cursor: pointer;
   }
 
@@ -273,6 +311,8 @@
   }
 
   .project-expand {
+    position: relative;
+    z-index: 1;
     margin-top: 0.4rem;
     padding: 0;
     border: none;
@@ -289,8 +329,8 @@
   }
 
   @media (max-width: 480px) {
-    .project,
-    .project-link {
+    .project {
+      display: flex;
       flex-direction: column;
       align-items: stretch;
     }
@@ -312,19 +352,7 @@
       margin-top: 0.75rem;
       text-align: center;
       white-space: normal;
-    }
-
-    /* Flattens the anchor so its content/meta reorder alongside the
-       show-more button, which lives outside the anchor in the markup. */
-    .project--expandable {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      justify-content: flex-start;
-    }
-
-    .project-link {
-      display: contents;
+      order: 3;
     }
 
     .project-expand {
@@ -332,8 +360,12 @@
       align-self: center;
     }
 
-    .project-meta {
-      order: 3;
+    /* Dissolves this plain wrapper div so .project-content and
+       .project-meta become direct flex children of .project and can be
+       reordered around .project-expand. Safe here because the div carries
+       no semantics to lose — unlike the anchor, which must stay intact. */
+    .project-row {
+      display: contents;
     }
   }
 </style>

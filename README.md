@@ -18,6 +18,14 @@ Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded — e.g. `
 - `npm run dev` / `npm run start` — start the dev server.
 - `npm run build` — type-check (`astro check`) and build for production.
 - `npm run preview` — serve the production build locally.
+- `npm run format` — format the repo with Prettier.
+- `npm run format:check` — check formatting without writing changes.
+
+## Dependencies
+
+TypeScript is pinned to `^6.0.3` rather than the latest major. Both type-checkers used by
+`npm run build` — `@astrojs/check` and `svelte-check` — cap their `typescript` peer dependency at
+`^5.0.0 || ^6.0.0`, so upgrading to TypeScript 7 breaks the build until they add support for it.
 
 ## Testing changes
 

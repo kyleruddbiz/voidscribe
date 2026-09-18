@@ -6,6 +6,11 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 Trunk-based development. Commit directly to `main` unless told otherwise.
 
+## Before calling a change done
+
+1. `npm run format` — auto-format the diff (sub-second; safe to run every time).
+2. `npm run build` — type-check and build.
+
 ## Testing changes
 
 Verify UI/content changes in the browser (`claude-in-chrome` tools) before calling them done:

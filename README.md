@@ -1,6 +1,6 @@
-# VoidScribe Studios
+# Void Scribe Studios
 
-Astro static site.
+Astro static site using Svelte for components.
 
 ## Getting started
 
@@ -11,7 +11,7 @@ npm run dev
 
 Dev server: `http://localhost:4321`.
 
-Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded — e.g. `encodeURIComponent(value)`) to fully render the MTG Simulator portfolio link. Without it, the link still builds but points to the unlocked base itch.io URL. Use the same encoded value for the `ITCH_ACCESS_CODE` build variable in Cloudflare Pages.
+Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded — e.g. `encodeURIComponent(value)`) to fully render the MTG Simulator portfolio link. Without it, the link still builds but points to the locked itch.io URL for the project. Use the same encoded value for the `ITCH_ACCESS_CODE` build variable in your hosting platform.
 
 ## Scripts
 

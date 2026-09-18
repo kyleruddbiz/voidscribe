@@ -6,7 +6,13 @@ interface Props {
   description?: string;
 }
 
-const { title, description = 'Void Scribe Studios — an independent game studio.' } = Astro.props;
+const {
+  title,
+  description = 'Void Scribe Studios — an independent game studio.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
 ---
 
 <!doctype html>
@@ -14,16 +20,41 @@ const { title, description = 'Void Scribe Studios — an independent game studio
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/images/voidscribe-vortex.svg" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/images/voidscribe-vortex.svg"
+    />
+    <meta name="theme-color" content="#0d0e12" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     <title>{title}</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Void Scribe Studios" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Void Scribe Studios" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
   </head>
   <body>
+    <a class="sr-only skip-link" href="#main">
+      Skip to content
+    </a>
+
     <header class="site-header">
       <a class="brand" href="/">
         <img
           src="/images/voidscribe-logo.svg"
-          alt="Void Scribe Studios"
+          alt="Void Scribe Studios — home"
           width="160"
           height="80"
         />
@@ -33,13 +64,14 @@ const { title, description = 'Void Scribe Studios — an independent game studio
       </nav>
     </header>
 
-    <main>
+    <main id="main">
       <slot />
     </main>
 
     <footer class="site-footer">
       <p>
-        Logo design by Garrett Christensen. &copy; {new Date().getFullYear()} Void Scribe Studios.
+        Logo design by Garrett Christensen. &copy; {new Date().getFullYear()}{' '}
+        Void Scribe Studios.
       </p>
     </footer>
   </body>
@@ -84,7 +116,23 @@ const { title, description = 'Void Scribe Studios — an independent game studio
 
   main {
     padding: 3rem var(--gutter) 5rem;
-    min-height: 60vh;
+    min-height: 60dvh;
+  }
+
+  /* .sr-only hides this until focused, then this override makes it a normal
+     visible, positioned element again. */
+  .skip-link:focus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.25rem;
+    clip-path: none;
+    white-space: normal;
+    background: var(--color-bg-raised);
+    color: var(--color-text);
   }
 
   .site-footer {

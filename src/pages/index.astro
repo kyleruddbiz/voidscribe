@@ -1,11 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { site } from '../content/site';
 ---
 
-<Layout title="Void Scribe Studios" description="Coming soon.">
+<Layout>
   <section class="hero">
-    <h1>Void Scribe Studios</h1>
-    <p class="tagline">Coming soon.</p>
+    <h1>{site.name}</h1>
+    <p class="tagline">{site.tagline}</p>
   </section>
 </Layout>
 

@@ -9,7 +9,6 @@
     icon: string;
     description?: string;
     title: Snippet;
-    titleLabel?: string;
   }
 
   let {
@@ -19,19 +18,15 @@
     icon,
     description,
     title,
-    titleLabel,
   }: Props = $props();
 
   const instanceId = $props.id();
   const descriptionId = `project-description-${instanceId}`;
+  const titleId = `project-title-${instanceId}`;
+  const expandId = `project-expand-${instanceId}`;
+  const collapseId = `project-collapse-${instanceId}`;
   const full = (description ?? '').trim();
   const hasDescription = full.length > 0;
-  const showMoreLabel = $derived(
-    titleLabel ? `Show more about ${titleLabel}` : 'Show more',
-  );
-  const showLessLabel = $derived(
-    titleLabel ? `Show less about ${titleLabel}` : 'Show less',
-  );
 
   let descriptionElement: HTMLParagraphElement | undefined;
   let textElement: HTMLSpanElement | undefined;
@@ -120,7 +115,7 @@
           <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"
             ><path d={icon} /></svg
           >
-          <span class="project-title">{@render title()}</span>
+          <span class="project-title" id={titleId}>{@render title()}</span>
         </span>
       </a>
       {#if hasDescription}
@@ -145,9 +140,10 @@
             <button
               type="button"
               class="project-expand-inline"
+              id={expandId}
               aria-expanded={expanded}
               aria-controls={descriptionId}
-              aria-label={showMoreLabel}
+              aria-labelledby="{expandId} {titleId}"
               onclick={expand}
             >
               Show more
@@ -162,9 +158,10 @@
     <button
       type="button"
       class="project-expand"
+      id={collapseId}
       aria-expanded={expanded}
       aria-controls={descriptionId}
-      aria-label={showLessLabel}
+      aria-labelledby="{collapseId} {titleId}"
       hidden={!expanded || !truncated}
       onclick={collapse}
     >

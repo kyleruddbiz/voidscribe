@@ -25,6 +25,9 @@
   const titleId = `project-title-${instanceId}`;
   const expandId = `project-expand-${instanceId}`;
   const collapseId = `project-collapse-${instanceId}`;
+  // Read once on purpose: trim() rewrites the rendered text imperatively, so
+  // it must not be reactive to later prop changes.
+  // svelte-ignore state_referenced_locally
   const full = (description ?? '').trim();
   const hasDescription = full.length > 0;
 

@@ -28,9 +28,9 @@
   const full = (description ?? '').trim();
   const hasDescription = full.length > 0;
 
-  let descriptionElement: HTMLParagraphElement | undefined;
-  let textElement: HTMLSpanElement | undefined;
-  let tailElement: HTMLSpanElement | undefined;
+  let descriptionElement = $state<HTMLParagraphElement>();
+  let textElement = $state<HTMLSpanElement>();
+  let tailElement = $state<HTMLSpanElement>();
 
   let mounted = $state(false);
   let expanded = $state(false);
@@ -251,6 +251,7 @@
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: var(--description-lines);
+    line-clamp: var(--description-lines);
     -webkit-box-orient: vertical;
   }
 
@@ -261,6 +262,7 @@
   .project-description.is-expanded {
     display: block;
     -webkit-line-clamp: unset;
+    line-clamp: unset;
   }
 
   .project-description.is-trimmed {
@@ -278,6 +280,7 @@
     .project-description {
       display: block;
       -webkit-line-clamp: unset;
+      line-clamp: unset;
       max-height: none;
     }
   }

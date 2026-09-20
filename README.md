@@ -21,6 +21,13 @@ Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded — e.g. `
 - `npm run format` — format the repo with Prettier.
 - `npm run format:check` — check formatting without writing changes.
 
+## Content
+
+Page content lives in `src/content/`:
+
+- `site.ts` — strings shared site-wide (name, tagline).
+- `<page>.ts` — content for one page, named after its route (`kyle-rudd.ts` for `/kyle-rudd`).
+
 ## Dependencies
 
 TypeScript is pinned to `^6.0.3` rather than the latest major. Both type-checkers used by

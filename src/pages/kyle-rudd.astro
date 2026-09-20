@@ -7,7 +7,7 @@ import {
   youtubeIconPath,
 } from '../lib/icon-paths';
 import { ITCH_ACCESS_CODE } from 'astro:env/server';
-import { site } from '../content/site';
+import { kyleRudd } from '../content/kyle-rudd';
 
 const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
 const itchQueryKey = String.fromCharCode(...itchQueryKeyCodes);
@@ -15,12 +15,21 @@ const itchAccessCode = decodeURIComponent(ITCH_ACCESS_CODE ?? '');
 const mtgSimulatorHref = itchAccessCode
   ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
   : 'https://voidscribestudios.itch.io/mtg-simulator';
+
+const [primaryRole, ...otherRoles] = kyleRudd.roles;
 ---
 
-<Layout title="Kyle Rudd" description={`Kyle Rudd, founder of ${site.name}.`}>
+<Layout title={kyleRudd.name} description={kyleRudd.tagline}>
   <section class="profile">
-    <h1>Kyle Rudd</h1>
-    <p class="role">Founder, {site.name}</p>
+    <h1>{kyleRudd.name}</h1>
+    <p class="role">
+      <span class="primary">{primaryRole}</span>{' '}
+      {otherRoles.map((role) => (
+        <>
+          <span>{role}</span>{' '}
+        </>
+      ))}
+    </p>
 
     <p class="bio">Bio coming soon.</p>
 
@@ -70,7 +79,49 @@ const mtgSimulatorHref = itchAccessCode
 
   .role {
     color: var(--color-text-dim);
+    font-size: 1.1em;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.08em;
     margin: 0 0 2rem;
+  }
+
+  /* Keep each role on one line so narrow viewports wrap between roles. */
+  .role span {
+    white-space: nowrap;
+  }
+
+  /* Separator trails each role so a wrap never starts a line with a dot. */
+  .role span:not(:last-child)::after {
+    content: ' ·';
+    color: var(--color-text-dim);
+  }
+
+  .primary {
+    color: var(--color-text);
+  }
+
+  /* Too narrow for one line: put the primary role alone on its own line
+     (no separator needed), with the other two together below it. */
+  @media (max-width: 36rem) {
+    .role .primary {
+      display: block;
+    }
+
+    /* Must match the separator rule's selector shape to out-rank it. */
+    .role .primary:not(:last-child)::after {
+      content: none;
+    }
+  }
+
+  /* Too narrow for the other two to share a line: stack all three, no dots. */
+  @media (max-width: 22rem) {
+    .role span {
+      display: block;
+    }
+
+    .role span:not(:last-child)::after {
+      content: none;
+    }
   }
 
   .bio {

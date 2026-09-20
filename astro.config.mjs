@@ -6,6 +6,10 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://voidscribestudios.com',
   integrations: [svelte(), sitemap()],
+  // Temporary: portfolio leads until the studio side has real content.
+  redirects: {
+    '/': '/kyle-rudd',
+  },
   env: {
     schema: {
       ITCH_ACCESS_CODE: envField.string({

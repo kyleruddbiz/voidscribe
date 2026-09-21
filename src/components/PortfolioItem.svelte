@@ -349,8 +349,8 @@
     max-height: none;
   }
 
-  /* No JS means nothing ever trims the text or reveals the rest, so lift the
-     clamp instead. */
+  /* Without JS nothing trims the text or adds a "Show more" button, so remove
+     the max-height and show the full description. */
   @media (scripting: none) {
     .item-description {
       max-height: none;

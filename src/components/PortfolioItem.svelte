@@ -47,6 +47,10 @@
     'U',
   ]);
 
+  // Whitespace and sentence punctuation (including an existing ellipsis and
+  // dashes) that would collide with the "..." at the cut point.
+  const trailingPunctuation = /[\s.,;:!?…\-–—]+$/;
+
   let descriptionElement = $state<HTMLDivElement>();
   let bodyElement = $state<HTMLDivElement>();
   let collapseElement = $state<HTMLButtonElement>();
@@ -122,7 +126,9 @@
     range.setStart(cut, Math.min(remaining, cut.length));
     range.setEndAfter(clone.lastChild!);
     range.deleteContents();
-    cut.data = cut.data.replace(/\s+$/, '');
+    // Trailing punctuation goes too: the tail brings its own "...", and
+    // "text.... Show more" or "text,... Show more" reads as a glitch.
+    cut.data = cut.data.replace(trailingPunctuation, '');
 
     // Step out of inline wrappers (<em>, <cite>, ...) but not out of the
     // enclosing block, so the tail sits flush on the last line of text.

@@ -1,5 +1,6 @@
 import { ITCH_ACCESS_CODE } from 'astro:env/server';
 import {
+  githubIconPath,
   itchIoIconPath,
   linkedinIconPath,
   youtubeIconPath,
@@ -31,6 +32,14 @@ const portfolio = [
     title: 'LinkedIn',
     description:
       "See what I've been up to as a professional software engineer.",
+  },
+  {
+    href: 'https://github.com/kyleruddbiz/voidscribe',
+    callToAction: 'View on GitHub',
+    // Placeholder until the vortex logo is cleaned up into a usable icon.
+    icon: githubIconPath,
+    title: 'Void Scribe Studios',
+    description: 'Coming Soon.',
   },
   {
     href: mtgSimulatorHref,

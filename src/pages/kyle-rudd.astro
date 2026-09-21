@@ -1,20 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PortfolioItem from '../components/PortfolioItem.svelte';
-import {
-  itchIoIconPath,
-  linkedinIconPath,
-  youtubeIconPath,
-} from '../lib/icon-paths';
-import { ITCH_ACCESS_CODE } from 'astro:env/server';
 import { kyleRudd } from '../content/kyle-rudd';
-
-const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
-const itchQueryKey = String.fromCharCode(...itchQueryKeyCodes);
-const itchAccessCode = decodeURIComponent(ITCH_ACCESS_CODE ?? '');
-const mtgSimulatorHref = itchAccessCode
-  ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
-  : 'https://voidscribestudios.itch.io/mtg-simulator';
 
 const [primaryRole, ...otherRoles] = kyleRudd.roles;
 ---
@@ -36,36 +23,9 @@ const [primaryRole, ...otherRoles] = kyleRudd.roles;
     <section class="portfolio">
       <h2>Portfolio</h2>
       <div class="portfolio-list">
-        <PortfolioItem
-          client:visible
-          href="https://www.linkedin.com/in/kyle-n-rudd/"
-          callToAction="View profile"
-          icon={linkedinIconPath}
-          description="See what I've been up to as a professional Software Engineer."
-        >
-          <Fragment slot="title">LinkedIn</Fragment>
-        </PortfolioItem>
-        <PortfolioItem
-          client:visible
-          href={mtgSimulatorHref}
-          rel="noopener noreferrer nofollow"
-          callToAction="Play on itch.io"
-          icon={itchIoIconPath}
-          description="A learning project to practice Unity 3D, online multiplayer, and game architecture."
-        >
-          <Fragment slot="title">
-            <cite>Magic: The Gathering</cite> Simulator
-          </Fragment>
-        </PortfolioItem>
-        <PortfolioItem
-          client:visible
-          href="https://www.youtube.com/watch?v=tcXh7IcB0-I"
-          callToAction="Watch on YouTube"
-          icon={youtubeIconPath}
-          description="A psychedelic satire of the modern advertising hellscape, expressed through a genre-bending collage of image and sound. That... plus Pink Floyd vibes."
-        >
-          <Fragment slot="title">Family Trip Mix 2 (Sellout Edition)</Fragment>
-        </PortfolioItem>
+        {kyleRudd.portfolio.map((item) => (
+          <PortfolioItem client:visible {...item} />
+        ))}
       </div>
     </section>
   </section>

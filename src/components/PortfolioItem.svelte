@@ -27,8 +27,8 @@
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
-  // Elements a "... Show more" tail may sit inside of. Anything else is
-  // treated as a block, which the tail must stay within to land flush.
+  // Wrappers the tail is placed outside of. It stays inside any other
+  // element, so it lands on the last line of text rather than after a block.
   const inlineTags = new Set([
     'A',
     'ABBR',
@@ -143,12 +143,10 @@
     return clone;
   };
 
-  // Trims the description down to the longest prefix that, together with the
-  // "... Show more" tail, still fits within --description-lines lines.
-  // Always measures with the tail in place so "... Show more" lands flush
-  // at the end of the last line. Runs even while expanded so `truncated`
-  // stays current, which lets "Show less" disappear once a resize makes
-  // the full text fit without it, and reappear if it later doesn't.
+  // Trims the description to the longest prefix that, with the "... Show more"
+  // tail appended, fits within --description-lines lines. Also runs while
+  // expanded so `truncated` tracks resizes: "Show less" is hidden whenever
+  // the full text fits.
   const trim = () => {
     if (!descriptionElement || !bodyElement || !template) return;
     const styles = getComputedStyle(descriptionElement);
@@ -173,9 +171,8 @@
     bodyElement.replaceChildren(contentUpTo(low));
   };
 
-  // Both buttons are removed or hidden by the toggle that was just pressed,
-  // which would drop keyboard and screen reader focus back to the document.
-  // Hand it to the button that replaces the one that went away.
+  // Pressing "Show less" hides it, which would drop keyboard and screen reader
+  // focus back to the document. Hand focus to the new "Show more" instead.
   const collapse = () => {
     expanded = false;
     trim();
@@ -185,15 +182,15 @@
   async function expand() {
     expanded = true;
     bodyElement?.replaceChildren(fullContent());
-    // "Show less" is only unhidden once Svelte has applied `expanded`.
+    // Replacing the content removed "Show more"; focus "Show less" once
+    // Svelte has unhidden it.
     await tick();
     collapseElement?.focus();
   }
 
-  // Trimming only ever changes the description's height, never its width,
-  // so gating re-measurement on width prevents an expand/collapse feedback
-  // loop: our own content changes can't produce a resize that triggers
-  // another trim.
+  // Trimming only changes the description's height, never its width, so
+  // re-measuring only on width changes keeps our own content changes from
+  // triggering another trim.
   const onResize = (width: number) => {
     if (measuring || width === lastWidth) return;
     lastWidth = width;
@@ -238,9 +235,9 @@
           id={descriptionId}
           bind:this={descriptionElement}
         >
-          <!-- Svelte renders `full` once, so the description is in the static
-               HTML. After mount, trim()/expand() own this element's children;
-               that's safe because `full` is deliberately non-reactive. -->
+          <!-- Rendered here so the text is in the static HTML. `full` is
+               non-reactive, so Svelte never touches this element again;
+               after mount, trim() and expand() own its children. -->
           <div bind:this={bodyElement}>{@html full}</div>
         </div>
       {/if}
@@ -297,8 +294,8 @@
 
   /* Stretches the click target to the whole card while keeping the anchor
      itself scoped to the icon/title, so it never contains another
-     interactive element (the "Show more"/"Show less" buttons live outside
-     it as ordinary siblings). */
+     interactive element. The "Show more"/"Show less" buttons sit outside it
+     and use z-index to stay clickable above this overlay. */
   .item-link::after {
     content: '';
     position: absolute;
@@ -362,13 +359,14 @@
   }
 
   /* The description is HTML injected with {@html} (and rebuilt by trim()),
-     so Svelte's scoped styles can't reach it: everything below is :global.
-     Zero margins keep the measured height exactly lines * line-height. */
+     so Svelte's scoped styles can't reach it: rules targeting it use
+     :global. */
   .item-description :global(p),
   .item-description :global(blockquote) {
     margin: 0;
   }
 
+  /* Spacing between blocks, in place of the margins zeroed above. */
   .item-description :global(div > * + *) {
     margin-top: 0.6em;
   }
@@ -379,9 +377,9 @@
     font-style: italic;
   }
 
-  /* Keeps "... Show more" together at the end of the last line: it can
-     never wrap onto a line of its own, and the trim routine only accepts a
-     cut point where the whole tail still fits alongside the visible text. */
+  /* nowrap keeps "... Show more" a single unit, so it wraps whole instead of
+     splitting; trim() then rejects any cut that pushes it past the last
+     line. Upright so it doesn't inherit a blockquote's italics. */
   .item-description :global(.portfolio-item-description-tail) {
     white-space: nowrap;
     font-style: normal;

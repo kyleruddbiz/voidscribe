@@ -58,7 +58,6 @@
   let expanded = $state(false);
   let truncated = $state(false);
   let lastWidth = -1;
-  let measuring = false;
 
   // Parsed once on mount. The description is HTML, so it can't be cut at a
   // character offset of the string: the cut has to happen on a DOM copy.
@@ -192,11 +191,9 @@
   // re-measuring only on width changes keeps our own content changes from
   // triggering another trim.
   const onResize = (width: number) => {
-    if (measuring || width === lastWidth) return;
+    if (width === lastWidth) return;
     lastWidth = width;
-    measuring = true;
     trim();
-    measuring = false;
   };
 
   onMount(() => {

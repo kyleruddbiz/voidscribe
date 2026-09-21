@@ -27,49 +27,143 @@
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
-  let descriptionElement = $state<HTMLParagraphElement>();
-  let textElement = $state<HTMLSpanElement>();
-  let tailElement = $state<HTMLSpanElement>();
+  // Elements a "... Show more" tail may sit inside of. Anything else is
+  // treated as a block, which the tail must stay within to land flush.
+  const inlineTags = new Set([
+    'A',
+    'ABBR',
+    'B',
+    'CITE',
+    'CODE',
+    'EM',
+    'I',
+    'MARK',
+    'Q',
+    'SMALL',
+    'SPAN',
+    'STRONG',
+    'SUB',
+    'SUP',
+    'U',
+  ]);
 
-  let mounted = $state(false);
+  let descriptionElement = $state<HTMLDivElement>();
+  let bodyElement = $state<HTMLDivElement>();
+
   let expanded = $state(false);
   let truncated = $state(false);
   let lastWidth = -1;
   let measuring = false;
 
+  // Parsed once on mount. The description is HTML, so it can't be cut at a
+  // character offset of the string: the cut has to happen on a DOM copy.
+  let template: HTMLTemplateElement | undefined;
+  let tail: HTMLSpanElement | undefined;
+  let textLength = 0;
+
   const fits = (maxHeight: number) =>
     descriptionElement!.scrollHeight <= maxHeight + 1;
 
-  // Trims `full` down to the longest prefix that, together with the
+  // Text nodes that render something, in document order. Whitespace-only
+  // nodes (the gaps between blocks) are skipped so a cut can never land in
+  // one, which would strand the tail on a line of its own.
+  const textNodes = (root: Node) => {
+    const nodes: Text[] = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.textContent!.trim()) nodes.push(node as Text);
+    }
+    return nodes;
+  };
+
+  const buildTail = () => {
+    const element = document.createElement('span');
+    element.className = 'project-description-tail';
+
+    const ellipsis = document.createElement('span');
+    ellipsis.className = 'project-description-ellipsis';
+    ellipsis.setAttribute('aria-hidden', 'true');
+    ellipsis.textContent = '...';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'project-expand-inline';
+    button.id = expandId;
+    button.textContent = 'Show more';
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', descriptionId);
+    button.setAttribute('aria-labelledby', `${expandId} ${titleId}`);
+    button.addEventListener('click', expand);
+
+    element.append(ellipsis, button);
+    return element;
+  };
+
+  const fullContent = () =>
+    template!.content.cloneNode(true) as DocumentFragment;
+
+  // A copy of the description cut off after `budget` characters of rendered
+  // text, with the tail appended. Range.deleteContents() does the hard part:
+  // it trims the text node the cut lands in, keeps the ancestors that node
+  // sits inside of (<p>, <blockquote>), and drops everything after it.
+  const contentUpTo = (budget: number) => {
+    const clone = fullContent();
+    let remaining = budget;
+    let cut: Text | undefined;
+    for (const node of textNodes(clone)) {
+      cut = node;
+      if (remaining <= node.length) break;
+      remaining -= node.length;
+    }
+    if (!cut) return clone;
+
+    const range = document.createRange();
+    range.setStart(cut, Math.min(remaining, cut.length));
+    range.setEndAfter(clone.lastChild!);
+    range.deleteContents();
+    cut.data = cut.data.replace(/\s+$/, '');
+
+    // Step out of inline wrappers (<em>, <cite>, ...) but not out of the
+    // enclosing block, so the tail sits flush on the last line of text.
+    let anchor: Node = cut;
+    while (
+      anchor.parentElement &&
+      inlineTags.has(anchor.parentElement.tagName)
+    ) {
+      anchor = anchor.parentElement;
+    }
+    (anchor as ChildNode).after(tail!);
+    return clone;
+  };
+
+  // Trims the description down to the longest prefix that, together with the
   // "... Show more" tail, still fits within --description-lines lines.
   // Always measures with the tail in place so "... Show more" lands flush
   // at the end of the last line. Runs even while expanded so `truncated`
   // stays current, which lets "Show less" disappear once a resize makes
   // the full text fit without it, and reappear if it later doesn't.
   const trim = () => {
-    if (!descriptionElement || !textElement || !tailElement) return;
+    if (!descriptionElement || !bodyElement || !template) return;
     const styles = getComputedStyle(descriptionElement);
     const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
     const maxHeight = parseFloat(styles.lineHeight) * lines;
 
-    tailElement.hidden = true;
-    textElement.textContent = full;
+    bodyElement.replaceChildren(fullContent());
     truncated = !fits(maxHeight);
     if (expanded || !truncated) return;
 
-    tailElement.hidden = false;
     let low = 0;
-    let high = full.length;
+    let high = textLength;
     while (low < high) {
       const middle = Math.ceil((low + high) / 2);
-      textElement.textContent = full.slice(0, middle);
+      bodyElement.replaceChildren(contentUpTo(middle));
       if (fits(maxHeight)) {
         low = middle;
       } else {
         high = middle - 1;
       }
     }
-    textElement.textContent = full.slice(0, low).replace(/\s+$/, '');
+    bodyElement.replaceChildren(contentUpTo(low));
   };
 
   const collapse = () => {
@@ -77,15 +171,14 @@
     trim();
   };
 
-  const expand = () => {
+  function expand() {
     expanded = true;
-    if (textElement) textElement.textContent = full;
-    if (tailElement) tailElement.hidden = true;
-  };
+    bodyElement?.replaceChildren(fullContent());
+  }
 
   // Trimming only ever changes the description's height, never its width,
   // so gating re-measurement on width prevents an expand/collapse feedback
-  // loop: our own text mutations can't produce a resize that triggers
+  // loop: our own content changes can't produce a resize that triggers
   // another trim.
   const onResize = (width: number) => {
     if (measuring || width === lastWidth) return;
@@ -97,7 +190,14 @@
 
   onMount(() => {
     if (!hasDescription || !descriptionElement) return;
-    mounted = true;
+    template = document.createElement('template');
+    template.innerHTML = full;
+    textLength = textNodes(template.content).reduce(
+      (sum, node) => sum + node.length,
+      0,
+    );
+    tail = buildTail();
+
     const observer = new ResizeObserver((entries) =>
       onResize(entries[0].contentRect.width),
     );
@@ -118,37 +218,17 @@
         </span>
       </a>
       {#if hasDescription}
-        <p
+        <div
           class="project-description"
-          class:is-trimmed={mounted && !expanded}
           class:is-expanded={expanded}
           id={descriptionId}
           bind:this={descriptionElement}
         >
-          {#if mounted && truncated && !expanded}
-            <span class="sr-only">{full}</span>
-          {/if}
-          <span
-            aria-hidden={mounted && truncated && !expanded}
-            bind:this={textElement}>{full}</span
-          >
-          <span class="project-description-tail" bind:this={tailElement} hidden>
-            <span class="project-description-ellipsis" aria-hidden="true"
-              >...</span
-            >
-            <button
-              type="button"
-              class="project-expand-inline"
-              id={expandId}
-              aria-expanded={expanded}
-              aria-controls={descriptionId}
-              aria-labelledby="{expandId} {titleId}"
-              onclick={expand}
-            >
-              Show more
-            </button>
-          </span>
-        </p>
+          <!-- Svelte renders `full` once, so the description is in the static
+               HTML. After mount, trim()/expand() own this element's children;
+               that's safe because `full` is deliberately non-reactive. -->
+          <div bind:this={bodyElement}>{@html full}</div>
+        </div>
       {/if}
     </div>
     <span class="project-meta">{callToAction} &rarr;</span>
@@ -241,30 +321,15 @@
     flex-shrink: 0;
   }
 
+  /* The clamp is a plain max-height, so it works before JS runs and for any
+     markup inside. JS then trims the content so "... Show more" lands on the
+     last line, rather than the text being cut off mid-line. */
   .project-description {
     --description-lines: 3;
     margin: 0.4rem 0 0;
     color: var(--color-text-dim);
     font-size: 0.9rem;
     line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: var(--description-lines);
-    line-clamp: var(--description-lines);
-    -webkit-box-orient: vertical;
-  }
-
-  /* Applied once JS takes over. A description short enough to fit as-is
-     renders identically in this layout, so it's safe to apply unconditionally
-     rather than only to descriptions that end up truncated. */
-  .project-description.is-trimmed,
-  .project-description.is-expanded {
-    display: block;
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
-  }
-
-  .project-description.is-trimmed {
     max-height: calc(1em * 1.5 * var(--description-lines));
     overflow: hidden;
   }
@@ -273,25 +338,41 @@
     max-height: none;
   }
 
-  /* No JS means .is-trimmed never applies, so the -webkit-line-clamp above
-     clamps the text with no way to reveal the rest. Lift the clamp instead. */
+  /* No JS means nothing ever trims the text or reveals the rest, so lift the
+     clamp instead. */
   @media (scripting: none) {
     .project-description {
-      display: block;
-      -webkit-line-clamp: unset;
-      line-clamp: unset;
       max-height: none;
     }
+  }
+
+  /* The description is HTML injected with {@html} (and rebuilt by trim()),
+     so Svelte's scoped styles can't reach it: everything below is :global.
+     Zero margins keep the measured height exactly lines * line-height. */
+  .project-description :global(p),
+  .project-description :global(blockquote) {
+    margin: 0;
+  }
+
+  .project-description :global(div > * + *) {
+    margin-top: 0.6em;
+  }
+
+  .project-description :global(blockquote) {
+    padding-left: 0.75em;
+    border-left: 2px solid var(--color-border);
+    font-style: italic;
   }
 
   /* Keeps "... Show more" together at the end of the last line: it can
      never wrap onto a line of its own, and the trim routine only accepts a
      cut point where the whole tail still fits alongside the visible text. */
-  .project-description-tail {
+  .project-description :global(.project-description-tail) {
     white-space: nowrap;
+    font-style: normal;
   }
 
-  .project-expand-inline {
+  .project-description :global(.project-expand-inline) {
     position: relative;
     z-index: 1;
     margin-left: 0.3em;
@@ -304,8 +385,8 @@
     cursor: pointer;
   }
 
-  .project-expand-inline:hover,
-  .project-expand-inline:focus-visible {
+  .project-description :global(.project-expand-inline:hover),
+  .project-description :global(.project-expand-inline:focus-visible) {
     text-decoration: underline;
   }
 

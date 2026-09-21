@@ -73,7 +73,7 @@ img {
 
 /* Visually hides content while keeping it in the accessibility tree.
    Absolutely positioned (rather than e.g. width:0) so it never affects the
-   layout it's measured within, such as PortfolioItem's line-clamp trimming. */
+   layout it sits within. */
 .sr-only {
   position: absolute;
   width: 1px;

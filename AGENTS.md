@@ -35,7 +35,7 @@ The same technique also tests width-dependent JS, like description truncation: s
 
 1. Close tabs you opened: `tabs_close_mcp`.
 2. Stop the dev server: `npx astro dev stop` (it's a detached daemon).
-3. Close Chrome: `taskkill //IM chrome.exe` (Bash, **no** `/F` — force-killing triggers a "didn't shut down correctly" prompt on next launch).
+3. Close Chrome: `taskkill //IM chrome.exe` (Bash, **no** `/F` — force-killing triggers a "didn't shut down correctly" prompt on next launch). An error like "could not be terminated" is expected noise from other chromium processes; the window still closes, so don't verify or retry.
 
 ## Troubleshooting
 

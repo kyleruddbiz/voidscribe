@@ -152,7 +152,9 @@
     const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
     const maxHeight = parseFloat(styles.lineHeight) * lines;
 
-    bodyElement.replaceChildren(fullContent());
+    // Expanded content is already the full text; rebuilding it would drop any
+    // text selection inside it.
+    if (!expanded) bodyElement.replaceChildren(fullContent());
     truncated = !fits(maxHeight);
     if (expanded || !truncated) return;
 

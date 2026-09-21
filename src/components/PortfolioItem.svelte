@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte';
-  import type { Snippet } from 'svelte';
 
   interface Props {
     href: string;
@@ -8,7 +7,7 @@
     callToAction: string;
     icon: string;
     description?: string;
-    title: Snippet;
+    title: string;
   }
 
   let {
@@ -115,7 +114,7 @@
           <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"
             ><path d={icon} /></svg
           >
-          <span class="project-title" id={titleId}>{@render title()}</span>
+          <span class="project-title" id={titleId}>{@html title}</span>
         </span>
       </a>
       {#if hasDescription}

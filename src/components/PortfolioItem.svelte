@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, untrack } from 'svelte';
+  import { onMount, tick, untrack } from 'svelte';
 
   interface Props {
     href: string;
@@ -49,6 +49,7 @@
 
   let descriptionElement = $state<HTMLDivElement>();
   let bodyElement = $state<HTMLDivElement>();
+  let collapseElement = $state<HTMLButtonElement>();
 
   let expanded = $state(false);
   let truncated = $state(false);
@@ -166,14 +167,21 @@
     bodyElement.replaceChildren(contentUpTo(low));
   };
 
+  // Both buttons are removed or hidden by the toggle that was just pressed,
+  // which would drop keyboard and screen reader focus back to the document.
+  // Hand it to the button that replaces the one that went away.
   const collapse = () => {
     expanded = false;
     trim();
+    tail?.querySelector('button')?.focus();
   };
 
-  function expand() {
+  async function expand() {
     expanded = true;
     bodyElement?.replaceChildren(fullContent());
+    // "Show less" is only unhidden once Svelte has applied `expanded`.
+    await tick();
+    collapseElement?.focus();
   }
 
   // Trimming only ever changes the description's height, never its width,
@@ -238,6 +246,7 @@
       type="button"
       class="project-expand"
       id={collapseId}
+      bind:this={collapseElement}
       aria-expanded={expanded}
       aria-controls={descriptionId}
       aria-labelledby="{collapseId} {titleId}"

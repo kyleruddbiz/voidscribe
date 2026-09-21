@@ -4,7 +4,7 @@ import {
   linkedinIconPath,
   youtubeIconPath,
 } from '../lib/icon-paths';
-import familyTripMix from './kyle-rudd/family-trip-mix.html?raw';
+import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 
 const name = 'Kyle Rudd';
 
@@ -46,7 +46,7 @@ const portfolio = [
     callToAction: 'Watch on YouTube',
     icon: youtubeIconPath,
     title: 'Family Trip Mix 2 (Sellout Edition)',
-    description: familyTripMix,
+    description: familyTripMixDescription,
   },
 ] as const;
 

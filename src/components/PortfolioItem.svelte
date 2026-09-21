@@ -54,6 +54,7 @@
   let descriptionElement = $state<HTMLDivElement>();
   let bodyElement = $state<HTMLDivElement>();
   let collapseElement = $state<HTMLButtonElement>();
+  let linkElement = $state<HTMLAnchorElement>();
 
   let expanded = $state(false);
   let truncated = $state(false);
@@ -189,6 +190,50 @@
     collapseElement?.focus();
   }
 
+  // The card's text sits above the link overlay so it can be selected, which
+  // takes it out of the anchor's click area. These handlers forward its clicks
+  // to the anchor; clicks on the anchor, links in the description and buttons
+  // are left alone.
+  const forward = (init: MouseEventInit) =>
+    linkElement?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, ...init }),
+    );
+
+  const onCardClick = (event: MouseEvent) => {
+    // Ignore the click forward() dispatches, or it would loop back in here.
+    if (!event.isTrusted) return;
+    const target = event.target as Element;
+    if (target.closest('button')) return;
+
+    // A drag-select still ends in a click. Don't follow it, and cancel it if it
+    // landed on the anchor (a drag within the title).
+    const selection = getSelection();
+    const selecting = !!selection && !selection.isCollapsed;
+    if (target.closest('a')) {
+      if (selecting) event.preventDefault();
+      return;
+    }
+    if (selecting) return;
+
+    forward({
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      shiftKey: event.shiftKey,
+      altKey: event.altKey,
+    });
+  };
+
+  // Middle-click fires auxclick, not click. It's forwarded as a ctrl/cmd-click,
+  // which opens a background tab. Unlike a left click, it isn't skipped when
+  // text is selected: a middle-click never drags, so the selection is stale.
+  const onCardAuxClick = (event: MouseEvent) => {
+    if (event.button !== 1 || (event.target as Element).closest('a, button')) {
+      return;
+    }
+    event.preventDefault();
+    forward({ ctrlKey: true, metaKey: true });
+  };
+
   // Trimming only changes the description's height, never its width, so
   // re-measuring only on width changes keeps our own content changes from
   // triggering another trim.
@@ -216,10 +261,22 @@
   });
 </script>
 
-<div class="item">
+<!-- Mouse-only convenience: the anchor is still the real, keyboard-operable
+     control, so the a11y warnings below don't apply. -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+<div class="item" onclick={onCardClick} onauxclick={onCardAuxClick}>
   <div class="item-row">
     <div class="item-content">
-      <a class="item-link" {href} target="_blank" {rel}>
+      <!-- draggable="false": dragging on a link's text would otherwise drag
+           the link instead of selecting the title. -->
+      <a
+        class="item-link"
+        {href}
+        target="_blank"
+        {rel}
+        draggable="false"
+        bind:this={linkElement}
+      >
         <span class="item-main">
           <svg class="item-icon" viewBox="0 0 24 24" aria-hidden="true"
             ><path d={icon} /></svg
@@ -291,14 +348,34 @@
     text-decoration: none;
   }
 
-  /* Stretches the click target to the whole card while keeping the anchor
-     itself scoped to the icon/title, so it never contains another
-     interactive element. The "Show more"/"Show less" buttons sit outside it
-     and use z-index to stay clickable above this overlay. */
+  /* Stretches the click target across the card's padding and gaps while
+     keeping the anchor itself scoped to the icon/title, so it never contains
+     another interactive element. The text sits above it (see below), and the
+     "Show more"/"Show less" buttons use z-index to stay clickable. */
   .item-link::after {
     content: '';
     position: absolute;
     inset: 0;
+  }
+
+  /* Text sits above the overlay so it can be selected; see onCardClick for how
+     clicks on it still follow the link. */
+  .item-main,
+  .item-description,
+  .item-meta {
+    position: relative;
+    z-index: 1;
+  }
+
+  .item-description,
+  .item-meta {
+    cursor: pointer;
+  }
+
+  /* Chrome won't start a selection inside a link unless the text is
+     explicitly user-select: text (draggable="false" alone isn't enough). */
+  .item-title {
+    user-select: text;
   }
 
   .item-main {

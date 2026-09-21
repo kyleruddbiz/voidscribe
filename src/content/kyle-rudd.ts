@@ -30,7 +30,7 @@ const portfolio = [
     icon: linkedinIconPath,
     title: 'LinkedIn',
     description:
-      "See what I've been up to as a professional Software Engineer.",
+      "See what I've been up to as a professional software engineer.",
   },
   {
     href: mtgSimulatorHref,

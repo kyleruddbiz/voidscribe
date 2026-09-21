@@ -20,10 +20,10 @@
   }: Props = $props();
 
   const instanceId = $props.id();
-  const descriptionId = `project-description-${instanceId}`;
-  const titleId = `project-title-${instanceId}`;
-  const expandId = `project-expand-${instanceId}`;
-  const collapseId = `project-collapse-${instanceId}`;
+  const descriptionId = `portfolio-item-description-${instanceId}`;
+  const titleId = `portfolio-item-title-${instanceId}`;
+  const expandId = `portfolio-item-expand-${instanceId}`;
+  const collapseId = `portfolio-item-collapse-${instanceId}`;
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
@@ -83,16 +83,16 @@
 
   const buildTail = () => {
     const element = document.createElement('span');
-    element.className = 'project-description-tail';
+    element.className = 'portfolio-item-description-tail';
 
     const ellipsis = document.createElement('span');
-    ellipsis.className = 'project-description-ellipsis';
+    ellipsis.className = 'portfolio-item-description-ellipsis';
     ellipsis.setAttribute('aria-hidden', 'true');
     ellipsis.textContent = '...';
 
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'project-expand-inline';
+    button.className = 'portfolio-item-expand-inline';
     button.id = expandId;
     button.textContent = 'Show more';
     button.setAttribute('aria-expanded', 'false');
@@ -220,20 +220,20 @@
   });
 </script>
 
-<div class="project">
-  <div class="project-row">
-    <div class="project-content">
-      <a class="project-link" {href} target="_blank" {rel}>
-        <span class="project-main">
-          <svg class="project-icon" viewBox="0 0 24 24" aria-hidden="true"
+<div class="item">
+  <div class="item-row">
+    <div class="item-content">
+      <a class="item-link" {href} target="_blank" {rel}>
+        <span class="item-main">
+          <svg class="item-icon" viewBox="0 0 24 24" aria-hidden="true"
             ><path d={icon} /></svg
           >
-          <span class="project-title" id={titleId}>{@html title}</span>
+          <span class="item-title" id={titleId}>{@html title}</span>
         </span>
       </a>
       {#if hasDescription}
         <div
-          class="project-description"
+          class="item-description"
           class:is-expanded={expanded}
           id={descriptionId}
           bind:this={descriptionElement}
@@ -245,12 +245,12 @@
         </div>
       {/if}
     </div>
-    <span class="project-meta">{callToAction} &rarr;</span>
+    <span class="item-meta">{callToAction} &rarr;</span>
   </div>
   {#if hasDescription}
     <button
       type="button"
-      class="project-expand"
+      class="item-expand"
       id={collapseId}
       bind:this={collapseElement}
       aria-expanded={expanded}
@@ -265,7 +265,7 @@
 </div>
 
 <style>
-  .project {
+  .item {
     position: relative;
     padding: 1rem 1.25rem;
     border: 1px solid var(--color-border);
@@ -273,25 +273,25 @@
     background: var(--color-bg-raised);
   }
 
-  .project:hover,
-  .project:focus-within {
+  .item:hover,
+  .item:focus-within {
     border-color: var(--color-accent);
   }
 
-  .project-row {
+  .item-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
   }
 
-  .project-content {
+  .item-content {
     flex: 1 1 auto;
     min-width: 0;
     padding-right: 1.5rem;
   }
 
-  .project-link {
+  .item-link {
     text-decoration: none;
   }
 
@@ -299,37 +299,37 @@
      itself scoped to the icon/title, so it never contains another
      interactive element (the "Show more"/"Show less" buttons live outside
      it as ordinary siblings). */
-  .project-link::after {
+  .item-link::after {
     content: '';
     position: absolute;
     inset: 0;
   }
 
-  .project-main {
+  .item-main {
     display: flex;
     align-items: center;
     gap: 0.65rem;
   }
 
-  .project-icon {
+  .item-icon {
     width: 1.15rem;
     height: 1.15rem;
     flex-shrink: 0;
     fill: var(--color-text-dim);
   }
 
-  .project:hover .project-icon,
-  .project:focus-within .project-icon {
+  .item:hover .item-icon,
+  .item:focus-within .item-icon {
     fill: var(--color-accent);
   }
 
-  .project-title {
+  .item-title {
     font-family: var(--font-display);
     color: var(--color-text);
     font-size: 1.05rem;
   }
 
-  .project-meta {
+  .item-meta {
     color: var(--color-accent-bright);
     font-size: 0.9rem;
     white-space: nowrap;
@@ -339,7 +339,7 @@
   /* The clamp is a plain max-height, so it works before JS runs and for any
      markup inside. JS then trims the content so "... Show more" lands on the
      last line, rather than the text being cut off mid-line. */
-  .project-description {
+  .item-description {
     --description-lines: 3;
     margin: 0.4rem 0 0;
     color: var(--color-text-dim);
@@ -349,14 +349,14 @@
     overflow: hidden;
   }
 
-  .project-description.is-expanded {
+  .item-description.is-expanded {
     max-height: none;
   }
 
   /* No JS means nothing ever trims the text or reveals the rest, so lift the
      clamp instead. */
   @media (scripting: none) {
-    .project-description {
+    .item-description {
       max-height: none;
     }
   }
@@ -364,16 +364,16 @@
   /* The description is HTML injected with {@html} (and rebuilt by trim()),
      so Svelte's scoped styles can't reach it: everything below is :global.
      Zero margins keep the measured height exactly lines * line-height. */
-  .project-description :global(p),
-  .project-description :global(blockquote) {
+  .item-description :global(p),
+  .item-description :global(blockquote) {
     margin: 0;
   }
 
-  .project-description :global(div > * + *) {
+  .item-description :global(div > * + *) {
     margin-top: 0.6em;
   }
 
-  .project-description :global(blockquote) {
+  .item-description :global(blockquote) {
     padding-left: 0.75em;
     border-left: 2px solid var(--color-border);
     font-style: italic;
@@ -382,12 +382,12 @@
   /* Keeps "... Show more" together at the end of the last line: it can
      never wrap onto a line of its own, and the trim routine only accepts a
      cut point where the whole tail still fits alongside the visible text. */
-  .project-description :global(.project-description-tail) {
+  .item-description :global(.portfolio-item-description-tail) {
     white-space: nowrap;
     font-style: normal;
   }
 
-  .project-description :global(.project-expand-inline) {
+  .item-description :global(.portfolio-item-expand-inline) {
     position: relative;
     z-index: 1;
     margin-left: 0.3em;
@@ -400,12 +400,12 @@
     cursor: pointer;
   }
 
-  .project-description :global(.project-expand-inline:hover),
-  .project-description :global(.project-expand-inline:focus-visible) {
+  .item-description :global(.portfolio-item-expand-inline:hover),
+  .item-description :global(.portfolio-item-expand-inline:focus-visible) {
     text-decoration: underline;
   }
 
-  .project-expand {
+  .item-expand {
     position: relative;
     z-index: 1;
     margin-top: 0.4rem;
@@ -418,48 +418,48 @@
     cursor: pointer;
   }
 
-  .project-expand:hover,
-  .project-expand:focus-visible {
+  .item-expand:hover,
+  .item-expand:focus-visible {
     text-decoration: underline;
   }
 
   @media (max-width: 480px) {
-    .project {
+    .item {
       display: flex;
       flex-direction: column;
       align-items: stretch;
     }
 
-    .project-content {
+    .item-content {
       padding-right: 0;
       order: 1;
     }
 
-    .project-main {
+    .item-main {
       justify-content: center;
     }
 
-    .project-description {
+    .item-description {
       text-align: center;
     }
 
-    .project-meta {
+    .item-meta {
       margin-top: 0.75rem;
       text-align: center;
       white-space: normal;
       order: 3;
     }
 
-    .project-expand {
+    .item-expand {
       order: 2;
       align-self: center;
     }
 
-    /* Dissolves this plain wrapper div so .project-content and
-       .project-meta become direct flex children of .project and can be
-       reordered around .project-expand. Safe here because the div carries
+    /* Dissolves this plain wrapper div so .item-content and
+       .item-meta become direct flex children of .item and can be
+       reordered around .item-expand. Safe here because the div carries
        no semantics to lose — unlike the anchor, which must stay intact. */
-    .project-row {
+    .item-row {
       display: contents;
     }
   }

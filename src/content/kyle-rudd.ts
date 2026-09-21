@@ -4,6 +4,7 @@ import {
   linkedinIconPath,
   youtubeIconPath,
 } from '../lib/icon-paths';
+import familyTripMix from './kyle-rudd/family-trip-mix.html?raw';
 
 const name = 'Kyle Rudd';
 
@@ -20,7 +21,8 @@ const mtgSimulatorHref = itchAccessCode
   ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
   : 'https://voidscribestudios.itch.io/mtg-simulator';
 
-// `title` and `description` are HTML strings.
+// `title` and `description` are HTML strings. Descriptions too complex to
+// inline live in ./kyle-rudd/ and are imported as raw text.
 const portfolio = [
   {
     href: 'https://www.linkedin.com/in/kyle-n-rudd/',
@@ -44,8 +46,7 @@ const portfolio = [
     callToAction: 'Watch on YouTube',
     icon: youtubeIconPath,
     title: 'Family Trip Mix 2 (Sellout Edition)',
-    description:
-      'A psychedelic satire of the modern advertising hellscape, expressed through a genre-bending collage of image and sound. That... plus Pink Floyd vibes.',
+    description: familyTripMix,
   },
 ] as const;
 

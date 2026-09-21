@@ -27,6 +27,13 @@ Page content lives in `src/content/`:
 
 - `site.ts` — strings shared site-wide (name, tagline).
 - `<page>.ts` — content for one page, named after its route (`kyle-rudd.ts` for `/kyle-rudd`).
+- `<page>/*.html` — markup too complex to inline in a content string, such as a multi-paragraph
+  portfolio description. Import it with `?raw` (e.g. `import x from './kyle-rudd/x.html?raw'`) and
+  use it as a value in the page's `.ts` file. Prettier formats these files, so `npm run format`
+  will catch malformed markup.
+
+Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
+because the content is authored in this repo, but don't feed it anything user-supplied.
 
 ## Dependencies
 

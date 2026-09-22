@@ -6,11 +6,11 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 Trunk-based development. Commit directly to `main` unless told otherwise.
 
-On `main`: wait for the user to review a change and explicitly say to commit before running `git commit`.
+Push every commit immediately after making it.
 
-On any other branch: once the user has approved the scope of work (e.g. by approving a plan), split it into logical commits and carry out all of it — code, formatting, building, testing, and the commits themselves — without pausing for review between commits. The user reviews the branch as a whole (e.g. as a pull request) instead of approving each commit individually.
+Single-commit task: review the change with the user before committing.
 
-Every commit is pushed right after it's made — there's no separate approval step for `git push`. On `main` this follows naturally, since a commit there already required the user's explicit go-ahead; on another branch, push each commit as you make it rather than batching pushes for the end.
+Multi-commit task: commit and push each commit as you go, without pausing for review in between. The user reviews everything at the end.
 
 ## Before calling a change done
 
@@ -25,7 +25,7 @@ Verify UI/content changes in the browser (`claude-in-chrome` tools) before calli
 2. Load `localhost:4321`.
 3. Check rendering, console, and interactions.
 
-Leave the dev server running and the browser tab open once you're done — don't stop or close them as a matter of routine. Reuse the same tab (navigate or reload it) for further checks instead of closing and relaunching. Only close things down if the user asks, or at the very end of a session where no further testing is expected — see [If asked to close the browser down](#if-asked-to-close-the-browser-down).
+Leave the dev server running and the browser tab open when you're done testing. Reuse the same tab for further checks. Close things down only if asked — see [If asked to close the browser down](#if-asked-to-close-the-browser-down).
 
 This app is responsive — layouts differ between desktop and mobile. Changes to layout, spacing, or CSS are candidates for a mobile check; use judgment on whether a given change could plausibly affect narrow-viewport rendering. See [Testing responsive/mobile layouts](#testing-responsivemobile-layouts) below for how.
 

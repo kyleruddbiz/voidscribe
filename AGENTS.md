@@ -6,7 +6,11 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 Trunk-based development. Commit directly to `main` unless told otherwise.
 
-Wait for the user to review a change and explicitly say to commit before running `git commit` or `git push`.
+Push every commit immediately after making it.
+
+Single-commit task: review the change with the user before committing.
+
+Multi-commit task: commit and push each commit as you go, without pausing for review in between. The user reviews everything at the end.
 
 ## Before calling a change done
 
@@ -21,6 +25,8 @@ Verify UI/content changes in the browser (`claude-in-chrome` tools) before calli
 2. Load `localhost:4321`.
 3. Check rendering, console, and interactions.
 
+Leave the dev server running and the browser tab open when you're done testing. Reuse the same tab for further checks. Close things down only if asked — see [If asked to close the browser down](#if-asked-to-close-the-browser-down).
+
 This app is responsive — layouts differ between desktop and mobile. Changes to layout, spacing, or CSS are candidates for a mobile check; use judgment on whether a given change could plausibly affect narrow-viewport rendering. See [Testing responsive/mobile layouts](#testing-responsivemobile-layouts) below for how.
 
 ### Testing responsive/mobile layouts
@@ -33,7 +39,7 @@ This app is responsive — layouts differ between desktop and mobile. Changes to
 
 The same technique also tests width-dependent JS, like description truncation: set `max-width` on a single element instead of copying a media query. This depends on `ResizeObserver` firing — see [Troubleshooting](#troubleshooting) if it silently does nothing. Pure CSS layout checks (above) don't need this.
 
-### Cleanup after a browser test session
+### If asked to close the browser down
 
 1. Close tabs you opened: `tabs_close_mcp`.
 2. Stop the dev server: `npx astro dev stop` (it's a detached daemon).

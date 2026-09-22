@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount, tick, untrack } from 'svelte';
   import { isSelecting } from '../lib/selection';
+  import { createTruncator, type HtmlTruncator } from '../lib/truncate-html';
+  import SkillChips from './SkillChips.svelte';
 
   interface Props {
     href: string;
@@ -29,42 +31,27 @@
   const instanceId = $props.id();
   const descriptionId = `portfolio-item-description-${instanceId}`;
   const titleId = `portfolio-item-title-${instanceId}`;
-  const expandId = `portfolio-item-expand-${instanceId}`;
-  const collapseId = `portfolio-item-collapse-${instanceId}`;
+  const showMoreId = `portfolio-item-show-more-${instanceId}`;
+  const showLessId = `portfolio-item-show-less-${instanceId}`;
+  // `description` is only ever read for its initial value (see truncator
+  // below); untrack signals that it's deliberately not meant to stay in
+  // sync with a later prop change.
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
-  // Wrappers the tail is placed outside of. It stays inside any other
-  // element, so it lands on the last line of text rather than after a block.
-  const inlineTags = new Set([
-    'A',
-    'ABBR',
-    'B',
-    'CITE',
-    'CODE',
-    'EM',
-    'I',
-    'MARK',
-    'Q',
-    'SMALL',
-    'SPAN',
-    'STRONG',
-    'SUB',
-    'SUP',
-    'U',
-  ]);
-
-  // Whitespace and sentence punctuation (including an existing ellipsis and
-  // dashes) that would collide with the "..." at the cut point.
-  const trailingPunctuation = /[\s.,;:!?…\-–—]+$/;
-
   let descriptionElement = $state<HTMLDivElement>();
   let bodyElement = $state<HTMLDivElement>();
+  let tail = $state<HTMLSpanElement>();
+  let showMoreElement = $state<HTMLButtonElement>();
   let collapseElement = $state<HTMLButtonElement>();
   let linkElement = $state<HTMLAnchorElement>();
 
   let expanded = $state(false);
   let truncated = $state(false);
+  // Faded in by collapse()/expand() once the tail/"Show less" button they
+  // reveal has settled into its final position, rather than popping in.
+  let tailAppearing = $state(false);
+  let showLessAppearing = $state(false);
   let lastWidth = -1;
 
   // Explicit pixel max-height used only while an expand/collapse animation is
@@ -75,144 +62,52 @@
   // second click re-entering expand()/collapse() before the first finishes.
   let transitioning = false;
 
-  // The collapsed box's actual rendered height, captured by expand() just
-  // before it changes anything. collapse() animates back to this rather than
-  // collapsedHeight()'s theoretical max: --description-lines is an upper
-  // bound, and trimmed content often lands a partial line short of it.
-  let restingHeight = 0;
-
-  // Must match the max-height transition duration in the stylesheet below.
-  const transitionMs = 300;
-
-  // Resolves once the description's max-height transition finishes, or after
-  // transitionMs regardless — the fallback covers prefers-reduced-motion
-  // (the transition is disabled below, so no event fires) and a transition
-  // with equal start/end heights (nothing to animate, so nothing fires).
+  // Resolves once the description's max-height transition finishes.
+  // getAnimations() reports nothing when there's nothing to animate — a
+  // transition with equal start/end heights, or prefers-reduced-motion
+  // (disabled below) — so this resolves immediately in those cases.
   const settled = (element: HTMLElement) =>
-    new Promise<void>((resolve) => {
-      let done = false;
-      const finish = () => {
-        if (done) return;
-        done = true;
-        element.removeEventListener('transitionend', onEnd);
-        resolve();
-      };
-      const onEnd = (event: TransitionEvent) => {
-        if (event.target === element && event.propertyName === 'max-height') {
-          finish();
-        }
-      };
-      element.addEventListener('transitionend', onEnd);
-      setTimeout(finish, transitionMs + 50);
-    });
+    Promise.allSettled(
+      element.getAnimations().map((animation) => animation.finished),
+    );
 
-  // Parsed once on mount. The description is HTML, so it can't be cut at a
-  // character offset of the string: the cut has to happen on a DOM copy.
-  let template: HTMLTemplateElement | undefined;
-  let tail: HTMLSpanElement | undefined;
-  let textLength = 0;
+  const nextFrame = () =>
+    new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+  // Pins the description at its current height, applies `change`, then
+  // transitions to the height `target` reports afterward. Resolves once the
+  // box has settled. Pinning a concrete pixel value a frame apart from the
+  // change is what makes the max-height transition below actually animate,
+  // rather than jumping straight to/from the calc()/none it's changing
+  // between.
+  async function animateHeight(change: () => void, target: () => number) {
+    if (!descriptionElement) return;
+    heightOverride = `${descriptionElement.getBoundingClientRect().height}px`;
+    change();
+    await tick();
+
+    await nextFrame();
+    heightOverride = `${target()}px`;
+    await tick();
+    await settled(descriptionElement);
+
+    // Hand max-height back to the is-expanded/calc() CSS below, so a later
+    // resize isn't stuck at this now-stale pixel value.
+    heightOverride = undefined;
+  }
+
+  // Built once on mount, since it needs `document`.
+  let truncator: HtmlTruncator | undefined;
 
   const fits = (maxHeight: number) =>
     descriptionElement!.scrollHeight <= maxHeight + 1;
 
-  // Text nodes that render something, in document order. Whitespace-only
-  // nodes (the gaps between blocks) are skipped so a cut can never land in
-  // one, which would strand the tail on a line of its own.
-  const textNodes = (root: Node) => {
-    const nodes: Text[] = [];
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (node.textContent!.trim()) nodes.push(node as Text);
-    }
-    return nodes;
-  };
-
-  const buildTail = () => {
-    const element = document.createElement('span');
-    element.className = 'portfolio-item-description-tail';
-
-    const ellipsis = document.createElement('span');
-    ellipsis.className = 'portfolio-item-description-ellipsis';
-    ellipsis.setAttribute('aria-hidden', 'true');
-    ellipsis.textContent = '...';
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'portfolio-item-expand-inline';
-    button.id = expandId;
-    button.textContent = 'Show more';
-    button.setAttribute('aria-expanded', 'false');
-    button.setAttribute('aria-controls', descriptionId);
-    button.setAttribute('aria-labelledby', `${expandId} ${titleId}`);
-    button.addEventListener('click', expand);
-
-    element.append(ellipsis, button);
-    return element;
-  };
-
-  const fullContent = () =>
-    template!.content.cloneNode(true) as DocumentFragment;
-
-  // A copy of the description cut off after `budget` characters of rendered
-  // text, with the tail appended. Range.deleteContents() does the hard part:
-  // it trims the text node the cut lands in, keeps the ancestors that node
-  // sits inside of (<p>, <blockquote>), and drops everything after it.
-  const contentUpTo = (budget: number) => {
-    const clone = fullContent();
-    let remaining = budget;
-    let cut: Text | undefined;
-    for (const node of textNodes(clone)) {
-      cut = node;
-      if (remaining <= node.length) break;
-      remaining -= node.length;
-    }
-    if (!cut) return clone;
-
-    const range = document.createRange();
-    range.setStart(cut, Math.min(remaining, cut.length));
-    range.setEndAfter(clone.lastChild!);
-    range.deleteContents();
-    // Trailing punctuation goes too: the tail brings its own "...", and
-    // "text.... Show more" or "text,... Show more" reads as a glitch.
-    cut.data = cut.data.replace(trailingPunctuation, '');
-
-    // Step out of inline wrappers (<em>, <cite>, ...) but not out of the
-    // enclosing block, so the tail sits flush on the last line of text.
-    let anchor: Node = cut;
-    while (
-      anchor.parentElement &&
-      inlineTags.has(anchor.parentElement.tagName)
-    ) {
-      anchor = anchor.parentElement;
-    }
-    (anchor as ChildNode).after(tail!);
-    return clone;
-  };
-
-  // The clamped height for the collapsed state, in pixels — both the resting
-  // CSS max-height (--description-lines below) and the animation target
-  // collapse() shrinks toward.
-  const collapsedHeight = () => {
+  // The --description-lines clamp, in pixels — the CSS max-height while
+  // collapsed, and the upper bound fits() checks trimmed content against.
+  const clampHeight = () => {
     const styles = getComputedStyle(descriptionElement!);
     const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
     return parseFloat(styles.lineHeight) * lines;
-  };
-
-  // Binary search over budgets for the longest prefix that, with the tail
-  // appended, fits within maxHeight. Mutates bodyElement with the result.
-  const applyTrim = (maxHeight: number) => {
-    let low = 0;
-    let high = textLength;
-    while (low < high) {
-      const middle = Math.ceil((low + high) / 2);
-      bodyElement!.replaceChildren(contentUpTo(middle));
-      if (fits(maxHeight)) {
-        low = middle;
-      } else {
-        high = middle - 1;
-      }
-    }
-    bodyElement!.replaceChildren(contentUpTo(low));
   };
 
   // Trims the description to the longest prefix that, with the "... Show more"
@@ -220,76 +115,81 @@
   // expanded so `truncated` tracks resizes: "Show less" is hidden whenever
   // the full text fits.
   const trim = () => {
-    if (!descriptionElement || !bodyElement || !template) return;
-    const maxHeight = collapsedHeight();
+    if (!descriptionElement || !bodyElement || !truncator) return;
+    const maxHeight = clampHeight();
 
     // Expanded content is already the full text; rebuilding it would drop any
     // text selection inside it.
-    if (!expanded) bodyElement.replaceChildren(fullContent());
+    if (!expanded) bodyElement.replaceChildren(truncator.full());
     truncated = !fits(maxHeight);
     if (expanded || !truncated) return;
-    applyTrim(maxHeight);
+    truncator.longestFitting(
+      (content) => bodyElement!.replaceChildren(content),
+      () => fits(maxHeight),
+    );
   };
 
-  // Hides "Show less" immediately, before the shrink starts: leaving it up
-  // until the box reaches its final height would pop the card's bottom edge
-  // the instant it later disappeared. The content stays the full text during
-  // the shrink, so it's clipped by overflow rather than popping straight to
-  // the truncated prefix; trim() swaps in the tail, faded in, once the box
-  // has reached its final height.
+  // Trims now, while still expanded, to learn the real collapsed height and
+  // set the trimmed content aside: --description-lines is only an upper
+  // bound, and trimmed content often lands a partial line short of it. The
+  // shrink itself runs over the full text, clipped by overflow, so it
+  // doesn't pop straight to the short version; the trimmed content goes back
+  // once the box has settled, faded in like "Show more" does on expand.
   async function collapse() {
-    if (transitioning || !expanded || !descriptionElement) return;
+    if (
+      transitioning ||
+      !expanded ||
+      !descriptionElement ||
+      !bodyElement ||
+      !truncator
+    ) {
+      return;
+    }
     transitioning = true;
-    expanded = false;
 
-    const startHeight = descriptionElement.scrollHeight;
-    heightOverride = `${startHeight}px`;
-    await tick();
+    const maxHeight = clampHeight();
+    truncator.longestFitting(
+      (content) => bodyElement!.replaceChildren(content),
+      () => fits(maxHeight),
+    );
+    const collapsedContent = [...bodyElement.childNodes];
+    const collapsedContentHeight = descriptionElement.scrollHeight;
 
-    requestAnimationFrame(() => {
-      heightOverride = `${restingHeight}px`;
-    });
-    await settled(descriptionElement);
+    await animateHeight(
+      () => {
+        bodyElement!.replaceChildren(truncator!.full());
+        expanded = false;
+      },
+      () => collapsedContentHeight,
+    );
 
-    tail?.classList.add('is-appearing');
-    trim();
-    requestAnimationFrame(() => tail?.classList.remove('is-appearing'));
+    tailAppearing = true;
+    bodyElement.replaceChildren(...collapsedContent);
+    requestAnimationFrame(() => (tailAppearing = false));
 
-    heightOverride = undefined;
-    tail?.querySelector('button')?.focus();
+    showMoreElement?.focus();
     transitioning = false;
   }
 
-  // Swaps in the full text immediately, then grows the box to fit: pinning
-  // the current height first and setting the target a frame later is what
-  // makes the max-height transition below animate instead of jumping
-  // straight to `none`. "Show less" is unhidden immediately too, so its
-  // space is reserved for the grow animation, but stays invisible until the
-  // box finishes growing, when it fades in like "Show more" does on collapse.
+  // Swaps in the full text and grows the box to fit. "Show less" is
+  // unhidden immediately too, so its space is reserved for the grow
+  // animation, but stays invisible until the box finishes growing, when it
+  // fades in like "Show more" does on collapse.
   async function expand() {
     if (transitioning || expanded || !descriptionElement) return;
     transitioning = true;
 
-    const startHeight = descriptionElement.getBoundingClientRect().height;
-    restingHeight = startHeight;
-    heightOverride = `${startHeight}px`;
-    expanded = true;
-    bodyElement?.replaceChildren(fullContent());
-    collapseElement?.classList.add('is-appearing');
-    await tick();
+    showLessAppearing = true;
+    await animateHeight(
+      () => {
+        bodyElement?.replaceChildren(truncator!.full());
+        expanded = true;
+      },
+      () => descriptionElement!.scrollHeight,
+    );
 
-    const targetHeight = descriptionElement.scrollHeight;
-    requestAnimationFrame(() => {
-      heightOverride = `${targetHeight}px`;
-    });
-    await settled(descriptionElement);
-
-    collapseElement?.classList.remove('is-appearing');
+    showLessAppearing = false;
     collapseElement?.focus();
-
-    // Hand max-height back to the "is-expanded" class (none), so a later
-    // resize isn't stuck at this now-stale pixel value.
-    heightOverride = undefined;
     transitioning = false;
   }
 
@@ -338,26 +238,19 @@
 
   // Trimming only changes the description's height, never its width, so
   // re-measuring only on width changes keeps our own content changes from
-  // triggering another trim.
+  // triggering another trim. Skipped mid-animation too: an expand/collapse
+  // owns bodyElement's content and descriptionElement's height until it
+  // finishes, and retrimming now would clobber both mid-flight.
   const onResize = (width: number) => {
     if (width === lastWidth) return;
     lastWidth = width;
-    // An expand/collapse animation owns bodyElement's content and
-    // descriptionElement's height until it finishes; retrimming now would
-    // clobber both mid-flight.
     if (transitioning) return;
     trim();
   };
 
   onMount(() => {
-    if (!hasDescription || !descriptionElement) return;
-    template = document.createElement('template');
-    template.innerHTML = full;
-    textLength = textNodes(template.content).reduce(
-      (sum, node) => sum + node.length,
-      0,
-    );
-    tail = buildTail();
+    if (!hasDescription || !descriptionElement || !tail) return;
+    truncator = createTruncator(full, tail);
 
     const observer = new ResizeObserver((entries) =>
       onResize(entries[0].contentRect.width),
@@ -373,7 +266,6 @@
 <div
   class="item"
   class:is-dimmed={dimmed}
-  class:is-filtering={activeSkills.length > 0}
   onclick={onCardClick}
   onauxclick={onCardAuxClick}
 >
@@ -409,6 +301,29 @@
                after mount, trim() and expand() own its children. -->
           <div bind:this={bodyElement}>{@html full}</div>
         </div>
+        <!-- Parked here until a trim moves it onto the last line of text
+             (see truncate-html.ts). -->
+        <div hidden>
+          <span
+            class="item-tail"
+            class:is-appearing={tailAppearing}
+            bind:this={tail}
+          >
+            <span aria-hidden="true">...</span>
+            <button
+              type="button"
+              class="item-show-more"
+              id={showMoreId}
+              bind:this={showMoreElement}
+              aria-expanded="false"
+              aria-controls={descriptionId}
+              aria-labelledby="{showMoreId} {titleId}"
+              onclick={expand}
+            >
+              Show more
+            </button>
+          </span>
+        </div>
       {/if}
     </div>
     <span class="item-meta">{callToAction} &rarr;</span>
@@ -416,27 +331,22 @@
   {#if hasDescription}
     <button
       type="button"
-      class="item-expand"
-      id={collapseId}
+      class="item-show-less"
+      class:is-appearing={showLessAppearing}
+      id={showLessId}
       bind:this={collapseElement}
       aria-expanded={expanded}
       aria-controls={descriptionId}
-      aria-labelledby="{collapseId} {titleId}"
+      aria-labelledby="{showLessId} {titleId}"
       hidden={!expanded || !truncated}
       onclick={collapse}
     >
       Show less
     </button>
   {/if}
-  {#if skills.length > 0}
-    <ul class="item-skills" aria-label="Skills">
-      {#each skills as skill (skill)}
-        <li class="item-skill" class:is-active={activeSkills.includes(skill)}>
-          <span>{skill}</span>
-        </li>
-      {/each}
-    </ul>
-  {/if}
+  <div class="item-skills">
+    <SkillChips {skills} {activeSkills} />
+  </div>
 </div>
 
 <style>
@@ -465,49 +375,15 @@
     opacity: 1;
   }
 
-  /* Chips straddle the bottom border. pointer-events: none lets clicks fall
-     through to the card's link overlay, so the whole card stays one target. */
+  /* Straddles the card's bottom border, inset to match the card's padding.
+     SkillChips lays itself out inside this box; --chips-align (set below
+     for mobile) tells it whether to hug the start or center. */
   .item-skills {
     position: absolute;
     left: 1.25rem;
     bottom: 0;
     transform: translateY(50%);
     z-index: 1;
-    display: flex;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    pointer-events: none;
-  }
-
-  .item-skill {
-    margin-left: 3px;
-    padding: 0.02rem 0.7rem;
-    transform: skewX(-14deg);
-    background: var(--color-accent-bright);
-    color: var(--color-bg);
-    font-size: 0.8rem;
-    font-weight: 600;
-    font-variant-caps: all-small-caps;
-    letter-spacing: 0.08em;
-    line-height: 1.5;
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
-  }
-
-  .item-skill:first-child {
-    margin-left: 0;
-  }
-
-  /* Counter-skew keeps the label upright. */
-  .item-skill > span {
-    display: block;
-    transform: skewX(14deg);
-  }
-
-  /* While a filter is active, chips outside it recede. */
-  .item.is-filtering .item-skill:not(.is-active) {
-    background: var(--color-accent);
   }
 
   .item-row {
@@ -599,10 +475,6 @@
     line-height: 1.5;
     max-height: calc(1em * 1.5 * var(--description-lines));
     overflow: hidden;
-    /* Duration must match transitionMs in the script above. expand()/
-       collapse() pin an explicit pixel max-height a frame apart so this
-       actually has two concrete values to animate between, rather than
-       jumping straight to/from the calc()/none below. */
     transition: max-height 0.3s ease;
   }
 
@@ -620,15 +492,14 @@
 
   @media (prefers-reduced-motion: reduce) {
     .item-description,
-    .item-expand,
-    .item-description :global(.portfolio-item-description-tail) {
+    .item-show-less,
+    .item-tail {
       transition: none;
     }
   }
 
-  /* The description is HTML injected with {@html} (and rebuilt by trim()),
-     so Svelte's scoped styles can't reach it: rules targeting it use
-     :global. */
+  /* The description is HTML injected with {@html}, so Svelte's scoped
+     styles can't reach it — these rules use :global. */
   .item-description :global(p),
   .item-description :global(blockquote) {
     margin: 0;
@@ -648,19 +519,13 @@
   /* nowrap keeps "... Show more" a single unit, so it wraps whole instead of
      splitting; trim() then rejects any cut that pushes it past the last
      line. Upright so it doesn't inherit a blockquote's italics. */
-  .item-description :global(.portfolio-item-description-tail) {
+  .item-tail {
     white-space: nowrap;
     font-style: normal;
     transition: opacity 0.15s ease;
   }
 
-  /* Set by collapse() right before inserting the tail, then cleared a frame
-     later so it fades in instead of appearing instantly. */
-  .item-description :global(.portfolio-item-description-tail.is-appearing) {
-    opacity: 0;
-  }
-
-  .item-description :global(.portfolio-item-expand-inline) {
+  .item-show-more {
     position: relative;
     z-index: 1;
     margin-left: 0.3em;
@@ -673,12 +538,12 @@
     cursor: pointer;
   }
 
-  .item-description :global(.portfolio-item-expand-inline:hover),
-  .item-description :global(.portfolio-item-expand-inline:focus-visible) {
+  .item-show-more:hover,
+  .item-show-more:focus-visible {
     text-decoration: underline;
   }
 
-  .item-expand {
+  .item-show-less {
     position: relative;
     z-index: 1;
     margin-top: 0.4rem;
@@ -692,14 +557,16 @@
     transition: opacity 0.15s ease;
   }
 
-  .item-expand:hover,
-  .item-expand:focus-visible {
+  .item-show-less:hover,
+  .item-show-less:focus-visible {
     text-decoration: underline;
   }
 
-  /* Set by expand() right after unhiding this, then cleared once the box
-     has finished growing, so it fades in instead of appearing instantly. */
-  .item-expand:global(.is-appearing) {
+  /* Set by collapse()/expand() right after the tail/"Show less" button is
+     revealed, then cleared a frame later so it fades in instead of
+     appearing instantly. */
+  .item-tail.is-appearing,
+  .item-show-less.is-appearing {
     opacity: 0;
   }
 
@@ -730,7 +597,7 @@
       order: 3;
     }
 
-    .item-expand {
+    .item-show-less {
       order: 2;
       align-self: center;
     }
@@ -738,13 +605,11 @@
     .item-skills {
       left: 0;
       right: 0;
-      justify-content: center;
+      --chips-align: center;
     }
 
-    /* Dissolves this plain wrapper div so .item-content and
-       .item-meta become direct flex children of .item and can be
-       reordered around .item-expand. Safe here because the div carries
-       no semantics to lose — unlike the anchor, which must stay intact. */
+    /* Dissolves this plain wrapper div so its children can be reordered
+       around .item-show-less. Safe — unlike the anchor, it carries no semantics to lose. */
     .item-row {
       display: contents;
     }

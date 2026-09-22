@@ -10,14 +10,10 @@
   const primary = $derived(roles[0]);
   const rest = $derived(roles.slice(1));
 
-  // Must match the per-letter delay step in the markup below.
   const letterStagger = 20;
 
   // A role's first letter peaks at the same instant as the previous role's
   // second-to-last letter, so the light carries over with no dead gap.
-  // Every letter takes the same time to reach its own peak, so matching two
-  // peaks just means offsetting the starts by the same number of stagger
-  // steps that separate those two letters — the windup itself cancels out.
   const roleDelays = $derived(
     roles.reduce<number[]>((delays, role, i) => {
       if (i === 0) {
@@ -81,6 +77,7 @@
 
 <style>
   .role {
+    --role-hint-duration: 1.4s;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -114,14 +111,15 @@
       color 0.15s ease,
       text-decoration-color 0.15s ease,
       text-decoration-thickness 0.15s ease;
-    animation: role-hint 1.4s ease-in-out;
+    animation: role-hint var(--role-hint-duration) ease-in-out;
     animation-delay: var(--role-delay);
   }
 
   /* Lights up left to right, on top of the underline sweep. Kept plain
-     inline so the space between words renders normally. */
+     inline so the space between words renders normally. Same duration as
+     the underline sweep above, so the two read as one animation. */
   .role-letter {
-    animation: letter-hint 1.4s ease-in-out;
+    animation: letter-hint var(--role-hint-duration) ease-in-out;
   }
 
   @keyframes letter-hint {

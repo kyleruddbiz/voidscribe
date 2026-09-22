@@ -30,18 +30,24 @@
   const instanceId = $props.id();
   const descriptionId = `portfolio-item-description-${instanceId}`;
   const titleId = `portfolio-item-title-${instanceId}`;
-  const expandId = `portfolio-item-expand-${instanceId}`;
-  const collapseId = `portfolio-item-collapse-${instanceId}`;
+  const showMoreId = `portfolio-item-show-more-${instanceId}`;
+  const showLessId = `portfolio-item-show-less-${instanceId}`;
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
   let descriptionElement = $state<HTMLDivElement>();
   let bodyElement = $state<HTMLDivElement>();
+  let tail = $state<HTMLSpanElement>();
+  let showMoreElement = $state<HTMLButtonElement>();
   let collapseElement = $state<HTMLButtonElement>();
   let linkElement = $state<HTMLAnchorElement>();
 
   let expanded = $state(false);
   let truncated = $state(false);
+  // Faded in by collapse()/expand() once the tail/"Show less" button they
+  // reveal has settled into its final position, rather than popping in.
+  let tailAppearing = $state(false);
+  let showLessAppearing = $state(false);
   let lastWidth = -1;
 
   // Explicit pixel max-height used only while an expand/collapse animation is
@@ -85,33 +91,9 @@
 
   // Built once on mount, since it needs `document`.
   let truncator: HtmlTruncator | undefined;
-  let tail: HTMLSpanElement | undefined;
 
   const fits = (maxHeight: number) =>
     descriptionElement!.scrollHeight <= maxHeight + 1;
-
-  const buildTail = () => {
-    const element = document.createElement('span');
-    element.className = 'portfolio-item-description-tail';
-
-    const ellipsis = document.createElement('span');
-    ellipsis.className = 'portfolio-item-description-ellipsis';
-    ellipsis.setAttribute('aria-hidden', 'true');
-    ellipsis.textContent = '...';
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'portfolio-item-expand-inline';
-    button.id = expandId;
-    button.textContent = 'Show more';
-    button.setAttribute('aria-expanded', 'false');
-    button.setAttribute('aria-controls', descriptionId);
-    button.setAttribute('aria-labelledby', `${expandId} ${titleId}`);
-    button.addEventListener('click', expand);
-
-    element.append(ellipsis, button);
-    return element;
-  };
 
   // The clamped height for the collapsed state, in pixels — both the resting
   // CSS max-height (--description-lines below) and the animation target
@@ -161,12 +143,12 @@
     });
     await settled(descriptionElement);
 
-    tail?.classList.add('is-appearing');
+    tailAppearing = true;
     trim();
-    requestAnimationFrame(() => tail?.classList.remove('is-appearing'));
+    requestAnimationFrame(() => (tailAppearing = false));
 
     heightOverride = undefined;
-    tail?.querySelector('button')?.focus();
+    showMoreElement?.focus();
     transitioning = false;
   }
 
@@ -185,7 +167,7 @@
     heightOverride = `${startHeight}px`;
     expanded = true;
     bodyElement?.replaceChildren(truncator!.full());
-    collapseElement?.classList.add('is-appearing');
+    showLessAppearing = true;
     await tick();
 
     const targetHeight = descriptionElement.scrollHeight;
@@ -194,7 +176,7 @@
     });
     await settled(descriptionElement);
 
-    collapseElement?.classList.remove('is-appearing');
+    showLessAppearing = false;
     collapseElement?.focus();
 
     // Hand max-height back to the "is-expanded" class (none), so a later
@@ -260,8 +242,7 @@
   };
 
   onMount(() => {
-    if (!hasDescription || !descriptionElement) return;
-    tail = buildTail();
+    if (!hasDescription || !descriptionElement || !tail) return;
     truncator = createTruncator(full, tail);
 
     const observer = new ResizeObserver((entries) =>
@@ -314,6 +295,29 @@
                after mount, trim() and expand() own its children. -->
           <div bind:this={bodyElement}>{@html full}</div>
         </div>
+        <!-- Parked here until a trim moves it onto the last line of text
+             (see truncate-html.ts). -->
+        <div hidden>
+          <span
+            class="item-tail"
+            class:is-appearing={tailAppearing}
+            bind:this={tail}
+          >
+            <span aria-hidden="true">...</span>
+            <button
+              type="button"
+              class="item-show-more"
+              id={showMoreId}
+              bind:this={showMoreElement}
+              aria-expanded="false"
+              aria-controls={descriptionId}
+              aria-labelledby="{showMoreId} {titleId}"
+              onclick={expand}
+            >
+              Show more
+            </button>
+          </span>
+        </div>
       {/if}
     </div>
     <span class="item-meta">{callToAction} &rarr;</span>
@@ -321,12 +325,13 @@
   {#if hasDescription}
     <button
       type="button"
-      class="item-expand"
-      id={collapseId}
+      class="item-show-less"
+      class:is-appearing={showLessAppearing}
+      id={showLessId}
       bind:this={collapseElement}
       aria-expanded={expanded}
       aria-controls={descriptionId}
-      aria-labelledby="{collapseId} {titleId}"
+      aria-labelledby="{showLessId} {titleId}"
       hidden={!expanded || !truncated}
       onclick={collapse}
     >
@@ -525,8 +530,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .item-description,
-    .item-expand,
-    .item-description :global(.portfolio-item-description-tail) {
+    .item-show-less,
+    .item-tail {
       transition: none;
     }
   }
@@ -553,19 +558,13 @@
   /* nowrap keeps "... Show more" a single unit, so it wraps whole instead of
      splitting; trim() then rejects any cut that pushes it past the last
      line. Upright so it doesn't inherit a blockquote's italics. */
-  .item-description :global(.portfolio-item-description-tail) {
+  .item-tail {
     white-space: nowrap;
     font-style: normal;
     transition: opacity 0.15s ease;
   }
 
-  /* Set by collapse() right before inserting the tail, then cleared a frame
-     later so it fades in instead of appearing instantly. */
-  .item-description :global(.portfolio-item-description-tail.is-appearing) {
-    opacity: 0;
-  }
-
-  .item-description :global(.portfolio-item-expand-inline) {
+  .item-show-more {
     position: relative;
     z-index: 1;
     margin-left: 0.3em;
@@ -578,12 +577,12 @@
     cursor: pointer;
   }
 
-  .item-description :global(.portfolio-item-expand-inline:hover),
-  .item-description :global(.portfolio-item-expand-inline:focus-visible) {
+  .item-show-more:hover,
+  .item-show-more:focus-visible {
     text-decoration: underline;
   }
 
-  .item-expand {
+  .item-show-less {
     position: relative;
     z-index: 1;
     margin-top: 0.4rem;
@@ -597,14 +596,16 @@
     transition: opacity 0.15s ease;
   }
 
-  .item-expand:hover,
-  .item-expand:focus-visible {
+  .item-show-less:hover,
+  .item-show-less:focus-visible {
     text-decoration: underline;
   }
 
-  /* Set by expand() right after unhiding this, then cleared once the box
-     has finished growing, so it fades in instead of appearing instantly. */
-  .item-expand:global(.is-appearing) {
+  /* Set by collapse()/expand() right after the tail/"Show less" button is
+     revealed, then cleared a frame later so it fades in instead of
+     appearing instantly. */
+  .item-tail.is-appearing,
+  .item-show-less.is-appearing {
     opacity: 0;
   }
 
@@ -635,7 +636,7 @@
       order: 3;
     }
 
-    .item-expand {
+    .item-show-less {
       order: 2;
       align-self: center;
     }
@@ -648,7 +649,7 @@
 
     /* Dissolves this plain wrapper div so .item-content and
        .item-meta become direct flex children of .item and can be
-       reordered around .item-expand. Safe here because the div carries
+       reordered around .item-show-less. Safe here because the div carries
        no semantics to lose — unlike the anchor, which must stay intact. */
     .item-row {
       display: contents;

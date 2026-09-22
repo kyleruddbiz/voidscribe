@@ -6,6 +6,8 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 Trunk-based development. Commit directly to `main` unless told otherwise.
 
+Wait for the user to review a change and explicitly say to commit before running `git commit` or `git push`.
+
 ## Before calling a change done
 
 1. `npm run format` — auto-format the diff (sub-second; safe to run every time).

@@ -7,8 +7,29 @@
   }
 
   let { roles }: Props = $props();
+  const primary = $derived(roles[0]);
+  const rest = $derived(roles.slice(1));
 
-  // A drag-select ends in a click; don't treat it as a toggle.
+  // Must match the per-letter delay step in the markup below.
+  const letterStagger = 20;
+
+  // A role's first letter peaks at the same instant as the previous role's
+  // second-to-last letter, so the light carries over with no dead gap.
+  // Every letter takes the same time to reach its own peak, so matching two
+  // peaks just means offsetting the starts by the same number of stagger
+  // steps that separate those two letters — the windup itself cancels out.
+  const roleDelays = $derived(
+    roles.reduce<number[]>((delays, role, i) => {
+      if (i === 0) {
+        delays.push(0);
+      } else {
+        const prev = roles[i - 1];
+        delays.push(delays[i - 1] + (prev.name.length - 2) * letterStagger);
+      }
+      return delays;
+    }, []),
+  );
+
   const onClick = (name: string) => {
     if (isSelecting()) return;
     skillFilter.toggle(name);
@@ -16,31 +37,53 @@
 
   const onKeydown = (event: KeyboardEvent, name: string) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
-    // Space would otherwise scroll the page.
     event.preventDefault();
     skillFilter.toggle(name);
   };
 </script>
 
-<!-- Spans, not <button>s: Chrome won't start a text selection inside a button,
-     and the role text needs to stay selectable. -->
+{#snippet toggle(role: { name: string }, isPrimary: boolean, delay: number)}
+  <!-- Spans, not <button>s: Chrome won't start a text selection inside a
+       button, and the role text needs to stay selectable. Each letter gets
+       its own span so the load-in sweep can light them up in sequence;
+       aria-label restores a clean name over the split-up fragments. -->
+  <span
+    class="role-toggle"
+    class:is-primary={isPrimary}
+    class:is-selected={skillFilter.isSelected(role.name)}
+    style="--role-delay: {delay}ms"
+    role="button"
+    tabindex="0"
+    aria-pressed={skillFilter.isSelected(role.name)}
+    aria-label={role.name}
+    onclick={() => onClick(role.name)}
+    onkeydown={(event) => onKeydown(event, role.name)}
+    >{#each [...role.name] as letter, i}<span
+        class="role-letter"
+        aria-hidden="true"
+        style="animation-delay: calc(var(--role-delay) + {i * letterStagger}ms)"
+        >{letter}</span
+      >{/each}</span
+  >
+{/snippet}
+
+<!-- Software Engineer stands alone so it can wrap onto its own line first;
+     the other two are grouped so they wrap together as a pair, then split
+     to one each only once neither fits the line at all. -->
 <p class="role" role="group" aria-label="Filter portfolio by skill">
-  {#each roles as role, index (role.name)}
-    <span
-      class="role-toggle"
-      class:is-primary={index === 0}
-      class:is-selected={skillFilter.isSelected(role.name)}
-      role="button"
-      tabindex="0"
-      aria-pressed={skillFilter.isSelected(role.name)}
-      onclick={() => onClick(role.name)}
-      onkeydown={(event) => onKeydown(event, role.name)}>{role.name}</span
-    >{' '}
-  {/each}
+  {@render toggle(primary, true, roleDelays[0])}
+  <span class="role-pair">
+    {#each rest as role, i (role.name)}
+      {@render toggle(role, false, roleDelays[i + 1])}
+    {/each}
+  </span>
 </p>
 
 <style>
   .role {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
     color: var(--color-text-dim);
     font-size: 1.1em;
     font-variant-caps: all-small-caps;
@@ -48,16 +91,47 @@
     margin: 0 0 2rem;
   }
 
+  .role-pair {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
+
+  /* The underline is always on but painted transparent at rest, so hover,
+     selection and the load-in sweep below only ever animate its color.
+     --role-delay (set inline per role) staggers the sweep role by role; the
+     letters below read it too, so their own wave picks up where each
+     role's starts. */
   .role-toggle {
     white-space: nowrap;
     cursor: pointer;
     user-select: text;
-    text-decoration: none;
-    text-decoration-color: var(--color-accent-bright);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
     transition:
       color 0.15s ease,
-      text-decoration-color 0.15s ease;
+      text-decoration-color 0.15s ease,
+      text-decoration-thickness 0.15s ease;
+    animation: role-hint 1.4s ease-in-out;
+    animation-delay: var(--role-delay);
+  }
+
+  /* Lights up left to right, on top of the underline sweep. Kept plain
+     inline so the space between words renders normally. */
+  .role-letter {
+    animation: letter-hint 1.4s ease-in-out;
+  }
+
+  @keyframes letter-hint {
+    0%,
+    100% {
+      color: var(--color-text-dim);
+    }
+    40% {
+      color: var(--color-text);
+    }
   }
 
   .role-toggle.is-primary {
@@ -68,23 +142,44 @@
   .role-toggle:hover,
   .role-toggle:focus-visible {
     color: var(--color-text);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
+    text-decoration-color: var(--color-accent-bright);
   }
 
   .role-toggle.is-selected {
     color: var(--color-text);
-    text-decoration: underline;
+    text-decoration-color: var(--color-accent-bright);
     text-decoration-thickness: 2px;
   }
 
+  /* Plays once per page load so the affordance is discovered without a
+     hover. Reuses the same underline hover/selection use, so it teaches
+     the real cue instead of a one-off effect. */
+  @keyframes role-hint {
+    0%,
+    100% {
+      text-decoration-color: transparent;
+    }
+    40% {
+      text-decoration-color: var(--color-accent);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .role-toggle,
+    .role-letter {
+      animation: none;
+    }
+  }
+
   /* Separator trails each role so a wrap never starts a line with a dot.
-     inline-block keeps the underline from running under it, which also
-     strips a leading space, hence the margin. */
+     "·" isn't centered in its own advance width in this font, so the right
+     margin is smaller than the left to make the gap look even on both
+     sides. */
   .role-toggle:not(:last-child)::after {
     content: '·';
     display: inline-block;
     margin-left: 0.4em;
+    margin-right: 0.32em;
     color: var(--color-text-dim);
     text-decoration: none;
   }
@@ -94,32 +189,6 @@
     .role-toggle {
       cursor: auto;
       text-decoration: none;
-    }
-  }
-
-  /* Too narrow for one line: put the primary role alone on its own line
-     (no separator needed), with the other two together below it. */
-  @media (max-width: 36rem) {
-    .role .role-toggle.is-primary {
-      display: block;
-      width: fit-content;
-    }
-
-    /* Must match the separator rule's selector shape to out-rank it. */
-    .role .role-toggle.is-primary:not(:last-child)::after {
-      content: none;
-    }
-  }
-
-  /* Too narrow for the other two to share a line: stack all three, no dots. */
-  @media (max-width: 22rem) {
-    .role .role-toggle {
-      display: block;
-      width: fit-content;
-    }
-
-    .role .role-toggle:not(:last-child)::after {
-      content: none;
     }
   }
 </style>

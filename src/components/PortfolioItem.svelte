@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick, untrack } from 'svelte';
+  import { isSelecting } from '../lib/selection';
 
   interface Props {
     href: string;
@@ -8,6 +9,9 @@
     icon: string;
     description?: string;
     title: string;
+    skills?: readonly string[];
+    activeSkills?: readonly string[];
+    dimmed?: boolean;
   }
 
   let {
@@ -17,6 +21,9 @@
     icon,
     description,
     title,
+    skills = [],
+    activeSkills = [],
+    dimmed = false,
   }: Props = $props();
 
   const instanceId = $props.id();
@@ -207,8 +214,7 @@
 
     // A drag-select still ends in a click. Don't follow it, and cancel it if it
     // landed on the anchor (a drag within the title).
-    const selection = getSelection();
-    const selecting = !!selection && !selection.isCollapsed;
+    const selecting = isSelecting();
     if (target.closest('a')) {
       if (selecting) event.preventDefault();
       return;
@@ -264,7 +270,13 @@
 <!-- Mouse-only convenience: the anchor is still the real, keyboard-operable
      control, so the a11y warnings below don't apply. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-<div class="item" onclick={onCardClick} onauxclick={onCardAuxClick}>
+<div
+  class="item"
+  class:is-dimmed={dimmed}
+  class:is-filtering={activeSkills.length > 0}
+  onclick={onCardClick}
+  onauxclick={onCardAuxClick}
+>
   <div class="item-row">
     <div class="item-content">
       <!-- draggable="false": dragging on a link's text would otherwise drag
@@ -315,20 +327,86 @@
       Show less
     </button>
   {/if}
+  {#if skills.length > 0}
+    <ul class="item-skills" aria-label="Skills">
+      {#each skills as skill (skill)}
+        <li class="item-skill" class:is-active={activeSkills.includes(skill)}>
+          <span>{skill}</span>
+        </li>
+      {/each}
+    </ul>
+  {/if}
 </div>
 
 <style>
   .item {
     position: relative;
-    padding: 1rem 1.25rem;
+    padding: 1rem 1.25rem 1.5rem;
     border: 1px solid var(--color-border);
     border-radius: 4px;
     background: var(--color-bg-raised);
+    transition:
+      opacity 0.25s ease,
+      border-color 0.2s ease;
   }
 
   .item:hover,
   .item:focus-within {
     border-color: var(--color-accent);
+  }
+
+  .item.is-dimmed {
+    opacity: 0.45;
+  }
+
+  .item.is-dimmed:hover,
+  .item.is-dimmed:focus-within {
+    opacity: 1;
+  }
+
+  /* Chips straddle the bottom border. pointer-events: none lets clicks fall
+     through to the card's link overlay, so the whole card stays one target. */
+  .item-skills {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 0;
+    transform: translateY(50%);
+    z-index: 1;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+
+  .item-skill {
+    margin-left: 3px;
+    padding: 0.02rem 0.7rem;
+    transform: skewX(-14deg);
+    background: var(--color-accent-bright);
+    color: var(--color-bg);
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.08em;
+    line-height: 1.5;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+  }
+
+  .item-skill:first-child {
+    margin-left: 0;
+  }
+
+  /* Counter-skew keeps the label upright. */
+  .item-skill > span {
+    display: block;
+    transform: skewX(14deg);
+  }
+
+  /* While a filter is active, chips outside it recede. */
+  .item.is-filtering .item-skill:not(.is-active) {
+    background: var(--color-accent);
   }
 
   .item-row {
@@ -527,6 +605,12 @@
     .item-expand {
       order: 2;
       align-self: center;
+    }
+
+    .item-skills {
+      left: 0;
+      right: 0;
+      justify-content: center;
     }
 
     /* Dissolves this plain wrapper div so .item-content and

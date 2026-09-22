@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick, untrack } from 'svelte';
   import { isSelecting } from '../lib/selection';
+  import { createTruncator, type HtmlTruncator } from '../lib/truncate-html';
 
   interface Props {
     href: string;
@@ -33,30 +34,6 @@
   const collapseId = `portfolio-item-collapse-${instanceId}`;
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
-
-  // Wrappers the tail is placed outside of. It stays inside any other
-  // element, so it lands on the last line of text rather than after a block.
-  const inlineTags = new Set([
-    'A',
-    'ABBR',
-    'B',
-    'CITE',
-    'CODE',
-    'EM',
-    'I',
-    'MARK',
-    'Q',
-    'SMALL',
-    'SPAN',
-    'STRONG',
-    'SUB',
-    'SUP',
-    'U',
-  ]);
-
-  // Whitespace and sentence punctuation (including an existing ellipsis and
-  // dashes) that would collide with the "..." at the cut point.
-  const trailingPunctuation = /[\s.,;:!?…\-–—]+$/;
 
   let descriptionElement = $state<HTMLDivElement>();
   let bodyElement = $state<HTMLDivElement>();
@@ -106,26 +83,12 @@
       setTimeout(finish, transitionMs + 50);
     });
 
-  // Parsed once on mount. The description is HTML, so it can't be cut at a
-  // character offset of the string: the cut has to happen on a DOM copy.
-  let template: HTMLTemplateElement | undefined;
+  // Built once on mount, since it needs `document`.
+  let truncator: HtmlTruncator | undefined;
   let tail: HTMLSpanElement | undefined;
-  let textLength = 0;
 
   const fits = (maxHeight: number) =>
     descriptionElement!.scrollHeight <= maxHeight + 1;
-
-  // Text nodes that render something, in document order. Whitespace-only
-  // nodes (the gaps between blocks) are skipped so a cut can never land in
-  // one, which would strand the tail on a line of its own.
-  const textNodes = (root: Node) => {
-    const nodes: Text[] = [];
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (node.textContent!.trim()) nodes.push(node as Text);
-    }
-    return nodes;
-  };
 
   const buildTail = () => {
     const element = document.createElement('span');
@@ -150,45 +113,6 @@
     return element;
   };
 
-  const fullContent = () =>
-    template!.content.cloneNode(true) as DocumentFragment;
-
-  // A copy of the description cut off after `budget` characters of rendered
-  // text, with the tail appended. Range.deleteContents() does the hard part:
-  // it trims the text node the cut lands in, keeps the ancestors that node
-  // sits inside of (<p>, <blockquote>), and drops everything after it.
-  const contentUpTo = (budget: number) => {
-    const clone = fullContent();
-    let remaining = budget;
-    let cut: Text | undefined;
-    for (const node of textNodes(clone)) {
-      cut = node;
-      if (remaining <= node.length) break;
-      remaining -= node.length;
-    }
-    if (!cut) return clone;
-
-    const range = document.createRange();
-    range.setStart(cut, Math.min(remaining, cut.length));
-    range.setEndAfter(clone.lastChild!);
-    range.deleteContents();
-    // Trailing punctuation goes too: the tail brings its own "...", and
-    // "text.... Show more" or "text,... Show more" reads as a glitch.
-    cut.data = cut.data.replace(trailingPunctuation, '');
-
-    // Step out of inline wrappers (<em>, <cite>, ...) but not out of the
-    // enclosing block, so the tail sits flush on the last line of text.
-    let anchor: Node = cut;
-    while (
-      anchor.parentElement &&
-      inlineTags.has(anchor.parentElement.tagName)
-    ) {
-      anchor = anchor.parentElement;
-    }
-    (anchor as ChildNode).after(tail!);
-    return clone;
-  };
-
   // The clamped height for the collapsed state, in pixels — both the resting
   // CSS max-height (--description-lines below) and the animation target
   // collapse() shrinks toward.
@@ -198,37 +122,23 @@
     return parseFloat(styles.lineHeight) * lines;
   };
 
-  // Binary search over budgets for the longest prefix that, with the tail
-  // appended, fits within maxHeight. Mutates bodyElement with the result.
-  const applyTrim = (maxHeight: number) => {
-    let low = 0;
-    let high = textLength;
-    while (low < high) {
-      const middle = Math.ceil((low + high) / 2);
-      bodyElement!.replaceChildren(contentUpTo(middle));
-      if (fits(maxHeight)) {
-        low = middle;
-      } else {
-        high = middle - 1;
-      }
-    }
-    bodyElement!.replaceChildren(contentUpTo(low));
-  };
-
   // Trims the description to the longest prefix that, with the "... Show more"
   // tail appended, fits within --description-lines lines. Also runs while
   // expanded so `truncated` tracks resizes: "Show less" is hidden whenever
   // the full text fits.
   const trim = () => {
-    if (!descriptionElement || !bodyElement || !template) return;
+    if (!descriptionElement || !bodyElement || !truncator) return;
     const maxHeight = collapsedHeight();
 
     // Expanded content is already the full text; rebuilding it would drop any
     // text selection inside it.
-    if (!expanded) bodyElement.replaceChildren(fullContent());
+    if (!expanded) bodyElement.replaceChildren(truncator.full());
     truncated = !fits(maxHeight);
     if (expanded || !truncated) return;
-    applyTrim(maxHeight);
+    truncator.longestFitting(
+      (content) => bodyElement!.replaceChildren(content),
+      () => fits(maxHeight),
+    );
   };
 
   // Hides "Show less" immediately, before the shrink starts: leaving it up
@@ -274,7 +184,7 @@
     restingHeight = startHeight;
     heightOverride = `${startHeight}px`;
     expanded = true;
-    bodyElement?.replaceChildren(fullContent());
+    bodyElement?.replaceChildren(truncator!.full());
     collapseElement?.classList.add('is-appearing');
     await tick();
 
@@ -351,13 +261,8 @@
 
   onMount(() => {
     if (!hasDescription || !descriptionElement) return;
-    template = document.createElement('template');
-    template.innerHTML = full;
-    textLength = textNodes(template.content).reduce(
-      (sum, node) => sum + node.length,
-      0,
-    );
     tail = buildTail();
+    truncator = createTruncator(full, tail);
 
     const observer = new ResizeObserver((entries) =>
       onResize(entries[0].contentRect.width),

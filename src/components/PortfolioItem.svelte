@@ -33,8 +33,9 @@
   const titleId = `portfolio-item-title-${instanceId}`;
   const showMoreId = `portfolio-item-show-more-${instanceId}`;
   const showLessId = `portfolio-item-show-less-${instanceId}`;
-  // untrack: only the initial description is ever used (see truncator below) —
-  // this isn't meant to stay in sync with a later prop change.
+  // untrack avoids Svelte's state_referenced_locally warning: `description`
+  // is only ever read for its initial value (see truncator below), so it's
+  // deliberately not meant to stay in sync with a later prop change.
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 

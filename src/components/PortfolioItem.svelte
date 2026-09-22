@@ -67,6 +67,45 @@
   let truncated = $state(false);
   let lastWidth = -1;
 
+  // Explicit pixel max-height used only while an expand/collapse animation is
+  // in flight; undefined the rest of the time, handing max-height back to the
+  // CSS classes below (the calc() clamp when collapsed, none when expanded).
+  let heightOverride = $state<string | undefined>(undefined);
+  // Guards against a resize retrimming content mid-animation, and against a
+  // second click re-entering expand()/collapse() before the first finishes.
+  let transitioning = false;
+
+  // The collapsed box's actual rendered height, captured by expand() just
+  // before it changes anything. collapse() animates back to this rather than
+  // collapsedHeight()'s theoretical max: --description-lines is an upper
+  // bound, and trimmed content often lands a partial line short of it.
+  let restingHeight = 0;
+
+  // Must match the max-height transition duration in the stylesheet below.
+  const transitionMs = 300;
+
+  // Resolves once the description's max-height transition finishes, or after
+  // transitionMs regardless — the fallback covers prefers-reduced-motion
+  // (the transition is disabled below, so no event fires) and a transition
+  // with equal start/end heights (nothing to animate, so nothing fires).
+  const settled = (element: HTMLElement) =>
+    new Promise<void>((resolve) => {
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        element.removeEventListener('transitionend', onEnd);
+        resolve();
+      };
+      const onEnd = (event: TransitionEvent) => {
+        if (event.target === element && event.propertyName === 'max-height') {
+          finish();
+        }
+      };
+      element.addEventListener('transitionend', onEnd);
+      setTimeout(finish, transitionMs + 50);
+    });
+
   // Parsed once on mount. The description is HTML, so it can't be cut at a
   // character offset of the string: the cut has to happen on a DOM copy.
   let template: HTMLTemplateElement | undefined;
@@ -150,51 +189,108 @@
     return clone;
   };
 
-  // Trims the description to the longest prefix that, with the "... Show more"
-  // tail appended, fits within --description-lines lines. Also runs while
-  // expanded so `truncated` tracks resizes: "Show less" is hidden whenever
-  // the full text fits.
-  const trim = () => {
-    if (!descriptionElement || !bodyElement || !template) return;
-    const styles = getComputedStyle(descriptionElement);
+  // The clamped height for the collapsed state, in pixels — both the resting
+  // CSS max-height (--description-lines below) and the animation target
+  // collapse() shrinks toward.
+  const collapsedHeight = () => {
+    const styles = getComputedStyle(descriptionElement!);
     const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
-    const maxHeight = parseFloat(styles.lineHeight) * lines;
+    return parseFloat(styles.lineHeight) * lines;
+  };
 
-    // Expanded content is already the full text; rebuilding it would drop any
-    // text selection inside it.
-    if (!expanded) bodyElement.replaceChildren(fullContent());
-    truncated = !fits(maxHeight);
-    if (expanded || !truncated) return;
-
+  // Binary search over budgets for the longest prefix that, with the tail
+  // appended, fits within maxHeight. Mutates bodyElement with the result.
+  const applyTrim = (maxHeight: number) => {
     let low = 0;
     let high = textLength;
     while (low < high) {
       const middle = Math.ceil((low + high) / 2);
-      bodyElement.replaceChildren(contentUpTo(middle));
+      bodyElement!.replaceChildren(contentUpTo(middle));
       if (fits(maxHeight)) {
         low = middle;
       } else {
         high = middle - 1;
       }
     }
-    bodyElement.replaceChildren(contentUpTo(low));
+    bodyElement!.replaceChildren(contentUpTo(low));
   };
 
-  // Pressing "Show less" hides it, which would drop keyboard and screen reader
-  // focus back to the document. Hand focus to the new "Show more" instead.
-  const collapse = () => {
+  // Trims the description to the longest prefix that, with the "... Show more"
+  // tail appended, fits within --description-lines lines. Also runs while
+  // expanded so `truncated` tracks resizes: "Show less" is hidden whenever
+  // the full text fits.
+  const trim = () => {
+    if (!descriptionElement || !bodyElement || !template) return;
+    const maxHeight = collapsedHeight();
+
+    // Expanded content is already the full text; rebuilding it would drop any
+    // text selection inside it.
+    if (!expanded) bodyElement.replaceChildren(fullContent());
+    truncated = !fits(maxHeight);
+    if (expanded || !truncated) return;
+    applyTrim(maxHeight);
+  };
+
+  // Hides "Show less" immediately, before the shrink starts: leaving it up
+  // until the box reaches its final height would pop the card's bottom edge
+  // the instant it later disappeared. The content stays the full text during
+  // the shrink, so it's clipped by overflow rather than popping straight to
+  // the truncated prefix; trim() swaps in the tail, faded in, once the box
+  // has reached its final height.
+  async function collapse() {
+    if (transitioning || !expanded || !descriptionElement) return;
+    transitioning = true;
     expanded = false;
-    trim();
-    tail?.querySelector('button')?.focus();
-  };
 
+    const startHeight = descriptionElement.scrollHeight;
+    heightOverride = `${startHeight}px`;
+    await tick();
+
+    requestAnimationFrame(() => {
+      heightOverride = `${restingHeight}px`;
+    });
+    await settled(descriptionElement);
+
+    tail?.classList.add('is-appearing');
+    trim();
+    requestAnimationFrame(() => tail?.classList.remove('is-appearing'));
+
+    heightOverride = undefined;
+    tail?.querySelector('button')?.focus();
+    transitioning = false;
+  }
+
+  // Swaps in the full text immediately, then grows the box to fit: pinning
+  // the current height first and setting the target a frame later is what
+  // makes the max-height transition below animate instead of jumping
+  // straight to `none`. "Show less" is unhidden immediately too, so its
+  // space is reserved for the grow animation, but stays invisible until the
+  // box finishes growing, when it fades in like "Show more" does on collapse.
   async function expand() {
+    if (transitioning || expanded || !descriptionElement) return;
+    transitioning = true;
+
+    const startHeight = descriptionElement.getBoundingClientRect().height;
+    restingHeight = startHeight;
+    heightOverride = `${startHeight}px`;
     expanded = true;
     bodyElement?.replaceChildren(fullContent());
-    // Replacing the content removed "Show more"; focus "Show less" once
-    // Svelte has unhidden it.
+    collapseElement?.classList.add('is-appearing');
     await tick();
+
+    const targetHeight = descriptionElement.scrollHeight;
+    requestAnimationFrame(() => {
+      heightOverride = `${targetHeight}px`;
+    });
+    await settled(descriptionElement);
+
+    collapseElement?.classList.remove('is-appearing');
     collapseElement?.focus();
+
+    // Hand max-height back to the "is-expanded" class (none), so a later
+    // resize isn't stuck at this now-stale pixel value.
+    heightOverride = undefined;
+    transitioning = false;
   }
 
   // The card's text sits above the link overlay so it can be selected, which
@@ -246,6 +342,10 @@
   const onResize = (width: number) => {
     if (width === lastWidth) return;
     lastWidth = width;
+    // An expand/collapse animation owns bodyElement's content and
+    // descriptionElement's height until it finishes; retrimming now would
+    // clobber both mid-flight.
+    if (transitioning) return;
     trim();
   };
 
@@ -301,6 +401,7 @@
           class="item-description"
           class:is-expanded={expanded}
           id={descriptionId}
+          style:max-height={heightOverride}
           bind:this={descriptionElement}
         >
           <!-- Rendered here so the text is in the static HTML. `full` is
@@ -498,6 +599,11 @@
     line-height: 1.5;
     max-height: calc(1em * 1.5 * var(--description-lines));
     overflow: hidden;
+    /* Duration must match transitionMs in the script above. expand()/
+       collapse() pin an explicit pixel max-height a frame apart so this
+       actually has two concrete values to animate between, rather than
+       jumping straight to/from the calc()/none below. */
+    transition: max-height 0.3s ease;
   }
 
   .item-description.is-expanded {
@@ -509,6 +615,14 @@
   @media (scripting: none) {
     .item-description {
       max-height: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .item-description,
+    .item-expand,
+    .item-description :global(.portfolio-item-description-tail) {
+      transition: none;
     }
   }
 
@@ -537,6 +651,13 @@
   .item-description :global(.portfolio-item-description-tail) {
     white-space: nowrap;
     font-style: normal;
+    transition: opacity 0.15s ease;
+  }
+
+  /* Set by collapse() right before inserting the tail, then cleared a frame
+     later so it fades in instead of appearing instantly. */
+  .item-description :global(.portfolio-item-description-tail.is-appearing) {
+    opacity: 0;
   }
 
   .item-description :global(.portfolio-item-expand-inline) {
@@ -568,11 +689,18 @@
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
+    transition: opacity 0.15s ease;
   }
 
   .item-expand:hover,
   .item-expand:focus-visible {
     text-decoration: underline;
+  }
+
+  /* Set by expand() right after unhiding this, then cleared once the box
+     has finished growing, so it fades in instead of appearing instantly. */
+  .item-expand:global(.is-appearing) {
+    opacity: 0;
   }
 
   @media (max-width: 480px) {

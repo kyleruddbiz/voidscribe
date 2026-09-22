@@ -26,6 +26,10 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
     />
     <meta name="theme-color" content="#0d0e12" />
     <meta name="description" content={description} />
+    <!-- Marks that scripts ran; gates the .js CSS rules in PortfolioItem. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
     <link rel="canonical" href={canonical} />
     <title>{pageTitle}</title>
 

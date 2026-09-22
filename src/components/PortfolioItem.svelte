@@ -48,6 +48,10 @@
 
   let expanded = $state(false);
   let truncated = $state(false);
+  // Set by reveal() below: revealed when the description starts growing
+  // open, settledIn once it finishes.
+  let revealed = $state(false);
+  let settledIn = $state(false);
   // Faded in by collapse()/expand() once the tail/"Show less" button they
   // reveal has settled into its final position, rather than popping in.
   let tailAppearing = $state(false);
@@ -193,6 +197,23 @@
     transitioning = false;
   }
 
+  // Trims the description, then grows the box open from 0 to that height.
+  async function reveal() {
+    if (!descriptionElement || !bodyElement || !truncator) return;
+    transitioning = true;
+
+    lastWidth = descriptionElement.getBoundingClientRect().width;
+    trim();
+
+    await animateHeight(
+      () => (revealed = true),
+      () => descriptionElement!.scrollHeight,
+    );
+
+    settledIn = true;
+    transitioning = false;
+  }
+
   // The card's text sits above the link overlay so it can be selected, which
   // takes it out of the anchor's click area. These handlers forward its clicks
   // to the anchor; clicks on the anchor, links in the description and buttons
@@ -256,6 +277,7 @@
       onResize(entries[0].contentRect.width),
     );
     observer.observe(descriptionElement);
+    reveal();
     return () => observer.disconnect();
   });
 </script>
@@ -266,6 +288,7 @@
 <div
   class="item"
   class:is-dimmed={dimmed}
+  class:is-settled={settledIn}
   onclick={onCardClick}
   onauxclick={onCardAuxClick}
 >
@@ -292,6 +315,7 @@
         <div
           class="item-description"
           class:is-expanded={expanded}
+          class:is-revealed={revealed}
           id={descriptionId}
           style:max-height={heightOverride}
           bind:this={descriptionElement}
@@ -384,6 +408,7 @@
     bottom: 0;
     transform: translateY(50%);
     z-index: 1;
+    transition: opacity 0.2s ease;
   }
 
   .item-row {
@@ -462,6 +487,7 @@
     font-size: 0.9rem;
     white-space: nowrap;
     flex-shrink: 0;
+    transition: opacity 0.2s ease;
   }
 
   /* The clamp is a plain max-height, so it works before JS runs and for any
@@ -475,11 +501,25 @@
     line-height: 1.5;
     max-height: calc(1em * 1.5 * var(--description-lines));
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    transition:
+      max-height 0.3s ease,
+      opacity 0.3s ease;
   }
 
   .item-description.is-expanded {
     max-height: none;
+  }
+
+  /* Hidden until reveal() runs; .js-gated so blocked-script visitors get the
+     full card instead of one stuck hidden. */
+  :global(.js) .item-description:not(.is-revealed) {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  :global(.js) .item:not(.is-settled) .item-meta,
+  :global(.js) .item:not(.is-settled) .item-skills {
+    opacity: 0;
   }
 
   /* Without JS nothing trims the text or adds a "Show more" button, so remove
@@ -493,7 +533,9 @@
   @media (prefers-reduced-motion: reduce) {
     .item-description,
     .item-show-less,
-    .item-tail {
+    .item-tail,
+    .item-meta,
+    .item-skills {
       transition: none;
     }
   }

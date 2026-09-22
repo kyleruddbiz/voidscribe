@@ -2,6 +2,7 @@
   import { onMount, tick, untrack } from 'svelte';
   import { isSelecting } from '../lib/selection';
   import { createTruncator, type HtmlTruncator } from '../lib/truncate-html';
+  import SkillChips from './SkillChips.svelte';
 
   interface Props {
     href: string;
@@ -264,7 +265,6 @@
 <div
   class="item"
   class:is-dimmed={dimmed}
-  class:is-filtering={activeSkills.length > 0}
   onclick={onCardClick}
   onauxclick={onCardAuxClick}
 >
@@ -343,15 +343,9 @@
       Show less
     </button>
   {/if}
-  {#if skills.length > 0}
-    <ul class="item-skills" aria-label="Skills">
-      {#each skills as skill (skill)}
-        <li class="item-skill" class:is-active={activeSkills.includes(skill)}>
-          <span>{skill}</span>
-        </li>
-      {/each}
-    </ul>
-  {/if}
+  <div class="item-skills">
+    <SkillChips {skills} {activeSkills} />
+  </div>
 </div>
 
 <style>
@@ -380,49 +374,15 @@
     opacity: 1;
   }
 
-  /* Chips straddle the bottom border. pointer-events: none lets clicks fall
-     through to the card's link overlay, so the whole card stays one target. */
+  /* Straddles the card's bottom border, inset to match the card's padding.
+     SkillChips lays itself out inside this box; --chips-align (set below
+     for mobile) tells it whether to hug the start or center. */
   .item-skills {
     position: absolute;
     left: 1.25rem;
     bottom: 0;
     transform: translateY(50%);
     z-index: 1;
-    display: flex;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    pointer-events: none;
-  }
-
-  .item-skill {
-    margin-left: 3px;
-    padding: 0.02rem 0.7rem;
-    transform: skewX(-14deg);
-    background: var(--color-accent-bright);
-    color: var(--color-bg);
-    font-size: 0.8rem;
-    font-weight: 600;
-    font-variant-caps: all-small-caps;
-    letter-spacing: 0.08em;
-    line-height: 1.5;
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
-  }
-
-  .item-skill:first-child {
-    margin-left: 0;
-  }
-
-  /* Counter-skew keeps the label upright. */
-  .item-skill > span {
-    display: block;
-    transform: skewX(14deg);
-  }
-
-  /* While a filter is active, chips outside it recede. */
-  .item.is-filtering .item-skill:not(.is-active) {
-    background: var(--color-accent);
   }
 
   .item-row {
@@ -645,7 +605,7 @@
     .item-skills {
       left: 0;
       right: 0;
-      justify-content: center;
+      --chips-align: center;
     }
 
     /* Dissolves this plain wrapper div so .item-content and

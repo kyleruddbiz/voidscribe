@@ -35,6 +35,10 @@ Page content lives in `src/content/`:
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.
 
+Long descriptions are safe too: each caller clamps them to its own line count (portfolio cards use
+`--description-lines` in `PortfolioItem.svelte`) and expands them client-side with
+`src/lib/truncate-html.ts`, which documents the technique.
+
 ## Dependencies
 
 TypeScript is pinned to `^6.0.3` rather than the latest major. Both type-checkers used by

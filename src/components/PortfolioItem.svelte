@@ -33,6 +33,8 @@
   const titleId = `portfolio-item-title-${instanceId}`;
   const showMoreId = `portfolio-item-show-more-${instanceId}`;
   const showLessId = `portfolio-item-show-less-${instanceId}`;
+  // untrack: only the initial description is ever used (see truncator below) —
+  // this isn't meant to stay in sync with a later prop change.
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
@@ -99,10 +101,9 @@
   const fits = (maxHeight: number) =>
     descriptionElement!.scrollHeight <= maxHeight + 1;
 
-  // The clamped height for the collapsed state, in pixels — both the resting
-  // CSS max-height (--description-lines below) and the animation target
-  // collapse() shrinks toward.
-  const collapsedHeight = () => {
+  // The --description-lines clamp, in pixels — the CSS max-height while
+  // collapsed, and the upper bound fits() checks trimmed content against.
+  const clampHeight = () => {
     const styles = getComputedStyle(descriptionElement!);
     const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
     return parseFloat(styles.lineHeight) * lines;
@@ -114,7 +115,7 @@
   // the full text fits.
   const trim = () => {
     if (!descriptionElement || !bodyElement || !truncator) return;
-    const maxHeight = collapsedHeight();
+    const maxHeight = clampHeight();
 
     // Expanded content is already the full text; rebuilding it would drop any
     // text selection inside it.
@@ -145,7 +146,7 @@
     }
     transitioning = true;
 
-    const maxHeight = collapsedHeight();
+    const maxHeight = clampHeight();
     truncator.longestFitting(
       (content) => bodyElement!.replaceChildren(content),
       () => fits(maxHeight),
@@ -236,13 +237,12 @@
 
   // Trimming only changes the description's height, never its width, so
   // re-measuring only on width changes keeps our own content changes from
-  // triggering another trim.
+  // triggering another trim. Skipped mid-animation too: an expand/collapse
+  // owns bodyElement's content and descriptionElement's height until it
+  // finishes, and retrimming now would clobber both mid-flight.
   const onResize = (width: number) => {
     if (width === lastWidth) return;
     lastWidth = width;
-    // An expand/collapse animation owns bodyElement's content and
-    // descriptionElement's height until it finishes; retrimming now would
-    // clobber both mid-flight.
     if (transitioning) return;
     trim();
   };
@@ -497,9 +497,8 @@
     }
   }
 
-  /* The description is HTML injected with {@html} (and rebuilt by trim()),
-     so Svelte's scoped styles can't reach it: rules targeting it use
-     :global. */
+  /* The description is HTML injected with {@html}, so Svelte's scoped
+     styles can't reach it — these rules use :global. */
   .item-description :global(p),
   .item-description :global(blockquote) {
     margin: 0;
@@ -608,10 +607,8 @@
       --chips-align: center;
     }
 
-    /* Dissolves this plain wrapper div so .item-content and
-       .item-meta become direct flex children of .item and can be
-       reordered around .item-show-less. Safe here because the div carries
-       no semantics to lose — unlike the anchor, which must stay intact. */
+    /* Dissolves this plain wrapper div so its children can be reordered
+       around .item-show-less. Safe — unlike the anchor, it carries no semantics to lose. */
     .item-row {
       display: contents;
     }

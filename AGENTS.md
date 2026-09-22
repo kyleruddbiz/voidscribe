@@ -10,7 +10,7 @@ On `main`: wait for the user to review a change and explicitly say to commit bef
 
 On any other branch: once the user has approved the scope of work (e.g. by approving a plan), split it into logical commits and carry out all of it — code, formatting, building, testing, and the commits themselves — without pausing for review between commits. The user reviews the branch as a whole (e.g. as a pull request) instead of approving each commit individually.
 
-`git push` always needs an explicit go-ahead, on any branch, unless told otherwise.
+Every commit is pushed right after it's made — there's no separate approval step for `git push`. On `main` this follows naturally, since a commit there already required the user's explicit go-ahead; on another branch, push each commit as you make it rather than batching pushes for the end.
 
 ## Before calling a change done
 

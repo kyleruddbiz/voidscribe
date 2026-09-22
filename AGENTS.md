@@ -6,7 +6,11 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 Trunk-based development. Commit directly to `main` unless told otherwise.
 
-Wait for the user to review a change and explicitly say to commit before running `git commit` or `git push`.
+On `main`: wait for the user to review a change and explicitly say to commit before running `git commit`.
+
+On any other branch: once the user has approved the scope of work (e.g. by approving a plan), split it into logical commits and carry out all of it — code, formatting, building, testing, and the commits themselves — without pausing for review between commits. The user reviews the branch as a whole (e.g. as a pull request) instead of approving each commit individually.
+
+`git push` always needs an explicit go-ahead, on any branch, unless told otherwise.
 
 ## Before calling a change done
 
@@ -21,6 +25,8 @@ Verify UI/content changes in the browser (`claude-in-chrome` tools) before calli
 2. Load `localhost:4321`.
 3. Check rendering, console, and interactions.
 
+Leave the dev server running and the browser tab open once you're done — don't stop or close them as a matter of routine. Reuse the same tab (navigate or reload it) for further checks instead of closing and relaunching. Only close things down if the user asks, or at the very end of a session where no further testing is expected — see [If asked to close the browser down](#if-asked-to-close-the-browser-down).
+
 This app is responsive — layouts differ between desktop and mobile. Changes to layout, spacing, or CSS are candidates for a mobile check; use judgment on whether a given change could plausibly affect narrow-viewport rendering. See [Testing responsive/mobile layouts](#testing-responsivemobile-layouts) below for how.
 
 ### Testing responsive/mobile layouts
@@ -33,7 +39,7 @@ This app is responsive — layouts differ between desktop and mobile. Changes to
 
 The same technique also tests width-dependent JS, like description truncation: set `max-width` on a single element instead of copying a media query. This depends on `ResizeObserver` firing — see [Troubleshooting](#troubleshooting) if it silently does nothing. Pure CSS layout checks (above) don't need this.
 
-### Cleanup after a browser test session
+### If asked to close the browser down
 
 1. Close tabs you opened: `tabs_close_mcp`.
 2. Stop the dev server: `npx astro dev stop` (it's a detached daemon).

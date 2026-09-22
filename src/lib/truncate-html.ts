@@ -1,13 +1,6 @@
-// Clamps arbitrary HTML to a caller-chosen box by cutting the rendered text at
-// a character offset and appending a caller-supplied tail node (e.g. an
-// "... Show more" control). The HTML can't be cut at a character offset of
-// the *string* — the cut has to happen on a DOM copy, since it needs to land
-// on a real text node and respect the markup's structure (paragraphs stay
-// paragraphs, a cut mid-blockquote stays inside the blockquote).
-//
-// This module only cuts; it has no opinion on how tall "fits" is or what
-// unit that's measured in — the caller measures its own box and drives
-// longestFitting() with a fits() predicate against it.
+// Truncates arbitrary HTML to support expand/collapse: cuts the rendered
+// text at a character offset (on a DOM copy, so markup structure is
+// preserved) and appends a caller-supplied tail node (e.g. "Show more").
 
 // Wrappers the tail is placed outside of. It stays inside any other
 // element, so it lands on the last line of text rather than after a block.
@@ -46,8 +39,7 @@ const textNodes = (root: Node) => {
 };
 
 export interface HtmlTruncator {
-  /** Total length, in characters of rendered text, of the untruncated HTML. */
-  readonly length: number;
+  readonly totalCharacterCount: number;
   /** The untruncated content, with no tail appended. */
   full(): DocumentFragment;
   /** The content cut to `characters` characters of rendered text, with the tail appended. */
@@ -66,7 +58,7 @@ export interface HtmlTruncator {
 export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
   const template = document.createElement('template');
   template.innerHTML = html;
-  const length = textNodes(template.content).reduce(
+  const totalCharacterCount = textNodes(template.content).reduce(
     (sum, node) => sum + node.length,
     0,
   );
@@ -113,7 +105,7 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     fits: () => boolean,
   ) => {
     let low = 0;
-    let high = length;
+    let high = totalCharacterCount;
     while (low < high) {
       const middle = Math.ceil((low + high) / 2);
       render(upTo(middle));
@@ -126,5 +118,5 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     render(upTo(low));
   };
 
-  return { length, full, upTo, longestFitting };
+  return { totalCharacterCount, full, upTo, longestFitting };
 };

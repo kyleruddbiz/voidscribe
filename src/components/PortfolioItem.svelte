@@ -369,7 +369,7 @@
     </button>
   {/if}
   <div class="item-skills">
-    <SkillChips {skills} {activeSkills} />
+    <SkillChips {skills} {activeSkills} revealed={settledIn} />
   </div>
 </div>
 
@@ -408,7 +408,6 @@
     bottom: 0;
     transform: translateY(50%);
     z-index: 1;
-    transition: opacity 0.2s ease;
   }
 
   .item-row {
@@ -517,8 +516,7 @@
     opacity: 0;
   }
 
-  :global(.js) .item:not(.is-settled) .item-meta,
-  :global(.js) .item:not(.is-settled) .item-skills {
+  :global(.js) .item:not(.is-settled) .item-meta {
     opacity: 0;
   }
 
@@ -534,8 +532,7 @@
     .item-description,
     .item-show-less,
     .item-tail,
-    .item-meta,
-    .item-skills {
+    .item-meta {
       transition: none;
     }
   }

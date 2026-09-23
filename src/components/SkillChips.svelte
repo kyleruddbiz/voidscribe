@@ -2,16 +2,22 @@
   interface Props {
     skills: readonly string[];
     activeSkills?: readonly string[];
+    revealed?: boolean;
   }
 
-  let { skills, activeSkills = [] }: Props = $props();
+  let { skills, activeSkills = [], revealed = true }: Props = $props();
   const filtering = $derived(activeSkills.length > 0);
 </script>
 
 {#if skills.length > 0}
   <ul class="chips" class:is-filtering={filtering} aria-label="Skills">
-    {#each skills as skill (skill)}
-      <li class="chip" class:is-active={activeSkills.includes(skill)}>
+    {#each skills as skill, i (skill)}
+      <li
+        class="chip"
+        class:is-active={activeSkills.includes(skill)}
+        class:is-hidden={!revealed}
+        style:--reveal-delay={`${i * 80}ms`}
+      >
         <span>{skill}</span>
       </li>
     {/each}
@@ -43,7 +49,9 @@
     letter-spacing: 0.08em;
     line-height: 1.5;
     white-space: nowrap;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      opacity 0.2s ease var(--reveal-delay, 0s);
   }
 
   .chip:first-child {
@@ -59,5 +67,17 @@
   /* While a filter is active, chips outside it recede. */
   .chips.is-filtering .chip:not(.is-active) {
     background: var(--color-accent);
+  }
+
+  /* .js-gated so blocked-script visitors get the chips instead of ones
+     stuck hidden; transition-delay (set per chip above) staggers the fade. */
+  :global(.js) .chip.is-hidden {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip {
+      transition: none;
+    }
   }
 </style>

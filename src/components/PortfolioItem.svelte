@@ -486,7 +486,7 @@
     font-size: 0.9rem;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 1.2s ease;
   }
 
   /* The clamp is a plain max-height, so it works before JS runs and for any
@@ -501,8 +501,8 @@
     max-height: calc(1em * 1.5 * var(--description-lines));
     overflow: hidden;
     transition:
-      max-height 0.3s ease,
-      opacity 0.3s ease;
+      max-height 0.6s ease,
+      opacity 0.6s ease;
   }
 
   .item-description.is-expanded {

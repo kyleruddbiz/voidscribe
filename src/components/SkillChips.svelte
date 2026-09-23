@@ -16,7 +16,7 @@
         class="chip"
         class:is-active={activeSkills.includes(skill)}
         class:is-hidden={!revealed}
-        style:--reveal-delay={`${i * 80}ms`}
+        style:--reveal-delay={`${i * 500}ms`}
       >
         <span>{skill}</span>
       </li>
@@ -51,7 +51,7 @@
     white-space: nowrap;
     transition:
       background-color 0.2s ease,
-      opacity 0.2s ease var(--reveal-delay, 0s);
+      opacity 1.2s ease var(--reveal-delay, 0s);
   }
 
   .chip:first-child {

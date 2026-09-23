@@ -78,9 +78,17 @@
 <style>
   .role {
     --role-hint-duration: 1.4s;
+    /* Total advance of a "·" separator (0.4em left margin + glyph + 0.32em
+       right margin), fixed in rem so it reads the same regardless of which
+       role's font-size it's used against. See the separator comment below
+       for how it's used. */
+    --role-sep: 1.119rem;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    /* A role that starts a wrapped line pulls its own separator dot fully
+       to the left of this box (see below) so it can be cropped off. */
+    overflow-x: clip;
     color: var(--color-text-dim);
     font-size: 1.1em;
     font-variant-caps: all-small-caps;
@@ -169,17 +177,32 @@
     }
   }
 
-  /* Separator trails each role so a wrap never starts a line with a dot.
-     "·" isn't centered in its own advance width in this font, so the right
-     margin is smaller than the left to make the gap look even on both
-     sides. */
-  .role-toggle:not(:last-child)::after {
+  /* Every role but the primary carries its OWN separator, glued to its
+     start rather than the previous role's end. Mid-line this is invisible:
+     the role reserves --role-sep of trailing space (below) for the next
+     role's dot, and the dot's own negative margin-left cancels its box's
+     width so it paints inside that reserved space with zero footprint of
+     its own. At a line start, though, there's no preceding trailing space
+     to paint into — the negative margin instead pushes the dot fully past
+     this role's left edge, where .role's overflow-x: clip above crops it,
+     leaving the role's text flush with the line start. "·" isn't centered
+     in its own advance width in this font, so the left padding is larger
+     than the trailing gap it leaves, to make the dot look centered in
+     --role-sep. */
+  .role-pair .role-toggle::before {
     content: '·';
     display: inline-block;
-    margin-left: 0.4em;
-    margin-right: 0.32em;
+    box-sizing: border-box;
+    width: var(--role-sep);
+    padding-left: 0.4em;
+    margin-left: calc(-1 * var(--role-sep));
     color: var(--color-text-dim);
     text-decoration: none;
+  }
+
+  /* Reserves the space the next role's separator dot paints into. */
+  .role-toggle:not(:last-child) {
+    margin-right: var(--role-sep);
   }
 
   /* Without JS nothing can be toggled, so don't look clickable. */

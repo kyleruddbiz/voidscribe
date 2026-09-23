@@ -593,7 +593,7 @@
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: opacity 0.15s ease;
+    transition: opacity 1.2s ease;
   }
 
   .item-show-less:hover,

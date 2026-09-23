@@ -84,9 +84,16 @@
   // change is what makes the max-height transition below actually animate,
   // rather than jumping straight to/from the calc()/none it's changing
   // between.
-  async function animateHeight(change: () => void, target: () => number) {
+  //
+  // `from` overrides the pinned starting height, for a caller that must
+  // mutate the box before calling this (see collapse()).
+  async function animateHeight(
+    change: () => void,
+    target: () => number,
+    from?: number,
+  ) {
     if (!descriptionElement) return;
-    heightOverride = `${descriptionElement.getBoundingClientRect().height}px`;
+    heightOverride = `${from ?? descriptionElement.getBoundingClientRect().height}px`;
     change();
     await tick();
 
@@ -98,6 +105,18 @@
     // Hand max-height back to the is-expanded/calc() CSS below, so a later
     // resize isn't stuck at this now-stale pixel value.
     heightOverride = undefined;
+  }
+
+  // Starts an element fading in: hides it via `setFrom`, forces a style
+  // flush so that commits before undoing it (otherwise both changes can
+  // land in the same frame and skip the transition), then lets the fade run
+  // — callers don't wait out the fade itself, just this setup.
+  async function appear(setFrom: (on: boolean) => void, element: HTMLElement) {
+    setFrom(true);
+    await tick();
+    getComputedStyle(element).opacity;
+    setFrom(false);
+    await tick();
   }
 
   // Built once on mount, since it needs `document`.
@@ -135,10 +154,11 @@
 
   // Trims now, while still expanded, to learn the real collapsed height and
   // set the trimmed content aside: --description-lines is only an upper
-  // bound, and trimmed content often lands a partial line short of it. The
-  // shrink itself runs over the full text, clipped by overflow, so it
-  // doesn't pop straight to the short version; the trimmed content goes back
-  // once the box has settled, faded in like "Show more" does on expand.
+  // bound, and trimmed content often lands a partial line short of it.
+  // Trimming mutates bodyElement, so `from` is read before it. The shrink
+  // itself runs over the full text, clipped by overflow, so it doesn't pop
+  // straight to the short version; the trimmed content goes back once the
+  // box has settled, and "... Show more" fades in.
   async function collapse() {
     if (
       transitioning ||
@@ -150,6 +170,8 @@
       return;
     }
     transitioning = true;
+
+    const from = descriptionElement.getBoundingClientRect().height;
 
     const maxHeight = clampHeight();
     truncator.longestFitting(
@@ -165,14 +187,14 @@
         expanded = false;
       },
       () => collapsedContentHeight,
+      from,
     );
 
-    tailAppearing = true;
     bodyElement.replaceChildren(...collapsedContent);
-    requestAnimationFrame(() => (tailAppearing = false));
+    if (tail) await appear((on) => (tailAppearing = on), tail);
 
     showMoreElement?.focus();
-    transitioning = false;
+    endTransition();
   }
 
   // Swaps in the full text and grows the box to fit. "Show less" is
@@ -192,9 +214,10 @@
       () => descriptionElement!.scrollHeight,
     );
 
-    showLessAppearing = false;
+    if (collapseElement)
+      await appear((on) => (showLessAppearing = on), collapseElement);
     collapseElement?.focus();
-    transitioning = false;
+    endTransition();
   }
 
   // Trims the description, then grows the box open from 0 to that height.
@@ -211,7 +234,7 @@
     );
 
     settledIn = true;
-    transitioning = false;
+    endTransition();
   }
 
   // The card's text sits above the link overlay so it can be selected, which
@@ -261,13 +284,24 @@
   // re-measuring only on width changes keeps our own content changes from
   // triggering another trim. Skipped mid-animation too: an expand/collapse
   // owns bodyElement's content and descriptionElement's height until it
-  // finishes, and retrimming now would clobber both mid-flight.
+  // finishes. `lastWidth` is left stale in that case so endTransition() can
+  // tell a resize was missed and catch up.
   const onResize = (width: number) => {
+    if (transitioning) return;
     if (width === lastWidth) return;
     lastWidth = width;
-    if (transitioning) return;
     trim();
   };
+
+  // Catches up on any resize onResize() skipped while transitioning.
+  function endTransition() {
+    transitioning = false;
+    if (!descriptionElement) return;
+    const width = descriptionElement.getBoundingClientRect().width;
+    if (width === lastWidth) return;
+    lastWidth = width;
+    trim();
+  }
 
   onMount(() => {
     if (!hasDescription || !descriptionElement || !tail) return;
@@ -375,6 +409,7 @@
 
 <style>
   .item {
+    --fade-in: opacity 1.2s ease;
     position: relative;
     padding: 1rem 1.25rem 1.5rem;
     border: 1px solid var(--color-border);
@@ -561,7 +596,7 @@
   .item-tail {
     white-space: nowrap;
     font-style: normal;
-    transition: opacity 0.15s ease;
+    transition: var(--fade-in);
   }
 
   .item-show-more {
@@ -593,7 +628,7 @@
     font-family: inherit;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: opacity 1.2s ease;
+    transition: var(--fade-in);
   }
 
   .item-show-less:hover,

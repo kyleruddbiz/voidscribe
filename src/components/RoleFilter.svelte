@@ -61,7 +61,10 @@
   {@render toggle(primary, true, roleDelays[0])}
   <span class="secondary-roles">
     {#each rest as role, i (role.name)}
-      {@render toggle(role, false, roleDelays[i + 1])}
+      <span class="role-item">
+        <span class="role-separator" aria-hidden="true">·</span>
+        {@render toggle(role, false, roleDelays[i + 1])}
+      </span>
     {/each}
   </span>
 </p>
@@ -70,6 +73,7 @@
   .role {
     --role-hint-duration: 1.4s;
     --role-separator-width: 1.119rem;
+    --focus-ring-room: 0.25rem;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -78,7 +82,11 @@
     font-size: 1.1em;
     font-variant-caps: all-small-caps;
     letter-spacing: 0.08em;
-    margin: 0 0 2rem;
+    /* Padding keeps the clip from cutting off the focus ring at the edges; the
+       negative margin cancels it. It's smaller than the hanging separator, so
+       that stays clipped. */
+    padding-inline: var(--focus-ring-room);
+    margin: 0 calc(-1 * var(--focus-ring-room)) 2rem;
   }
 
   .secondary-roles {
@@ -132,14 +140,22 @@
     font-size: 1.1em;
   }
 
-  .role-toggle:hover,
+  /* Hover only on devices that really hover, so a tap doesn't leave it stuck. */
+  @media (hover: hover) {
+    .role-toggle:hover {
+      color: var(--color-text);
+      text-decoration-color: var(--color-accent-bright);
+    }
+  }
+
   .role-toggle:focus-visible {
-    color: var(--color-text);
-    text-decoration-color: var(--color-accent-bright);
+    outline: 1px solid var(--color-accent-bright);
+    outline-offset: 0.15em;
+    border-radius: 2px;
   }
 
   .role-toggle.is-selected {
-    color: var(--color-text);
+    color: var(--color-accent-bright);
     text-decoration-color: var(--color-accent-bright);
     text-decoration-thickness: 2px;
   }
@@ -151,21 +167,25 @@
     }
   }
 
+  .role-item {
+    display: flex;
+    align-items: baseline;
+  }
+
   /* Each role carries its own leading separator, drawn in the previous role's
      trailing margin. At the start of a wrapped line it hangs outside .role and
-     is clipped by overflow-x. */
-  .secondary-roles .role-toggle::before {
-    content: '·';
-    display: inline-block;
+     is clipped by overflow-x. It's a sibling of the toggle, not part of it, so
+     the toggle's focus ring and underline don't include it. */
+  .role-separator {
     box-sizing: border-box;
     width: var(--role-separator-width);
     padding-left: 0.4em;
     margin-left: calc(-1 * var(--role-separator-width));
-    color: var(--color-text-dim);
-    text-decoration: none;
+    user-select: none;
   }
 
-  .role-toggle:not(:last-child) {
+  .role > .role-toggle,
+  .role-item:not(:last-child) {
     margin-right: var(--role-separator-width);
   }
 

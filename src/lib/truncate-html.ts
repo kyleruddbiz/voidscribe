@@ -16,9 +16,9 @@ const inlineTags = new Set([
   'U',
 ]);
 
-const trailingPunctuation = /[\s.,;:!?…\-–—]+$/;
+const trailingSpaceAndPunctuation = /[\s.,;:!?…\-–—]+$/;
 
-const textNodes = (root: Node) => {
+const nonBlankTextNodes = (root: Node) => {
   const nodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -27,10 +27,30 @@ const textNodes = (root: Node) => {
   return nodes;
 };
 
+const outermostInlineAncestor = (node: Node): Node => {
+  let outermost = node;
+  while (
+    outermost.parentElement &&
+    inlineTags.has(outermost.parentElement.tagName)
+  ) {
+    outermost = outermost.parentElement;
+  }
+  return outermost;
+};
+
+const deleteEverythingAfter = (
+  container: DocumentFragment,
+  text: Text,
+  offset: number,
+) => {
+  const range = document.createRange();
+  range.setStart(text, Math.min(offset, text.length));
+  range.setEndAfter(container.lastChild!);
+  range.deleteContents();
+};
+
 export interface HtmlTruncator {
-  readonly totalCharacterCount: number;
   full(): DocumentFragment;
-  upTo(characters: number): DocumentFragment;
   longestFitting(
     render: (content: DocumentFragment) => void,
     fits: () => boolean,
@@ -40,38 +60,27 @@ export interface HtmlTruncator {
 export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
   const template = document.createElement('template');
   template.innerHTML = html;
-  const totalCharacterCount = textNodes(template.content).reduce(
+  const totalCharacterCount = nonBlankTextNodes(template.content).reduce(
     (sum, node) => sum + node.length,
     0,
   );
 
   const full = () => template.content.cloneNode(true) as DocumentFragment;
 
-  const upTo = (characters: number): DocumentFragment => {
+  const truncatedTo = (characterCount: number): DocumentFragment => {
     const clone = full();
-    let remaining = characters;
-    let cut: Text | undefined;
-    for (const node of textNodes(clone)) {
-      cut = node;
-      if (remaining <= node.length) break;
-      remaining -= node.length;
+    let charactersLeft = characterCount;
+    let cutNode: Text | undefined;
+    for (const node of nonBlankTextNodes(clone)) {
+      cutNode = node;
+      if (charactersLeft <= node.length) break;
+      charactersLeft -= node.length;
     }
-    if (!cut) return clone;
+    if (!cutNode) return clone;
 
-    const range = document.createRange();
-    range.setStart(cut, Math.min(remaining, cut.length));
-    range.setEndAfter(clone.lastChild!);
-    range.deleteContents();
-    cut.data = cut.data.replace(trailingPunctuation, '');
-
-    let anchor: Node = cut;
-    while (
-      anchor.parentElement &&
-      inlineTags.has(anchor.parentElement.tagName)
-    ) {
-      anchor = anchor.parentElement;
-    }
-    (anchor as ChildNode).after(tail);
+    deleteEverythingAfter(clone, cutNode, charactersLeft);
+    cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');
+    (outermostInlineAncestor(cutNode) as ChildNode).after(tail);
     return clone;
   };
 
@@ -83,15 +92,15 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     let high = totalCharacterCount;
     while (low < high) {
       const middle = Math.ceil((low + high) / 2);
-      render(upTo(middle));
+      render(truncatedTo(middle));
       if (fits()) {
         low = middle;
       } else {
         high = middle - 1;
       }
     }
-    render(upTo(low));
+    render(truncatedTo(low));
   };
 
-  return { totalCharacterCount, full, upTo, longestFitting };
+  return { full, longestFitting };
 };

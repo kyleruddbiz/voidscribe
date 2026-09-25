@@ -185,7 +185,8 @@
   }
 
   .item-description,
-  .item-meta {
+  .item-meta,
+  .item-skills {
     cursor: pointer;
   }
 

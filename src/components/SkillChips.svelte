@@ -2,12 +2,12 @@
   interface Props {
     skills: readonly string[];
     activeSkills?: readonly string[];
-    revealed?: boolean;
+    isRevealed?: boolean;
   }
 
   const revealStaggerMs = 500;
 
-  let { skills, activeSkills = [], revealed = true }: Props = $props();
+  let { skills, activeSkills = [], isRevealed = true }: Props = $props();
   const isFiltering = $derived(activeSkills.length > 0);
 </script>
 
@@ -17,7 +17,7 @@
       <li
         class="chip"
         class:is-active={activeSkills.includes(skill)}
-        class:is-hidden={!revealed}
+        class:is-hidden={!isRevealed}
         style:--reveal-delay={`${i * revealStaggerMs}ms`}
       >
         <span>{skill}</span>

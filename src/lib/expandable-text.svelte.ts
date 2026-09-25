@@ -33,18 +33,18 @@ export class ExpandableText {
   showMoreElement?: HTMLButtonElement;
   showLessElement?: HTMLButtonElement;
 
-  expanded = $state(false);
-  truncated = $state(false);
-  textRevealed = $state(false);
-  introComplete = $state(false);
-  tailTransparent = $state(false);
-  showLessTransparent = $state(false);
+  isExpanded = $state(false);
+  isTruncated = $state(false);
+  isTextRevealed = $state(false);
+  isIntroComplete = $state(false);
+  isTailTransparent = $state(false);
+  isShowLessTransparent = $state(false);
   pinnedMaxHeight = $state<string>();
 
   readonly hasContent: boolean;
   private truncator?: HtmlTruncator;
   private lastWidth = -1;
-  private transitioning = false;
+  private isTransitioning = false;
 
   constructor(private readonly fullHtml: string) {
     this.hasContent = fullHtml.length > 0;
@@ -57,7 +57,7 @@ export class ExpandableText {
     this.truncator = createTruncator(this.fullHtml, this.tailElement);
 
     const observer = new ResizeObserver(() => {
-      if (!this.transitioning) this.retruncateIfWidthChanged();
+      if (!this.isTransitioning) this.retruncateIfWidthChanged();
     });
     observer.observe(this.textElement);
     this.revealOnLoad();
@@ -65,14 +65,14 @@ export class ExpandableText {
   }
 
   async expand() {
-    if (this.transitioning || this.expanded || !this.textElement) return;
-    this.transitioning = true;
+    if (this.isTransitioning || this.isExpanded || !this.textElement) return;
+    this.isTransitioning = true;
 
-    this.showLessTransparent = true;
+    this.isShowLessTransparent = true;
     await this.animateHeight(
       () => {
         this.bodyElement?.replaceChildren(this.truncator!.full());
-        this.expanded = true;
+        this.isExpanded = true;
       },
       () => this.textElement!.scrollHeight,
     );
@@ -80,7 +80,7 @@ export class ExpandableText {
     if (this.showLessElement) {
       await fadeIn(
         this.showLessElement,
-        (transparent) => (this.showLessTransparent = transparent),
+        (transparent) => (this.isShowLessTransparent = transparent),
       );
     }
     this.showLessElement?.focus();
@@ -89,15 +89,15 @@ export class ExpandableText {
 
   async collapse() {
     if (
-      this.transitioning ||
-      !this.expanded ||
+      this.isTransitioning ||
+      !this.isExpanded ||
       !this.textElement ||
       !this.bodyElement ||
       !this.truncator
     ) {
       return;
     }
-    this.transitioning = true;
+    this.isTransitioning = true;
 
     const expandedHeight = this.textElement.getBoundingClientRect().height;
     const collapsed = this.measureCollapsed();
@@ -105,7 +105,7 @@ export class ExpandableText {
     await this.animateHeight(
       () => {
         this.bodyElement!.replaceChildren(this.truncator!.full());
-        this.expanded = false;
+        this.isExpanded = false;
       },
       () => collapsed.height,
       expandedHeight,
@@ -115,7 +115,7 @@ export class ExpandableText {
     if (this.tailElement) {
       await fadeIn(
         this.tailElement,
-        (transparent) => (this.tailTransparent = transparent),
+        (transparent) => (this.isTailTransparent = transparent),
       );
     }
     this.showMoreElement?.focus();
@@ -123,20 +123,20 @@ export class ExpandableText {
   }
 
   private async revealOnLoad() {
-    this.transitioning = true;
+    this.isTransitioning = true;
     this.retruncateIfWidthChanged();
 
     await this.animateHeight(
-      () => (this.textRevealed = true),
+      () => (this.isTextRevealed = true),
       () => this.textElement!.scrollHeight,
     );
 
-    this.introComplete = true;
+    this.isIntroComplete = true;
     this.endTransition();
   }
 
   private endTransition() {
-    this.transitioning = false;
+    this.isTransitioning = false;
     if (this.textElement) this.retruncateIfWidthChanged();
   }
 
@@ -153,9 +153,11 @@ export class ExpandableText {
     }
     const maxHeight = this.collapsedMaxHeight();
 
-    if (!this.expanded) this.bodyElement.replaceChildren(this.truncator.full());
-    this.truncated = !this.fitsWithin(maxHeight);
-    if (this.truncated && !this.expanded) this.renderTruncated(maxHeight);
+    if (!this.isExpanded) {
+      this.bodyElement.replaceChildren(this.truncator.full());
+    }
+    this.isTruncated = !this.fitsWithin(maxHeight);
+    if (this.isTruncated && !this.isExpanded) this.renderTruncated(maxHeight);
   }
 
   private measureCollapsed() {

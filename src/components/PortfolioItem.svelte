@@ -7,7 +7,7 @@
 
   interface Props extends PortfolioEntry {
     activeSkills?: readonly string[];
-    dimmed?: boolean;
+    isDimmed?: boolean;
   }
 
   let {
@@ -19,7 +19,7 @@
     title,
     skills,
     activeSkills = [],
-    dimmed = false,
+    isDimmed = false,
   }: Props = $props();
 
   const instanceId = $props.id();
@@ -37,8 +37,8 @@
 
 <div
   class="item"
-  class:is-dimmed={dimmed}
-  class:is-settled={expandable.introComplete}
+  class:is-dimmed={isDimmed}
+  class:is-settled={expandable.isIntroComplete}
   {@attach wholeCardLink(() => linkElement)}
 >
   <div class="item-row">
@@ -61,8 +61,8 @@
       {#if expandable.hasContent}
         <div
           class="item-description"
-          class:is-expanded={expandable.expanded}
-          class:is-revealed={expandable.textRevealed}
+          class:is-expanded={expandable.isExpanded}
+          class:is-revealed={expandable.isTextRevealed}
           id={descriptionId}
           style:max-height={expandable.pinnedMaxHeight}
           bind:this={expandable.textElement}
@@ -72,7 +72,7 @@
         <div hidden>
           <span
             class="item-tail"
-            class:is-transparent={expandable.tailTransparent}
+            class:is-transparent={expandable.isTailTransparent}
             bind:this={expandable.tailElement}
           >
             <span aria-hidden="true">...</span>
@@ -98,20 +98,24 @@
     <button
       type="button"
       class="item-show-less"
-      class:is-transparent={expandable.showLessTransparent}
+      class:is-transparent={expandable.isShowLessTransparent}
       id={showLessId}
       bind:this={expandable.showLessElement}
-      aria-expanded={expandable.expanded}
+      aria-expanded={expandable.isExpanded}
       aria-controls={descriptionId}
       aria-labelledby="{showLessId} {titleId}"
-      hidden={!expandable.expanded || !expandable.truncated}
+      hidden={!expandable.isExpanded || !expandable.isTruncated}
       onclick={() => expandable.collapse()}
     >
       Show less
     </button>
   {/if}
   <div class="item-skills">
-    <SkillChips {skills} {activeSkills} revealed={expandable.introComplete} />
+    <SkillChips
+      {skills}
+      {activeSkills}
+      isRevealed={expandable.isIntroComplete}
+    />
   </div>
 </div>
 

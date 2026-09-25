@@ -51,7 +51,7 @@
       <PortfolioItem
         {...item}
         {activeSkills}
-        dimmed={isFiltering && !matchesFilter(item)}
+        isDimmed={isFiltering && !matchesFilter(item)}
       />
     </div>
   {/each}

@@ -73,20 +73,18 @@
   .role {
     --role-hint-duration: 1.4s;
     --role-separator-width: 1.119rem;
-    --focus-ring-room: 0.25rem;
+    --focus-ring-width: 1px;
+    --focus-ring-reach: 4px;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    overflow-x: clip;
+    overflow: clip;
+    overflow-clip-margin: var(--focus-ring-reach);
     color: var(--color-text-dim);
     font-size: 1.1em;
     font-variant-caps: all-small-caps;
     letter-spacing: 0.08em;
-    /* Padding keeps the clip from cutting off the focus ring at the edges; the
-       negative margin cancels it. It's smaller than the hanging separator, so
-       that stays clipped. */
-    padding-inline: var(--focus-ring-room);
-    margin: 0 calc(-1 * var(--focus-ring-room)) 2rem;
+    margin: 0 0 2rem;
   }
 
   .secondary-roles {
@@ -149,8 +147,8 @@
   }
 
   .role-toggle:focus-visible {
-    outline: 1px solid var(--color-accent-bright);
-    outline-offset: 0.15em;
+    outline: var(--focus-ring-width) solid var(--color-accent-bright);
+    outline-offset: calc(var(--focus-ring-reach) - var(--focus-ring-width));
     border-radius: 2px;
   }
 
@@ -174,7 +172,7 @@
 
   /* Each role carries its own leading separator, drawn in the previous role's
      trailing margin. At the start of a wrapped line it hangs outside .role and
-     is clipped by overflow-x. It's a sibling of the toggle, not part of it, so
+     is clipped by `.role`'s overflow. It's a sibling of the toggle, not part of it, so
      the toggle's focus ring and underline don't include it. */
   .role-separator {
     box-sizing: border-box;

@@ -26,8 +26,8 @@ const fadeIn = async (
   await tick();
 };
 
-export class ExpandableDescription {
-  descriptionElement?: HTMLDivElement;
+export class ExpandableText {
+  textElement?: HTMLDivElement;
   bodyElement?: HTMLDivElement;
   tailElement?: HTMLSpanElement;
   showMoreElement?: HTMLButtonElement;
@@ -35,7 +35,7 @@ export class ExpandableDescription {
 
   expanded = $state(false);
   truncated = $state(false);
-  descriptionRevealed = $state(false);
+  textRevealed = $state(false);
   introComplete = $state(false);
   tailTransparent = $state(false);
   showLessTransparent = $state(false);
@@ -51,7 +51,7 @@ export class ExpandableDescription {
   }
 
   mount() {
-    if (!this.hasContent || !this.descriptionElement || !this.tailElement) {
+    if (!this.hasContent || !this.textElement || !this.tailElement) {
       return;
     }
     this.truncator = createTruncator(this.fullHtml, this.tailElement);
@@ -59,13 +59,13 @@ export class ExpandableDescription {
     const observer = new ResizeObserver(() => {
       if (!this.transitioning) this.retruncateIfWidthChanged();
     });
-    observer.observe(this.descriptionElement);
+    observer.observe(this.textElement);
     this.revealOnLoad();
     return () => observer.disconnect();
   }
 
   async expand() {
-    if (this.transitioning || this.expanded || !this.descriptionElement) return;
+    if (this.transitioning || this.expanded || !this.textElement) return;
     this.transitioning = true;
 
     this.showLessTransparent = true;
@@ -74,7 +74,7 @@ export class ExpandableDescription {
         this.bodyElement?.replaceChildren(this.truncator!.full());
         this.expanded = true;
       },
-      () => this.descriptionElement!.scrollHeight,
+      () => this.textElement!.scrollHeight,
     );
 
     if (this.showLessElement) {
@@ -91,7 +91,7 @@ export class ExpandableDescription {
     if (
       this.transitioning ||
       !this.expanded ||
-      !this.descriptionElement ||
+      !this.textElement ||
       !this.bodyElement ||
       !this.truncator
     ) {
@@ -99,8 +99,7 @@ export class ExpandableDescription {
     }
     this.transitioning = true;
 
-    const expandedHeight =
-      this.descriptionElement.getBoundingClientRect().height;
+    const expandedHeight = this.textElement.getBoundingClientRect().height;
     const collapsed = this.measureCollapsed();
 
     await this.animateHeight(
@@ -128,8 +127,8 @@ export class ExpandableDescription {
     this.retruncateIfWidthChanged();
 
     await this.animateHeight(
-      () => (this.descriptionRevealed = true),
-      () => this.descriptionElement!.scrollHeight,
+      () => (this.textRevealed = true),
+      () => this.textElement!.scrollHeight,
     );
 
     this.introComplete = true;
@@ -138,18 +137,18 @@ export class ExpandableDescription {
 
   private endTransition() {
     this.transitioning = false;
-    if (this.descriptionElement) this.retruncateIfWidthChanged();
+    if (this.textElement) this.retruncateIfWidthChanged();
   }
 
   private retruncateIfWidthChanged() {
-    const width = this.descriptionElement!.getBoundingClientRect().width;
+    const width = this.textElement!.getBoundingClientRect().width;
     if (width === this.lastWidth) return;
     this.lastWidth = width;
     this.updateTruncation();
   }
 
   private updateTruncation() {
-    if (!this.descriptionElement || !this.bodyElement || !this.truncator) {
+    if (!this.textElement || !this.bodyElement || !this.truncator) {
       return;
     }
     const maxHeight = this.collapsedMaxHeight();
@@ -163,7 +162,7 @@ export class ExpandableDescription {
     this.renderTruncated(this.collapsedMaxHeight());
     return {
       nodes: [...this.bodyElement!.childNodes],
-      height: this.descriptionElement!.scrollHeight,
+      height: this.textElement!.scrollHeight,
     };
   }
 
@@ -175,14 +174,12 @@ export class ExpandableDescription {
   }
 
   private fitsWithin(maxHeight: number) {
-    return (
-      this.descriptionElement!.scrollHeight <= maxHeight + subpixelTolerance
-    );
+    return this.textElement!.scrollHeight <= maxHeight + subpixelTolerance;
   }
 
   private collapsedMaxHeight() {
-    const styles = getComputedStyle(this.descriptionElement!);
-    const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
+    const styles = getComputedStyle(this.textElement!);
+    const lines = parseInt(styles.getPropertyValue('--collapsed-lines'), 10);
     return parseFloat(styles.lineHeight) * lines;
   }
 
@@ -191,7 +188,7 @@ export class ExpandableDescription {
     targetHeight: () => number,
     startHeight?: number,
   ) {
-    const element = this.descriptionElement;
+    const element = this.textElement;
     if (!element) return;
     startHeight ??= element.getBoundingClientRect().height;
 

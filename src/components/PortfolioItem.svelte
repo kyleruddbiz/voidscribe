@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte';
-  import { ExpandableDescription } from '../lib/expandable-description.svelte';
-  import { forwardClicksToLink } from '../lib/forward-clicks-to-link';
+  import { ExpandableText } from '../lib/expandable-text.svelte';
+  import { wholeCardLink } from '../lib/whole-card-link';
   import type { PortfolioEntry } from '../lib/portfolio';
   import SkillChips from './SkillChips.svelte';
 
@@ -29,7 +29,7 @@
   const showLessId = `portfolio-item-show-less-${instanceId}`;
 
   const fullHtml = untrack(() => (description ?? '').trim());
-  const expandable = new ExpandableDescription(fullHtml);
+  const expandable = new ExpandableText(fullHtml);
   let linkElement = $state<HTMLAnchorElement>();
 
   onMount(() => expandable.mount());
@@ -39,7 +39,7 @@
   class="item"
   class:is-dimmed={dimmed}
   class:is-settled={expandable.introComplete}
-  {@attach forwardClicksToLink(() => linkElement)}
+  {@attach wholeCardLink(() => linkElement)}
 >
   <div class="item-row">
     <div class="item-content">
@@ -62,10 +62,10 @@
         <div
           class="item-description"
           class:is-expanded={expandable.expanded}
-          class:is-revealed={expandable.descriptionRevealed}
+          class:is-revealed={expandable.textRevealed}
           id={descriptionId}
           style:max-height={expandable.pinnedMaxHeight}
-          bind:this={expandable.descriptionElement}
+          bind:this={expandable.textElement}
         >
           <div bind:this={expandable.bodyElement}>{@html fullHtml}</div>
         </div>
@@ -204,7 +204,7 @@
   }
 
   .item-title {
-    /* Chrome won't start a selection inside a link unless this is explicit. */
+    /* Chrome won't start a drag-select inside a link unless this is explicit. */
     user-select: text;
     font-family: var(--font-display);
     color: var(--color-text);
@@ -220,12 +220,12 @@
   }
 
   .item-description {
-    --description-lines: 3;
+    --collapsed-lines: 3;
     margin: 0.4rem 0 0;
     color: var(--color-text-dim);
     font-size: 0.9rem;
     line-height: 1.5;
-    max-height: calc(1em * 1.5 * var(--description-lines));
+    max-height: calc(1em * 1.5 * var(--collapsed-lines));
     overflow: hidden;
     transition:
       max-height 0.6s ease,

@@ -4,7 +4,7 @@ import { hasTextSelection } from './selection';
 const middleMouseButton = 1;
 const openInBackgroundTab = { ctrlKey: true, metaKey: true };
 
-export const forwardClicksToLink =
+export const wholeCardLink =
   (getLink: () => HTMLAnchorElement | undefined): Attachment<HTMLElement> =>
   (card) => {
     const clickLink = (modifiers: MouseEventInit) =>

@@ -35,16 +35,6 @@ Page content lives in `src/content/`:
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.
 
-## Code comments
-
-Inline comments are a code smell. Favor self-documenting code: clear names, small functions, and
-well-named constants. When code needs a comment to be understood, first consider refactoring it for
-clarity — a comment shouldn't paper over a bad design.
-
-Inline comments are still acceptable when the code is genuinely complex, or when they provide
-meaningful context the code can't express on its own (e.g. a browser quirk, a workaround, or the
-reason a non-obvious choice was made).
-
 ## Dependencies
 
 TypeScript is pinned to `^6.0.3` rather than the latest major. Both type-checkers used by

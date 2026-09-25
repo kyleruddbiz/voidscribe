@@ -61,7 +61,10 @@
   {@render toggle(primary, true, roleDelays[0])}
   <span class="secondary-roles">
     {#each rest as role, i (role.name)}
-      {@render toggle(role, false, roleDelays[i + 1])}
+      <span class="role-item">
+        <span class="role-separator" aria-hidden="true">·</span>
+        {@render toggle(role, false, roleDelays[i + 1])}
+      </span>
     {/each}
   </span>
 </p>
@@ -70,10 +73,15 @@
   .role {
     --role-hint-duration: 1.4s;
     --role-separator-width: 1.119rem;
+    --focus-ring-width: 1px;
+    --focus-ring-reach: 4px;
+    --role-row-gap: 0.5rem;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    overflow-x: clip;
+    row-gap: var(--role-row-gap);
+    overflow: clip;
+    overflow-clip-margin: var(--focus-ring-reach);
     color: var(--color-text-dim);
     font-size: 1.1em;
     font-variant-caps: all-small-caps;
@@ -85,6 +93,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    row-gap: var(--role-row-gap);
   }
 
   .role-toggle {
@@ -132,14 +141,21 @@
     font-size: 1.1em;
   }
 
-  .role-toggle:hover,
+  @media (hover: hover) {
+    .role-toggle:hover {
+      color: var(--color-text);
+      text-decoration-color: var(--color-accent-bright);
+    }
+  }
+
   .role-toggle:focus-visible {
-    color: var(--color-text);
-    text-decoration-color: var(--color-accent-bright);
+    outline: var(--focus-ring-width) solid var(--color-accent-bright);
+    outline-offset: calc(var(--focus-ring-reach) - var(--focus-ring-width));
+    border-radius: 2px;
   }
 
   .role-toggle.is-selected {
-    color: var(--color-text);
+    color: var(--color-accent-bright);
     text-decoration-color: var(--color-accent-bright);
     text-decoration-thickness: 2px;
   }
@@ -151,21 +167,24 @@
     }
   }
 
+  .role-item {
+    display: flex;
+    align-items: baseline;
+  }
+
   /* Each role carries its own leading separator, drawn in the previous role's
      trailing margin. At the start of a wrapped line it hangs outside .role and
-     is clipped by overflow-x. */
-  .secondary-roles .role-toggle::before {
-    content: '·';
-    display: inline-block;
+     is clipped by `.role`'s overflow. */
+  .role-separator {
     box-sizing: border-box;
     width: var(--role-separator-width);
     padding-left: 0.4em;
     margin-left: calc(-1 * var(--role-separator-width));
-    color: var(--color-text-dim);
-    text-decoration: none;
+    user-select: none;
   }
 
-  .role-toggle:not(:last-child) {
+  .role > .role-toggle,
+  .role-item:not(:last-child) {
     margin-right: var(--role-separator-width);
   }
 

@@ -16,8 +16,6 @@ Multi-commit task: commit and push each commit as you go, without pausing for re
 
 Inline comments are a code smell. Resist the urge to fill the codebase with them. Favor self-documenting code: clear names, small functions, and well-named constants. When code needs a comment to be understood, first consider refactoring it for clarity — a comment shouldn't paper over a bad design.
 
-Never write a comment that restates what the code already says (e.g. explaining what a media query or property does).
-
 Inline comments are still acceptable when the code is genuinely complex, or when they provide meaningful context the code can't express on its own (e.g. a browser quirk, a workaround, or the reason a non-obvious choice was made).
 
 ## Before calling a change done

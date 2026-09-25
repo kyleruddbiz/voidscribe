@@ -75,9 +75,11 @@
     --role-separator-width: 1.119rem;
     --focus-ring-width: 1px;
     --focus-ring-reach: 4px;
+    --role-row-gap: 0.5rem;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    row-gap: var(--role-row-gap);
     overflow: clip;
     overflow-clip-margin: var(--focus-ring-reach);
     color: var(--color-text-dim);
@@ -91,6 +93,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
+    row-gap: var(--role-row-gap);
   }
 
   .role-toggle {

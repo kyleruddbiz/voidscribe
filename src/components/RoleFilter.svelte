@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { hasTextSelection } from '../lib/selection';
+  import { markThirdRoleNearlyDone } from '../lib/role-intro';
   import { selectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
 
@@ -22,6 +24,28 @@
       roles.slice(0, i).reduce((total, role) => total + startOffsetMs(role), 0),
     ),
   );
+
+  let container: HTMLElement;
+
+  const signalWhenThirdRoleNearlyDone = async () => {
+    const thirdToggle = container.querySelectorAll('.role-toggle')[2];
+    const animation = thirdToggle
+      ?.getAnimations()
+      .find(
+        (a) =>
+          a instanceof CSSAnimation && a.animationName.endsWith('role-hint'),
+      );
+    if (!animation) return markThirdRoleNearlyDone();
+
+    await animation.ready;
+    const delay = Number(animation.effect?.getTiming().delay ?? 0);
+    const nearlyDoneAt =
+      Number(animation.startTime) + delay + startOffsetMs(roles[2]);
+    const remaining = nearlyDoneAt - Number(document.timeline.currentTime);
+    setTimeout(markThirdRoleNearlyDone, Math.max(0, remaining));
+  };
+
+  onMount(signalWhenThirdRoleNearlyDone);
 
   const onClick = (name: string) => {
     if (hasTextSelection()) return;
@@ -57,7 +81,12 @@
   >
 {/snippet}
 
-<p class="role" role="group" aria-label="Filter portfolio by skill">
+<p
+  class="role"
+  role="group"
+  aria-label="Filter portfolio by skill"
+  bind:this={container}
+>
   {@render toggle(primary, true, roleDelays[0])}
   <span class="secondary-roles">
     {#each rest as role, i (role.name)}

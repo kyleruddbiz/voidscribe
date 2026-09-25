@@ -1,4 +1,5 @@
 import { tick } from 'svelte';
+import { thirdRoleNearlyDone } from './role-intro';
 import { createTruncator, type HtmlTruncator } from './truncate-html';
 
 const subpixelTolerance = 1;
@@ -126,6 +127,7 @@ export class ExpandableText {
     this.isTransitioning = true;
     this.retruncateIfWidthChanged();
 
+    await thirdRoleNearlyDone;
     await this.animateHeight(
       () => (this.isTextRevealed = true),
       () => this.textElement!.scrollHeight,

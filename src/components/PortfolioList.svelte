@@ -25,7 +25,7 @@
   const matchesFilter = (item: PortfolioEntry) =>
     item.skills.some((skill) => activeSkills.includes(skill));
 
-  const matchingFirst = $derived(
+  const orderedItems = $derived(
     isFiltering
       ? [
           ...items.filter(matchesFilter),
@@ -43,7 +43,7 @@
 </script>
 
 <div class="portfolio-list">
-  {#each matchingFirst as item (item.title)}
+  {#each orderedItems as item (item.title)}
     <div
       class="portfolio-card"
       animate:flip={{ duration: flipDuration, easing: cubicOut }}

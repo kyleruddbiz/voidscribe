@@ -1,8 +1,8 @@
 import type { Attachment } from 'svelte/attachments';
 import { hasTextSelection } from './selection';
 
-const middleMouseButton = 1;
-const openInBackgroundTab = { ctrlKey: true, metaKey: true };
+const middleButtonIndex = 1;
+const openInBackgroundTabModifiers = { ctrlKey: true, metaKey: true };
 
 export const wholeCardLink =
   (getLink: () => HTMLAnchorElement | undefined): Attachment<HTMLElement> =>
@@ -40,11 +40,11 @@ export const wholeCardLink =
 
     const onAuxClick = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (event.button !== middleMouseButton || target.closest('a, button')) {
+      if (event.button !== middleButtonIndex || target.closest('a, button')) {
         return;
       }
       event.preventDefault();
-      clickLink(openInBackgroundTab);
+      clickLink(openInBackgroundTabModifiers);
     };
 
     card.addEventListener('click', onClick);

@@ -12,16 +12,16 @@
   const rest = $derived(roles.slice(1));
 
   const letterStaggerMs = 20;
-  const lettersOfOverlap = 2;
+  const lettersLeftWhenNextRoleStarts = 2;
 
-  const roleDelays = $derived.by(() => {
-    let delay = 0;
-    return roles.map((role) => {
-      const roleDelay = delay;
-      delay += (role.name.length - lettersOfOverlap) * letterStaggerMs;
-      return roleDelay;
-    });
-  });
+  const startOffsetMs = (role: Role) =>
+    (role.name.length - lettersLeftWhenNextRoleStarts) * letterStaggerMs;
+
+  const roleDelays = $derived(
+    roles.map((_, i) =>
+      roles.slice(0, i).reduce((total, role) => total + startOffsetMs(role), 0),
+    ),
+  );
 
   const onClick = (name: string) => {
     if (hasTextSelection()) return;

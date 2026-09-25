@@ -1,10 +1,10 @@
-import { ITCH_ACCESS_CODE } from 'astro:env/server';
 import {
   githubIconPath,
   itchIoIconPath,
   linkedinIconPath,
   youtubeIconPath,
 } from '../lib/icon-paths';
+import { withAccessCode } from '../lib/itch-access';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 
 const name = 'Kyle Rudd';
@@ -29,12 +29,9 @@ const roles = [
   },
 ] as const;
 
-const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
-const itchQueryKey = String.fromCharCode(...itchQueryKeyCodes);
-const itchAccessCode = decodeURIComponent(ITCH_ACCESS_CODE ?? '');
-const mtgSimulatorHref = itchAccessCode
-  ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
-  : 'https://voidscribestudios.itch.io/mtg-simulator';
+const mtgSimulatorHref = withAccessCode(
+  'https://voidscribestudios.itch.io/mtg-simulator',
+);
 
 const portfolio = [
   {

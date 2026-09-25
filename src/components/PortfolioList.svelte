@@ -20,16 +20,16 @@
         .flatMap((role) => role.skills),
     ),
   ]);
-  const filtering = $derived(activeSkills.length > 0);
+  const isFiltering = $derived(activeSkills.length > 0);
 
-  const matches = (item: PortfolioEntry) =>
+  const matchesFilter = (item: PortfolioEntry) =>
     item.skills.some((skill) => activeSkills.includes(skill));
 
-  const ordered = $derived(
-    filtering
+  const matchingFirst = $derived(
+    isFiltering
       ? [
-          ...items.filter((item) => matches(item)),
-          ...items.filter((item) => !matches(item)),
+          ...items.filter(matchesFilter),
+          ...items.filter((item) => !matchesFilter(item)),
         ]
       : items,
   );
@@ -43,7 +43,7 @@
 </script>
 
 <div class="portfolio-list">
-  {#each ordered as item (item.title)}
+  {#each matchingFirst as item (item.title)}
     <div
       class="portfolio-card"
       animate:flip={{ duration: flipDuration, easing: cubicOut }}
@@ -51,7 +51,7 @@
       <PortfolioItem
         {...item}
         {activeSkills}
-        dimmed={filtering && !matches(item)}
+        dimmed={isFiltering && !matchesFilter(item)}
       />
     </div>
   {/each}

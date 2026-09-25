@@ -5,18 +5,20 @@
     revealed?: boolean;
   }
 
+  const revealStaggerMs = 500;
+
   let { skills, activeSkills = [], revealed = true }: Props = $props();
-  const filtering = $derived(activeSkills.length > 0);
+  const isFiltering = $derived(activeSkills.length > 0);
 </script>
 
 {#if skills.length > 0}
-  <ul class="chips" class:is-filtering={filtering} aria-label="Skills">
+  <ul class="chips" class:is-filtering={isFiltering} aria-label="Skills">
     {#each skills as skill, i (skill)}
       <li
         class="chip"
         class:is-active={activeSkills.includes(skill)}
         class:is-hidden={!revealed}
-        style:--reveal-delay={`${i * 500}ms`}
+        style:--reveal-delay={`${i * revealStaggerMs}ms`}
       >
         <span>{skill}</span>
       </li>

@@ -11,19 +11,17 @@
   const primary = $derived(roles[0]);
   const rest = $derived(roles.slice(1));
 
-  const letterStagger = 20;
+  const letterStaggerMs = 20;
+  const lettersOfOverlap = 2;
 
-  const roleDelays = $derived(
-    roles.reduce<number[]>((delays, role, i) => {
-      if (i === 0) {
-        delays.push(0);
-      } else {
-        const prev = roles[i - 1];
-        delays.push(delays[i - 1] + (prev.name.length - 2) * letterStagger);
-      }
-      return delays;
-    }, []),
-  );
+  const roleDelays = $derived.by(() => {
+    let delay = 0;
+    return roles.map((role) => {
+      const roleDelay = delay;
+      delay += (role.name.length - lettersOfOverlap) * letterStaggerMs;
+      return roleDelay;
+    });
+  });
 
   const onClick = (name: string) => {
     if (hasTextSelection()) return;
@@ -52,15 +50,15 @@
     >{#each [...role.name] as letter, i}<span
         class="role-letter"
         aria-hidden="true"
-        style="animation-delay: calc(var(--role-delay) + {i * letterStagger}ms)"
-        >{letter}</span
+        style="animation-delay: calc(var(--role-delay) + {i *
+          letterStaggerMs}ms)">{letter}</span
       >{/each}</span
   >
 {/snippet}
 
 <p class="role" role="group" aria-label="Filter portfolio by skill">
   {@render toggle(primary, true, roleDelays[0])}
-  <span class="role-pair">
+  <span class="secondary-roles">
     {#each rest as role, i (role.name)}
       {@render toggle(role, false, roleDelays[i + 1])}
     {/each}
@@ -70,7 +68,7 @@
 <style>
   .role {
     --role-hint-duration: 1.4s;
-    --role-sep: 1.119rem;
+    --role-separator-width: 1.119rem;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -82,7 +80,7 @@
     margin: 0 0 2rem;
   }
 
-  .role-pair {
+  .secondary-roles {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -102,6 +100,16 @@
       text-decoration-thickness 0.15s ease;
     animation: role-hint var(--role-hint-duration) ease-in-out;
     animation-delay: var(--role-delay);
+  }
+
+  @keyframes role-hint {
+    0%,
+    100% {
+      text-decoration-color: transparent;
+    }
+    40% {
+      text-decoration-color: var(--color-accent);
+    }
   }
 
   .role-letter {
@@ -135,16 +143,6 @@
     text-decoration-thickness: 2px;
   }
 
-  @keyframes role-hint {
-    0%,
-    100% {
-      text-decoration-color: transparent;
-    }
-    40% {
-      text-decoration-color: var(--color-accent);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .role-toggle,
     .role-letter {
@@ -152,19 +150,19 @@
     }
   }
 
-  .role-pair .role-toggle::before {
+  .secondary-roles .role-toggle::before {
     content: '·';
     display: inline-block;
     box-sizing: border-box;
-    width: var(--role-sep);
+    width: var(--role-separator-width);
     padding-left: 0.4em;
-    margin-left: calc(-1 * var(--role-sep));
+    margin-left: calc(-1 * var(--role-separator-width));
     color: var(--color-text-dim);
     text-decoration: none;
   }
 
   .role-toggle:not(:last-child) {
-    margin-right: var(--role-sep);
+    margin-right: var(--role-separator-width);
   }
 
   @media (scripting: none) {

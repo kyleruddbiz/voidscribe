@@ -36,8 +36,6 @@ const mtgSimulatorHref = itchAccessCode
   ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
   : 'https://voidscribestudios.itch.io/mtg-simulator';
 
-// `title` and `description` are HTML strings. Descriptions too complex to
-// inline live in ./kyle-rudd/ and are imported as raw text.
 const portfolio = [
   {
     href: 'https://www.linkedin.com/in/kyle-n-rudd/',
@@ -51,7 +49,6 @@ const portfolio = [
   {
     href: 'https://github.com/kyleruddbiz/voidscribe',
     callToAction: 'View on GitHub',
-    // Placeholder until the vortex logo is cleaned up into a usable icon.
     icon: githubIconPath,
     title: 'Void Scribe Studios',
     skills: [Skill.softwareEngineering, Skill.uiUxDesign],

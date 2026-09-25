@@ -25,15 +25,12 @@
 {/if}
 
 <style>
-  /* Laid out from the start of whatever box the parent gives it; the parent
-     sets --chips-align: center to center them in it instead. */
   .chips {
     display: flex;
     justify-content: var(--chips-align, flex-start);
     margin: 0;
     padding: 0;
     list-style: none;
-    /* Lets clicks fall through to whatever the parent positions these over. */
     pointer-events: none;
   }
 
@@ -58,19 +55,15 @@
     margin-left: 0;
   }
 
-  /* Counter-skew keeps the label upright. */
   .chip > span {
     display: block;
     transform: skewX(14deg);
   }
 
-  /* While a filter is active, chips outside it recede. */
   .chips.is-filtering .chip:not(.is-active) {
     background: var(--color-accent);
   }
 
-  /* .js-gated so blocked-script visitors get the chips instead of ones
-     stuck hidden; transition-delay (set per chip above) staggers the fade. */
   :global(.js) .chip.is-hidden {
     opacity: 0;
   }

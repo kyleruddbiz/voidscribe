@@ -27,7 +27,6 @@
 
   let { items, roles }: Props = $props();
 
-  // Skills carried by any selected role. Empty when nothing is selected.
   const activeSkills = $derived([
     ...new Set(
       roles
@@ -50,8 +49,6 @@
   );
 
   let flipDuration = $state(320);
-  // Checked in onMount, not at module scope: matchMedia isn't available
-  // while Astro server-renders this island.
   onMount(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
       flipDuration = 0;

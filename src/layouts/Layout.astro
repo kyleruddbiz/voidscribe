@@ -26,7 +26,6 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
     />
     <meta name="theme-color" content="#0d0e12" />
     <meta name="description" content={description} />
-    <!-- Marks that scripts ran; gates the .js CSS rules in PortfolioItem. -->
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
@@ -96,7 +95,6 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
   .brand img {
     height: 3rem;
     width: auto;
-    /* the source logo is black-on-transparent; invert it for the dark theme */
     filter: invert(1) brightness(1.6);
   }
 
@@ -105,8 +103,6 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
     min-height: 60dvh;
   }
 
-  /* .sr-only hides this until focused, then this override makes it a normal
-     visible, positioned element again. */
   .skip-link:focus {
     position: absolute;
     top: 0;

@@ -1,9 +1,3 @@
-// Truncates arbitrary HTML to support expand/collapse: cuts the rendered
-// text at a character offset (on a DOM copy, so markup structure is
-// preserved) and appends a caller-supplied tail node (e.g. "Show more").
-
-// Wrappers the tail is placed outside of. It stays inside any other
-// element, so it lands on the last line of text rather than after a block.
 const inlineTags = new Set([
   'A',
   'ABBR',
@@ -22,13 +16,8 @@ const inlineTags = new Set([
   'U',
 ]);
 
-// Whitespace and sentence punctuation (including an existing ellipsis and
-// dashes) that would collide with a tail beginning in "...".
 const trailingPunctuation = /[\s.,;:!?…\-–—]+$/;
 
-// Text nodes that render something, in document order. Whitespace-only
-// nodes (the gaps between blocks) are skipped so a cut can never land in
-// one, which would strand the tail on a line of its own.
 const textNodes = (root: Node) => {
   const nodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -40,15 +29,8 @@ const textNodes = (root: Node) => {
 
 export interface HtmlTruncator {
   readonly totalCharacterCount: number;
-  /** The untruncated content, with no tail appended. */
   full(): DocumentFragment;
-  /** The content cut to `characters` characters of rendered text, with the tail appended. */
   upTo(characters: number): DocumentFragment;
-  /**
-   * Binary search over cut points for the longest prefix that, once rendered
-   * via `render` and with the tail appended, satisfies `fits`. Leaves the
-   * longest fitting prefix rendered.
-   */
   longestFitting(
     render: (content: DocumentFragment) => void,
     fits: () => boolean,
@@ -65,9 +47,6 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
 
   const full = () => template.content.cloneNode(true) as DocumentFragment;
 
-  // Range.deleteContents() does the hard part: it trims the text node the
-  // cut lands in, keeps the ancestors that node sits inside of (<p>,
-  // <blockquote>), and drops everything after it.
   const upTo = (characters: number): DocumentFragment => {
     const clone = full();
     let remaining = characters;
@@ -83,12 +62,8 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     range.setStart(cut, Math.min(remaining, cut.length));
     range.setEndAfter(clone.lastChild!);
     range.deleteContents();
-    // Trailing punctuation goes too: the tail brings its own "...", and
-    // "text.... Show more" or "text,... Show more" reads as a glitch.
     cut.data = cut.data.replace(trailingPunctuation, '');
 
-    // Step out of inline wrappers (<em>, <cite>, ...) but not out of the
-    // enclosing block, so the tail sits flush on the last line of text.
     let anchor: Node = cut;
     while (
       anchor.parentElement &&

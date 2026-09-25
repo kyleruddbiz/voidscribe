@@ -1,6 +1,3 @@
-// Module-level store for state shared across separate Astro islands. A class
-// instance keeps `$state` reactive across the module boundary, which a bare
-// exported `$state` variable would not.
 class SkillFilter {
   selected = $state<string[]>([]);
 

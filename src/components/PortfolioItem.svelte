@@ -33,9 +33,6 @@
   const titleId = `portfolio-item-title-${instanceId}`;
   const showMoreId = `portfolio-item-show-more-${instanceId}`;
   const showLessId = `portfolio-item-show-less-${instanceId}`;
-  // `description` is only ever read for its initial value (see truncator
-  // below); untrack signals that it's deliberately not meant to stay in
-  // sync with a later prop change.
   const full = untrack(() => (description ?? '').trim());
   const hasDescription = full.length > 0;
 
@@ -48,28 +45,15 @@
 
   let expanded = $state(false);
   let truncated = $state(false);
-  // Set by reveal() below: revealed when the description starts growing
-  // open, settledIn once it finishes.
   let revealed = $state(false);
   let settledIn = $state(false);
-  // Faded in by collapse()/expand() once the tail/"Show less" button they
-  // reveal has settled into its final position, rather than popping in.
   let tailAppearing = $state(false);
   let showLessAppearing = $state(false);
   let lastWidth = -1;
 
-  // Explicit pixel max-height used only while an expand/collapse animation is
-  // in flight; undefined the rest of the time, handing max-height back to the
-  // CSS classes below (the calc() clamp when collapsed, none when expanded).
   let heightOverride = $state<string | undefined>(undefined);
-  // Guards against a resize retrimming content mid-animation, and against a
-  // second click re-entering expand()/collapse() before the first finishes.
   let transitioning = false;
 
-  // Resolves once the description's max-height transition finishes.
-  // getAnimations() reports nothing when there's nothing to animate — a
-  // transition with equal start/end heights, or prefers-reduced-motion
-  // (disabled below) — so this resolves immediately in those cases.
   const settled = (element: HTMLElement) =>
     Promise.allSettled(
       element.getAnimations().map((animation) => animation.finished),
@@ -78,15 +62,6 @@
   const nextFrame = () =>
     new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
-  // Pins the description at its current height, applies `change`, then
-  // transitions to the height `target` reports afterward. Resolves once the
-  // box has settled. Pinning a concrete pixel value a frame apart from the
-  // change is what makes the max-height transition below actually animate,
-  // rather than jumping straight to/from the calc()/none it's changing
-  // between.
-  //
-  // `from` overrides the pinned starting height, for a caller that must
-  // mutate the box before calling this (see collapse()).
   async function animateHeight(
     change: () => void,
     target: () => number,
@@ -102,15 +77,9 @@
     await tick();
     await settled(descriptionElement);
 
-    // Hand max-height back to the is-expanded/calc() CSS below, so a later
-    // resize isn't stuck at this now-stale pixel value.
     heightOverride = undefined;
   }
 
-  // Starts an element fading in: hides it via `setFrom`, forces a style
-  // flush so that commits before undoing it (otherwise both changes can
-  // land in the same frame and skip the transition), then lets the fade run
-  // — callers don't wait out the fade itself, just this setup.
   async function appear(setFrom: (on: boolean) => void, element: HTMLElement) {
     setFrom(true);
     await tick();
@@ -119,30 +88,21 @@
     await tick();
   }
 
-  // Built once on mount, since it needs `document`.
   let truncator: HtmlTruncator | undefined;
 
   const fits = (maxHeight: number) =>
     descriptionElement!.scrollHeight <= maxHeight + 1;
 
-  // The --description-lines clamp, in pixels — the CSS max-height while
-  // collapsed, and the upper bound fits() checks trimmed content against.
   const clampHeight = () => {
     const styles = getComputedStyle(descriptionElement!);
     const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
     return parseFloat(styles.lineHeight) * lines;
   };
 
-  // Trims the description to the longest prefix that, with the "... Show more"
-  // tail appended, fits within --description-lines lines. Also runs while
-  // expanded so `truncated` tracks resizes: "Show less" is hidden whenever
-  // the full text fits.
   const trim = () => {
     if (!descriptionElement || !bodyElement || !truncator) return;
     const maxHeight = clampHeight();
 
-    // Expanded content is already the full text; rebuilding it would drop any
-    // text selection inside it.
     if (!expanded) bodyElement.replaceChildren(truncator.full());
     truncated = !fits(maxHeight);
     if (expanded || !truncated) return;
@@ -152,13 +112,6 @@
     );
   };
 
-  // Trims now, while still expanded, to learn the real collapsed height and
-  // set the trimmed content aside: --description-lines is only an upper
-  // bound, and trimmed content often lands a partial line short of it.
-  // Trimming mutates bodyElement, so `from` is read before it. The shrink
-  // itself runs over the full text, clipped by overflow, so it doesn't pop
-  // straight to the short version; the trimmed content goes back once the
-  // box has settled, and "... Show more" fades in.
   async function collapse() {
     if (
       transitioning ||
@@ -197,10 +150,6 @@
     endTransition();
   }
 
-  // Swaps in the full text and grows the box to fit. "Show less" is
-  // unhidden immediately too, so its space is reserved for the grow
-  // animation, but stays invisible until the box finishes growing, when it
-  // fades in like "Show more" does on collapse.
   async function expand() {
     if (transitioning || expanded || !descriptionElement) return;
     transitioning = true;
@@ -220,7 +169,6 @@
     endTransition();
   }
 
-  // Trims the description, then grows the box open from 0 to that height.
   async function reveal() {
     if (!descriptionElement || !bodyElement || !truncator) return;
     transitioning = true;
@@ -237,23 +185,16 @@
     endTransition();
   }
 
-  // The card's text sits above the link overlay so it can be selected, which
-  // takes it out of the anchor's click area. These handlers forward its clicks
-  // to the anchor; clicks on the anchor, links in the description and buttons
-  // are left alone.
   const forward = (init: MouseEventInit) =>
     linkElement?.dispatchEvent(
       new MouseEvent('click', { bubbles: true, cancelable: true, ...init }),
     );
 
   const onCardClick = (event: MouseEvent) => {
-    // Ignore the click forward() dispatches, or it would loop back in here.
     if (!event.isTrusted) return;
     const target = event.target as Element;
     if (target.closest('button')) return;
 
-    // A drag-select still ends in a click. Don't follow it, and cancel it if it
-    // landed on the anchor (a drag within the title).
     const selecting = isSelecting();
     if (target.closest('a')) {
       if (selecting) event.preventDefault();
@@ -269,9 +210,6 @@
     });
   };
 
-  // Middle-click fires auxclick, not click. It's forwarded as a ctrl/cmd-click,
-  // which opens a background tab. Unlike a left click, it isn't skipped when
-  // text is selected: a middle-click never drags, so the selection is stale.
   const onCardAuxClick = (event: MouseEvent) => {
     if (event.button !== 1 || (event.target as Element).closest('a, button')) {
       return;
@@ -280,12 +218,6 @@
     forward({ ctrlKey: true, metaKey: true });
   };
 
-  // Trimming only changes the description's height, never its width, so
-  // re-measuring only on width changes keeps our own content changes from
-  // triggering another trim. Skipped mid-animation too: an expand/collapse
-  // owns bodyElement's content and descriptionElement's height until it
-  // finishes. `lastWidth` is left stale in that case so endTransition() can
-  // tell a resize was missed and catch up.
   const onResize = (width: number) => {
     if (transitioning) return;
     if (width === lastWidth) return;
@@ -293,7 +225,6 @@
     trim();
   };
 
-  // Catches up on any resize onResize() skipped while transitioning.
   function endTransition() {
     transitioning = false;
     if (!descriptionElement) return;
@@ -316,8 +247,6 @@
   });
 </script>
 
-<!-- Mouse-only convenience: the anchor is still the real, keyboard-operable
-     control, so the a11y warnings below don't apply. -->
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
   class="item"
@@ -328,8 +257,6 @@
 >
   <div class="item-row">
     <div class="item-content">
-      <!-- draggable="false": dragging on a link's text would otherwise drag
-           the link instead of selecting the title. -->
       <a
         class="item-link"
         {href}
@@ -354,13 +281,8 @@
           style:max-height={heightOverride}
           bind:this={descriptionElement}
         >
-          <!-- Rendered here so the text is in the static HTML. `full` is
-               non-reactive, so Svelte never touches this element again;
-               after mount, trim() and expand() own its children. -->
           <div bind:this={bodyElement}>{@html full}</div>
         </div>
-        <!-- Parked here until a trim moves it onto the last line of text
-             (see truncate-html.ts). -->
         <div hidden>
           <span
             class="item-tail"
@@ -434,9 +356,6 @@
     opacity: 1;
   }
 
-  /* Straddles the card's bottom border, inset to match the card's padding.
-     SkillChips lays itself out inside this box; --chips-align (set below
-     for mobile) tells it whether to hug the start or center. */
   .item-skills {
     position: absolute;
     left: 1.25rem;
@@ -462,18 +381,12 @@
     text-decoration: none;
   }
 
-  /* Stretches the click target across the card's padding and gaps while
-     keeping the anchor itself scoped to the icon/title, so it never contains
-     another interactive element. The text sits above it (see below), and the
-     "Show more"/"Show less" buttons use z-index to stay clickable. */
   .item-link::after {
     content: '';
     position: absolute;
     inset: 0;
   }
 
-  /* Text sits above the overlay so it can be selected; see onCardClick for how
-     clicks on it still follow the link. */
   .item-main,
   .item-description,
   .item-meta {
@@ -486,8 +399,6 @@
     cursor: pointer;
   }
 
-  /* Chrome won't start a selection inside a link unless the text is
-     explicitly user-select: text (draggable="false" alone isn't enough). */
   .item-title {
     user-select: text;
   }
@@ -524,9 +435,6 @@
     transition: opacity 1.2s ease;
   }
 
-  /* The clamp is a plain max-height, so it works before JS runs and for any
-     markup inside. JS then trims the content so "... Show more" lands on the
-     last line, rather than the text being cut off mid-line. */
   .item-description {
     --description-lines: 3;
     margin: 0.4rem 0 0;
@@ -544,8 +452,6 @@
     max-height: none;
   }
 
-  /* Hidden until reveal() runs; .js-gated so blocked-script visitors get the
-     full card instead of one stuck hidden. */
   :global(.js) .item-description:not(.is-revealed) {
     max-height: 0;
     opacity: 0;
@@ -555,8 +461,6 @@
     opacity: 0;
   }
 
-  /* Without JS nothing trims the text or adds a "Show more" button, so remove
-     the max-height and show the full description. */
   @media (scripting: none) {
     .item-description {
       max-height: none;
@@ -572,14 +476,11 @@
     }
   }
 
-  /* The description is HTML injected with {@html}, so Svelte's scoped
-     styles can't reach it — these rules use :global. */
   .item-description :global(p),
   .item-description :global(blockquote) {
     margin: 0;
   }
 
-  /* Spacing between blocks, in place of the margins zeroed above. */
   .item-description :global(div > * + *) {
     margin-top: 0.6em;
   }
@@ -590,9 +491,6 @@
     font-style: italic;
   }
 
-  /* nowrap keeps "... Show more" a single unit, so it wraps whole instead of
-     splitting; trim() then rejects any cut that pushes it past the last
-     line. Upright so it doesn't inherit a blockquote's italics. */
   .item-tail {
     white-space: nowrap;
     font-style: normal;
@@ -636,9 +534,6 @@
     text-decoration: underline;
   }
 
-  /* Set by collapse()/expand() right after the tail/"Show less" button is
-     revealed, then cleared a frame later so it fades in instead of
-     appearing instantly. */
   .item-tail.is-appearing,
   .item-show-less.is-appearing {
     opacity: 0;
@@ -682,8 +577,6 @@
       --chips-align: center;
     }
 
-    /* Dissolves this plain wrapper div so its children can be reordered
-       around .item-show-less. Safe — unlike the anchor, it carries no semantics to lose. */
     .item-row {
       display: contents;
     }

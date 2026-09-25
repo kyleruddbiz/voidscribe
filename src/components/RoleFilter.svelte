@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { isSelecting } from '../lib/selection';
-  import { skillFilter } from '../lib/skill-filter.svelte';
+  import { hasTextSelection } from '../lib/selection';
+  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import type { Role } from '../lib/portfolio';
 
   interface Props {
-    roles: readonly { name: string }[];
+    roles: readonly Role[];
   }
 
   let { roles }: Props = $props();
@@ -25,26 +26,26 @@
   );
 
   const onClick = (name: string) => {
-    if (isSelecting()) return;
-    skillFilter.toggle(name);
+    if (hasTextSelection()) return;
+    selectedRoles.toggle(name);
   };
 
   const onKeydown = (event: KeyboardEvent, name: string) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
-    skillFilter.toggle(name);
+    selectedRoles.toggle(name);
   };
 </script>
 
-{#snippet toggle(role: { name: string }, isPrimary: boolean, delay: number)}
+{#snippet toggle(role: Role, isPrimary: boolean, delay: number)}
   <span
     class="role-toggle"
     class:is-primary={isPrimary}
-    class:is-selected={skillFilter.isSelected(role.name)}
+    class:is-selected={selectedRoles.has(role.name)}
     style="--role-delay: {delay}ms"
     role="button"
     tabindex="0"
-    aria-pressed={skillFilter.isSelected(role.name)}
+    aria-pressed={selectedRoles.has(role.name)}
     aria-label={role.name}
     onclick={() => onClick(role.name)}
     onkeydown={(event) => onKeydown(event, role.name)}

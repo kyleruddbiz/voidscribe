@@ -1,17 +1,11 @@
 <script lang="ts">
   import { onMount, tick, untrack } from 'svelte';
-  import { isSelecting } from '../lib/selection';
+  import { hasTextSelection } from '../lib/selection';
   import { createTruncator, type HtmlTruncator } from '../lib/truncate-html';
+  import type { PortfolioEntry } from '../lib/portfolio';
   import SkillChips from './SkillChips.svelte';
 
-  interface Props {
-    href: string;
-    rel?: string;
-    callToAction: string;
-    icon: string;
-    description?: string;
-    title: string;
-    skills?: readonly string[];
+  interface Props extends PortfolioEntry {
     activeSkills?: readonly string[];
     dimmed?: boolean;
   }
@@ -23,7 +17,7 @@
     icon,
     description,
     title,
-    skills = [],
+    skills,
     activeSkills = [],
     dimmed = false,
   }: Props = $props();
@@ -195,7 +189,7 @@
     const target = event.target as Element;
     if (target.closest('button')) return;
 
-    const selecting = isSelecting();
+    const selecting = hasTextSelection();
     if (target.closest('a')) {
       if (selecting) event.preventDefault();
       return;

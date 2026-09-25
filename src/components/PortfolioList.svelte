@@ -3,25 +3,11 @@
   import { cubicOut } from 'svelte/easing';
   import { onMount } from 'svelte';
   import PortfolioItem from './PortfolioItem.svelte';
-  import { skillFilter } from '../lib/skill-filter.svelte';
-
-  interface Item {
-    href: string;
-    rel?: string;
-    callToAction: string;
-    icon: string;
-    description?: string;
-    title: string;
-    skills: readonly string[];
-  }
-
-  interface Role {
-    name: string;
-    skills: readonly string[];
-  }
+  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import type { PortfolioEntry, Role } from '../lib/portfolio';
 
   interface Props {
-    items: readonly Item[];
+    items: readonly PortfolioEntry[];
     roles: readonly Role[];
   }
 
@@ -30,13 +16,13 @@
   const activeSkills = $derived([
     ...new Set(
       roles
-        .filter((role) => skillFilter.isSelected(role.name))
+        .filter((role) => selectedRoles.has(role.name))
         .flatMap((role) => role.skills),
     ),
   ]);
   const filtering = $derived(activeSkills.length > 0);
 
-  const matches = (item: Item) =>
+  const matches = (item: PortfolioEntry) =>
     item.skills.some((skill) => activeSkills.includes(skill));
 
   const ordered = $derived(

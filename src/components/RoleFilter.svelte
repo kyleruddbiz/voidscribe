@@ -141,7 +141,6 @@
     font-size: 1.1em;
   }
 
-  /* Hover only on devices that really hover, so a tap doesn't leave it stuck. */
   @media (hover: hover) {
     .role-toggle:hover {
       color: var(--color-text);
@@ -175,8 +174,7 @@
 
   /* Each role carries its own leading separator, drawn in the previous role's
      trailing margin. At the start of a wrapped line it hangs outside .role and
-     is clipped by `.role`'s overflow. It's a sibling of the toggle, not part of it, so
-     the toggle's focus ring and underline don't include it. */
+     is clipped by `.role`'s overflow. */
   .role-separator {
     box-sizing: border-box;
     width: var(--role-separator-width);

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount, tick, untrack } from 'svelte';
-  import { hasTextSelection } from '../lib/selection';
-  import { createTruncator, type HtmlTruncator } from '../lib/truncate-html';
+  import { onMount, untrack } from 'svelte';
+  import { ExpandableDescription } from '../lib/expandable-description.svelte';
+  import { forwardClicksToLink } from '../lib/forward-clicks-to-link';
   import type { PortfolioEntry } from '../lib/portfolio';
   import SkillChips from './SkillChips.svelte';
 
@@ -27,232 +27,24 @@
   const titleId = `portfolio-item-title-${instanceId}`;
   const showMoreId = `portfolio-item-show-more-${instanceId}`;
   const showLessId = `portfolio-item-show-less-${instanceId}`;
-  const full = untrack(() => (description ?? '').trim());
-  const hasDescription = full.length > 0;
 
-  let descriptionElement = $state<HTMLDivElement>();
-  let bodyElement = $state<HTMLDivElement>();
-  let tail = $state<HTMLSpanElement>();
-  let showMoreElement = $state<HTMLButtonElement>();
-  let collapseElement = $state<HTMLButtonElement>();
+  const fullHtml = untrack(() => (description ?? '').trim());
+  const expandable = new ExpandableDescription(fullHtml);
   let linkElement = $state<HTMLAnchorElement>();
 
-  let expanded = $state(false);
-  let truncated = $state(false);
-  let revealed = $state(false);
-  let settledIn = $state(false);
-  let tailAppearing = $state(false);
-  let showLessAppearing = $state(false);
-  let lastWidth = -1;
-
-  let heightOverride = $state<string | undefined>(undefined);
-  let transitioning = false;
-
-  const settled = (element: HTMLElement) =>
-    Promise.allSettled(
-      element.getAnimations().map((animation) => animation.finished),
-    );
-
-  const nextFrame = () =>
-    new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-
-  async function animateHeight(
-    change: () => void,
-    target: () => number,
-    from?: number,
-  ) {
-    if (!descriptionElement) return;
-    heightOverride = `${from ?? descriptionElement.getBoundingClientRect().height}px`;
-    change();
-    await tick();
-
-    await nextFrame();
-    heightOverride = `${target()}px`;
-    await tick();
-    await settled(descriptionElement);
-
-    heightOverride = undefined;
-  }
-
-  async function appear(setFrom: (on: boolean) => void, element: HTMLElement) {
-    setFrom(true);
-    await tick();
-    getComputedStyle(element).opacity;
-    setFrom(false);
-    await tick();
-  }
-
-  let truncator: HtmlTruncator | undefined;
-
-  const fits = (maxHeight: number) =>
-    descriptionElement!.scrollHeight <= maxHeight + 1;
-
-  const clampHeight = () => {
-    const styles = getComputedStyle(descriptionElement!);
-    const lines = parseInt(styles.getPropertyValue('--description-lines'), 10);
-    return parseFloat(styles.lineHeight) * lines;
-  };
-
-  const trim = () => {
-    if (!descriptionElement || !bodyElement || !truncator) return;
-    const maxHeight = clampHeight();
-
-    if (!expanded) bodyElement.replaceChildren(truncator.full());
-    truncated = !fits(maxHeight);
-    if (expanded || !truncated) return;
-    truncator.longestFitting(
-      (content) => bodyElement!.replaceChildren(content),
-      () => fits(maxHeight),
-    );
-  };
-
-  async function collapse() {
-    if (
-      transitioning ||
-      !expanded ||
-      !descriptionElement ||
-      !bodyElement ||
-      !truncator
-    ) {
-      return;
-    }
-    transitioning = true;
-
-    const from = descriptionElement.getBoundingClientRect().height;
-
-    const maxHeight = clampHeight();
-    truncator.longestFitting(
-      (content) => bodyElement!.replaceChildren(content),
-      () => fits(maxHeight),
-    );
-    const collapsedContent = [...bodyElement.childNodes];
-    const collapsedContentHeight = descriptionElement.scrollHeight;
-
-    await animateHeight(
-      () => {
-        bodyElement!.replaceChildren(truncator!.full());
-        expanded = false;
-      },
-      () => collapsedContentHeight,
-      from,
-    );
-
-    bodyElement.replaceChildren(...collapsedContent);
-    if (tail) await appear((on) => (tailAppearing = on), tail);
-
-    showMoreElement?.focus();
-    endTransition();
-  }
-
-  async function expand() {
-    if (transitioning || expanded || !descriptionElement) return;
-    transitioning = true;
-
-    showLessAppearing = true;
-    await animateHeight(
-      () => {
-        bodyElement?.replaceChildren(truncator!.full());
-        expanded = true;
-      },
-      () => descriptionElement!.scrollHeight,
-    );
-
-    if (collapseElement)
-      await appear((on) => (showLessAppearing = on), collapseElement);
-    collapseElement?.focus();
-    endTransition();
-  }
-
-  async function reveal() {
-    if (!descriptionElement || !bodyElement || !truncator) return;
-    transitioning = true;
-
-    lastWidth = descriptionElement.getBoundingClientRect().width;
-    trim();
-
-    await animateHeight(
-      () => (revealed = true),
-      () => descriptionElement!.scrollHeight,
-    );
-
-    settledIn = true;
-    endTransition();
-  }
-
-  const forward = (init: MouseEventInit) =>
-    linkElement?.dispatchEvent(
-      new MouseEvent('click', { bubbles: true, cancelable: true, ...init }),
-    );
-
-  const onCardClick = (event: MouseEvent) => {
-    if (!event.isTrusted) return;
-    const target = event.target as Element;
-    if (target.closest('button')) return;
-
-    const selecting = hasTextSelection();
-    if (target.closest('a')) {
-      if (selecting) event.preventDefault();
-      return;
-    }
-    if (selecting) return;
-
-    forward({
-      ctrlKey: event.ctrlKey,
-      metaKey: event.metaKey,
-      shiftKey: event.shiftKey,
-      altKey: event.altKey,
-    });
-  };
-
-  const onCardAuxClick = (event: MouseEvent) => {
-    if (event.button !== 1 || (event.target as Element).closest('a, button')) {
-      return;
-    }
-    event.preventDefault();
-    forward({ ctrlKey: true, metaKey: true });
-  };
-
-  const onResize = (width: number) => {
-    if (transitioning) return;
-    if (width === lastWidth) return;
-    lastWidth = width;
-    trim();
-  };
-
-  function endTransition() {
-    transitioning = false;
-    if (!descriptionElement) return;
-    const width = descriptionElement.getBoundingClientRect().width;
-    if (width === lastWidth) return;
-    lastWidth = width;
-    trim();
-  }
-
-  onMount(() => {
-    if (!hasDescription || !descriptionElement || !tail) return;
-    truncator = createTruncator(full, tail);
-
-    const observer = new ResizeObserver((entries) =>
-      onResize(entries[0].contentRect.width),
-    );
-    observer.observe(descriptionElement);
-    reveal();
-    return () => observer.disconnect();
-  });
+  onMount(() => expandable.mount());
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
   class="item"
   class:is-dimmed={dimmed}
-  class:is-settled={settledIn}
-  onclick={onCardClick}
-  onauxclick={onCardAuxClick}
+  class:is-settled={expandable.introComplete}
+  {@attach forwardClicksToLink(() => linkElement)}
 >
   <div class="item-row">
     <div class="item-content">
       <a
-        class="item-link"
+        class="stretched-link"
         {href}
         target="_blank"
         {rel}
@@ -266,33 +58,33 @@
           <span class="item-title" id={titleId}>{@html title}</span>
         </span>
       </a>
-      {#if hasDescription}
+      {#if expandable.hasContent}
         <div
           class="item-description"
-          class:is-expanded={expanded}
-          class:is-revealed={revealed}
+          class:is-expanded={expandable.expanded}
+          class:is-revealed={expandable.descriptionRevealed}
           id={descriptionId}
-          style:max-height={heightOverride}
-          bind:this={descriptionElement}
+          style:max-height={expandable.pinnedMaxHeight}
+          bind:this={expandable.descriptionElement}
         >
-          <div bind:this={bodyElement}>{@html full}</div>
+          <div bind:this={expandable.bodyElement}>{@html fullHtml}</div>
         </div>
         <div hidden>
           <span
             class="item-tail"
-            class:is-appearing={tailAppearing}
-            bind:this={tail}
+            class:is-transparent={expandable.tailTransparent}
+            bind:this={expandable.tailElement}
           >
             <span aria-hidden="true">...</span>
             <button
               type="button"
               class="item-show-more"
               id={showMoreId}
-              bind:this={showMoreElement}
+              bind:this={expandable.showMoreElement}
               aria-expanded="false"
               aria-controls={descriptionId}
               aria-labelledby="{showMoreId} {titleId}"
-              onclick={expand}
+              onclick={() => expandable.expand()}
             >
               Show more
             </button>
@@ -302,24 +94,24 @@
     </div>
     <span class="item-meta">{callToAction} &rarr;</span>
   </div>
-  {#if hasDescription}
+  {#if expandable.hasContent}
     <button
       type="button"
       class="item-show-less"
-      class:is-appearing={showLessAppearing}
+      class:is-transparent={expandable.showLessTransparent}
       id={showLessId}
-      bind:this={collapseElement}
-      aria-expanded={expanded}
+      bind:this={expandable.showLessElement}
+      aria-expanded={expandable.expanded}
       aria-controls={descriptionId}
       aria-labelledby="{showLessId} {titleId}"
-      hidden={!expanded || !truncated}
-      onclick={collapse}
+      hidden={!expandable.expanded || !expandable.truncated}
+      onclick={() => expandable.collapse()}
     >
       Show less
     </button>
   {/if}
   <div class="item-skills">
-    <SkillChips {skills} {activeSkills} revealed={settledIn} />
+    <SkillChips {skills} {activeSkills} revealed={expandable.introComplete} />
   </div>
 </div>
 
@@ -371,11 +163,11 @@
     padding-right: 1.5rem;
   }
 
-  .item-link {
+  .stretched-link {
     text-decoration: none;
   }
 
-  .item-link::after {
+  .stretched-link::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -391,10 +183,6 @@
   .item-description,
   .item-meta {
     cursor: pointer;
-  }
-
-  .item-title {
-    user-select: text;
   }
 
   .item-main {
@@ -416,6 +204,7 @@
   }
 
   .item-title {
+    user-select: text;
     font-family: var(--font-display);
     color: var(--color-text);
     font-size: 1.05rem;
@@ -426,7 +215,7 @@
     font-size: 0.9rem;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: opacity 1.2s ease;
+    transition: var(--fade-in);
   }
 
   .item-description {
@@ -491,49 +280,46 @@
     transition: var(--fade-in);
   }
 
-  .item-show-more {
+  .item-show-more,
+  .item-show-less {
     position: relative;
     z-index: 1;
-    margin-left: 0.3em;
     padding: 0;
     border: none;
     background: none;
     color: var(--color-accent-bright);
     font-family: inherit;
-    font-size: inherit;
     cursor: pointer;
   }
 
   .item-show-more:hover,
-  .item-show-more:focus-visible {
-    text-decoration: underline;
-  }
-
-  .item-show-less {
-    position: relative;
-    z-index: 1;
-    margin-top: 0.4rem;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--color-accent-bright);
-    font-family: inherit;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: var(--fade-in);
-  }
-
+  .item-show-more:focus-visible,
   .item-show-less:hover,
   .item-show-less:focus-visible {
     text-decoration: underline;
   }
 
-  .item-tail.is-appearing,
-  .item-show-less.is-appearing {
+  .item-show-more {
+    margin-left: 0.3em;
+    font-size: inherit;
+  }
+
+  .item-show-less {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    transition: var(--fade-in);
+  }
+
+  .item-tail.is-transparent,
+  .item-show-less.is-transparent {
     opacity: 0;
   }
 
   @media (max-width: 480px) {
+    .item-row {
+      display: contents;
+    }
+
     .item {
       display: flex;
       flex-direction: column;
@@ -569,10 +355,6 @@
       left: 0;
       right: 0;
       --chips-align: center;
-    }
-
-    .item-row {
-      display: contents;
     }
   }
 </style>

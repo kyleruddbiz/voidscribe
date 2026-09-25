@@ -1,5 +1,3 @@
-/* Void Scribe Studios — global styles */
-
 :root {
   --color-bg: #0d0e12;
   --color-bg-raised: #16181f;
@@ -71,9 +69,6 @@ img {
   color: var(--color-bg);
 }
 
-/* Visually hides content while keeping it in the accessibility tree.
-   Absolutely positioned (rather than e.g. width:0) so it never affects the
-   layout it sits within. */
 .sr-only {
   position: absolute;
   width: 1px;

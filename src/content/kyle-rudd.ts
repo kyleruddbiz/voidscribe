@@ -1,10 +1,10 @@
-import { ITCH_ACCESS_CODE } from 'astro:env/server';
 import {
   githubIconPath,
   itchIoIconPath,
   linkedinIconPath,
   youtubeIconPath,
-} from '../lib/icon-paths';
+} from '../lib/simple-icons';
+import { withAccessCode } from '../lib/itch-access';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 
 const name = 'Kyle Rudd';
@@ -29,15 +29,10 @@ const roles = [
   },
 ] as const;
 
-const itchQueryKeyCodes = [112, 97, 115, 115, 119, 111, 114, 100];
-const itchQueryKey = String.fromCharCode(...itchQueryKeyCodes);
-const itchAccessCode = decodeURIComponent(ITCH_ACCESS_CODE ?? '');
-const mtgSimulatorHref = itchAccessCode
-  ? `https://voidscribestudios.itch.io/mtg-simulator?${itchQueryKey}=${encodeURIComponent(itchAccessCode)}`
-  : 'https://voidscribestudios.itch.io/mtg-simulator';
+const mtgSimulatorHref = withAccessCode(
+  'https://voidscribestudios.itch.io/mtg-simulator',
+);
 
-// `title` and `description` are HTML strings. Descriptions too complex to
-// inline live in ./kyle-rudd/ and are imported as raw text.
 const portfolio = [
   {
     href: 'https://www.linkedin.com/in/kyle-n-rudd/',
@@ -51,7 +46,6 @@ const portfolio = [
   {
     href: 'https://github.com/kyleruddbiz/voidscribe',
     callToAction: 'View on GitHub',
-    // Placeholder until the vortex logo is cleaned up into a usable icon.
     icon: githubIconPath,
     title: 'Void Scribe Studios',
     skills: [Skill.softwareEngineering, Skill.uiUxDesign],

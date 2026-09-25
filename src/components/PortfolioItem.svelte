@@ -44,7 +44,7 @@
   <div class="item-row">
     <div class="item-content">
       <a
-        class="stretched-link"
+        class="overlay-link"
         {href}
         target="_blank"
         {rel}
@@ -167,11 +167,11 @@
     padding-right: 1.5rem;
   }
 
-  .stretched-link {
+  .overlay-link {
     text-decoration: none;
   }
 
-  .stretched-link::after {
+  .overlay-link::after {
     content: '';
     position: absolute;
     inset: 0;

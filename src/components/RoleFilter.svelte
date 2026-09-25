@@ -36,6 +36,7 @@
 </script>
 
 {#snippet toggle(role: Role, isPrimary: boolean, delay: number)}
+  <!-- Spans, not <button>s: Chrome won't start a text selection inside a button. -->
   <span
     class="role-toggle"
     class:is-primary={isPrimary}
@@ -150,6 +151,9 @@
     }
   }
 
+  /* Each role carries its own leading separator, drawn in the previous role's
+     trailing margin. At the start of a wrapped line it hangs outside .role and
+     is clipped by overflow-x. */
   .secondary-roles .role-toggle::before {
     content: '·';
     display: inline-block;

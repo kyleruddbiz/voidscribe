@@ -3,7 +3,7 @@ import {
   itchIoIconPath,
   linkedinIconPath,
   youtubeIconPath,
-} from '../lib/icon-paths';
+} from '../lib/simple-icons';
 import { withAccessCode } from '../lib/itch-access';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 

@@ -204,6 +204,7 @@
   }
 
   .item-title {
+    /* Chrome won't start a selection inside a link unless this is explicit. */
     user-select: text;
     font-family: var(--font-display);
     color: var(--color-text);

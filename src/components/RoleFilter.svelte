@@ -25,13 +25,13 @@
 
   const onClick = (name: string) => {
     if (hasTextSelection()) return;
-    selectedRoles.toggle(name);
+    selectedRoles.toggleExclusive(name);
   };
 
   const onKeydown = (event: KeyboardEvent, name: string) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
-    selectedRoles.toggle(name);
+    selectedRoles.toggleExclusive(name);
   };
 </script>
 

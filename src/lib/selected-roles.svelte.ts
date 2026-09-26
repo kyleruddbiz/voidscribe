@@ -5,6 +5,10 @@ class SelectedRoles {
     return this.names.includes(name);
   }
 
+  toggleExclusive(name: string) {
+    this.names = this.has(name) ? [] : [name];
+  }
+
   toggle(name: string) {
     this.names = this.has(name)
       ? this.names.filter((selected) => selected !== name)

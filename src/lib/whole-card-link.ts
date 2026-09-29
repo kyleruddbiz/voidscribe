@@ -32,8 +32,10 @@ export const wholeCardLink =
         if (selecting) {
           event.preventDefault();
         }
+
         return;
       }
+
       if (selecting) {
         return;
       }
@@ -51,12 +53,14 @@ export const wholeCardLink =
       if (event.button !== middleButtonIndex || target.closest('a, button')) {
         return;
       }
+
       event.preventDefault();
       clickLink(openInBackgroundTabModifiers);
     };
 
     card.addEventListener('click', onClick);
     card.addEventListener('auxclick', onAuxClick);
+
     return () => {
       card.removeEventListener('click', onClick);
       card.removeEventListener('auxclick', onAuxClick);

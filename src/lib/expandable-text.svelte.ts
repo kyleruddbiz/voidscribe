@@ -54,6 +54,7 @@ export class ExpandableText {
     if (!this.hasContent || !this.textElement || !this.tailElement) {
       return;
     }
+
     this.truncator = createTruncator(this.fullHtml, this.tailElement);
 
     const observer = new ResizeObserver(() => {
@@ -63,6 +64,7 @@ export class ExpandableText {
     });
     observer.observe(this.textElement);
     this.revealOnLoad();
+
     return () => observer.disconnect();
   }
 
@@ -70,6 +72,7 @@ export class ExpandableText {
     if (this.isTransitioning || this.isExpanded || !this.textElement) {
       return;
     }
+
     this.isTransitioning = true;
 
     this.isShowLessTransparent = true;
@@ -87,6 +90,7 @@ export class ExpandableText {
         (transparent) => (this.isShowLessTransparent = transparent),
       );
     }
+
     this.showLessElement?.focus();
     this.endTransition();
   }
@@ -101,6 +105,7 @@ export class ExpandableText {
     ) {
       return;
     }
+
     this.isTransitioning = true;
 
     const expandedHeight = this.textElement.getBoundingClientRect().height;
@@ -122,6 +127,7 @@ export class ExpandableText {
         (transparent) => (this.isTailTransparent = transparent),
       );
     }
+
     this.showMoreElement?.focus();
     this.endTransition();
   }
@@ -151,6 +157,7 @@ export class ExpandableText {
     if (width === this.lastWidth) {
       return;
     }
+
     this.lastWidth = width;
     this.updateTruncation();
   }
@@ -159,11 +166,13 @@ export class ExpandableText {
     if (!this.textElement || !this.bodyElement || !this.truncator) {
       return;
     }
+
     const maxHeight = this.collapsedMaxHeight();
 
     if (!this.isExpanded) {
       this.bodyElement.replaceChildren(this.truncator.full());
     }
+
     this.isTruncated = !this.fitsWithin(maxHeight);
     if (this.isTruncated && !this.isExpanded) {
       this.renderTruncated(maxHeight);
@@ -172,6 +181,7 @@ export class ExpandableText {
 
   private measureCollapsed() {
     this.renderTruncated(this.collapsedMaxHeight());
+
     return {
       nodes: [...this.bodyElement!.childNodes],
       height: this.textElement!.scrollHeight,
@@ -192,6 +202,7 @@ export class ExpandableText {
   private collapsedMaxHeight() {
     const styles = getComputedStyle(this.textElement!);
     const lines = parseInt(styles.getPropertyValue('--collapsed-lines'), 10);
+
     return parseFloat(styles.lineHeight) * lines;
   }
 
@@ -204,6 +215,7 @@ export class ExpandableText {
     if (!element) {
       return;
     }
+
     startHeight ??= element.getBoundingClientRect().height;
 
     this.pinnedMaxHeight = `${startHeight}px`;

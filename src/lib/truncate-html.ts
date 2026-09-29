@@ -26,6 +26,7 @@ const nonBlankTextNodes = (root: Node) => {
       nodes.push(node as Text);
     }
   }
+
   return nodes;
 };
 
@@ -37,6 +38,7 @@ const outermostInlineAncestor = (node: Node): Node => {
   ) {
     outermost = outermost.parentElement;
   }
+
   return outermost;
 };
 
@@ -78,8 +80,10 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
       if (charactersLeft <= node.length) {
         break;
       }
+
       charactersLeft -= node.length;
     }
+
     if (!cutNode) {
       return clone;
     }
@@ -87,6 +91,7 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     deleteEverythingAfter(clone, cutNode, charactersLeft);
     cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');
     (outermostInlineAncestor(cutNode) as ChildNode).after(tail);
+
     return clone;
   };
 
@@ -105,6 +110,7 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
         high = middle - 1;
       }
     }
+
     render(truncatedTo(low));
   };
 

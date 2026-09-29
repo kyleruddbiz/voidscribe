@@ -27,6 +27,7 @@
     if (hasTextSelection()) {
       return;
     }
+
     selectedRoles.toggleExclusive(name);
   };
 
@@ -34,6 +35,7 @@
     if (event.key !== 'Enter' && event.key !== ' ') {
       return;
     }
+
     event.preventDefault();
     selectedRoles.toggleExclusive(name);
   };

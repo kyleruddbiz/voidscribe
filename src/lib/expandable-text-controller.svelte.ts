@@ -8,27 +8,27 @@ const showLessRowSelector = '.show-less-row';
 const showLessSelector = '.show-less';
 const pendingAttribute = 'data-pending';
 
-interface TextEntry {
+interface TextState {
   truncator: HtmlTruncator;
   isExpanded: boolean;
 }
 
-type FocusTarget = typeof showMoreSelector | typeof showLessSelector;
+type FocusSelector = typeof showMoreSelector | typeof showLessSelector;
 
-export class ExpandableText {
+export class ExpandableTextController {
   isIntroComplete = $state(false);
 
   readonly hasContent: boolean;
   private container?: HTMLElement;
-  private template?: HTMLElement;
+  private buttonTemplate?: HTMLElement;
   private showMoreId = '';
   private showLessId = '';
-  private crossfade?: LayerCrossfade;
-  private entries = new Map<string, TextEntry>();
-  private current?: TextEntry;
+  private layerCrossfade?: LayerCrossfade;
+  private textStates = new Map<string, TextState>();
+  private currentText?: TextState;
   private requestedHtml: string;
-  private lastWidth = -1;
-  private transitionCount = 0;
+  private lastRenderedWidth = -1;
+  private latestTransitionNumber = 0;
   private isTransitioning = false;
 
   constructor(initialHtml: string) {
@@ -36,80 +36,80 @@ export class ExpandableText {
     this.requestedHtml = initialHtml;
   }
 
-  mount(container: HTMLElement, template: HTMLElement) {
+  mount(container: HTMLElement, buttonTemplate: HTMLElement) {
     this.container = container;
-    this.template = template;
+    this.buttonTemplate = buttonTemplate;
     this.showMoreId = this.takeTemplateId(showMoreSelector);
     this.showLessId = this.takeTemplateId(showLessSelector);
 
-    this.crossfade = new LayerCrossfade(container);
-    this.crossfade.adopt(container.firstElementChild as HTMLElement);
+    this.layerCrossfade = new LayerCrossfade(container);
+    this.layerCrossfade.adopt(container.firstElementChild as HTMLElement);
 
-    const onClick = (event: MouseEvent) => {
+    const onContainerClick = (event: MouseEvent) => {
       const target = event.target as Element;
       if (target.closest(showMoreSelector)) this.expand();
       else if (target.closest(showLessSelector)) this.collapse();
     };
-    container.addEventListener('click', onClick);
+    container.addEventListener('click', onContainerClick);
 
-    const observer = new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       if (!this.isTransitioning) this.retruncateIfWidthChanged();
     });
-    observer.observe(container);
+    resizeObserver.observe(container);
 
-    this.present(this.requestedHtml);
+    this.transitionTo(this.requestedHtml);
     return () => {
-      container.removeEventListener('click', onClick);
-      observer.disconnect();
+      container.removeEventListener('click', onContainerClick);
+      resizeObserver.disconnect();
     };
   }
 
   show(html: string) {
     this.requestedHtml = html;
-    if (!this.crossfade) return;
-    const entry = this.entryFor(html);
-    if (entry !== this.current) this.present(html);
+    if (!this.layerCrossfade) return;
+    const textState = this.textStateFor(html);
+    if (textState !== this.currentText) this.transitionTo(html);
   }
 
   expand() {
-    if (!this.current || this.current.isExpanded) return;
-    this.current.isExpanded = true;
-    this.present(this.requestedHtml, showLessSelector);
+    if (!this.currentText || this.currentText.isExpanded) return;
+    this.currentText.isExpanded = true;
+    this.transitionTo(this.requestedHtml, showLessSelector);
   }
 
   collapse() {
-    if (!this.current?.isExpanded) return;
-    this.current.isExpanded = false;
-    this.present(this.requestedHtml, showMoreSelector);
+    if (!this.currentText?.isExpanded) return;
+    this.currentText.isExpanded = false;
+    this.transitionTo(this.requestedHtml, showMoreSelector);
   }
 
-  private entryFor(html: string) {
-    let entry = this.entries.get(html);
-    if (!entry) {
-      entry = {
+  private textStateFor(html: string) {
+    let textState = this.textStates.get(html);
+    if (!textState) {
+      textState = {
         truncator: createTruncator(html, () => this.createTail()),
         isExpanded: false,
       };
-      this.entries.set(html, entry);
+      this.textStates.set(html, textState);
     }
-    return entry;
+    return textState;
   }
 
   private takeTemplateId(selector: string) {
-    const element = this.template!.querySelector(selector)!;
+    const element = this.buttonTemplate!.querySelector(selector)!;
     const id = element.id;
     element.removeAttribute('id');
     return id;
   }
 
   private cloneFromTemplate(
-    containerSelector: string,
+    clonedElementSelector: string,
     buttonSelector: string,
     buttonId: string,
   ) {
-    const clone = this.template!.querySelector(containerSelector)!.cloneNode(
-      true,
-    ) as HTMLElement;
+    const clone = this.buttonTemplate!.querySelector(
+      clonedElementSelector,
+    )!.cloneNode(true) as HTMLElement;
     const button = clone.matches(buttonSelector)
       ? clone
       : clone.querySelector(buttonSelector)!;
@@ -133,60 +133,68 @@ export class ExpandableText {
     );
   }
 
-  private async present(html: string, focusTarget?: FocusTarget) {
-    const entry = this.entryFor(html);
-    const transition = ++this.transitionCount;
+  private async transitionTo(html: string, focusSelector?: FocusSelector) {
+    const textState = this.textStateFor(html);
+    const transitionNumber = ++this.latestTransitionNumber;
     this.isTransitioning = true;
-    this.lastWidth = this.container!.getBoundingClientRect().width;
+    this.lastRenderedWidth = this.container!.getBoundingClientRect().width;
 
-    const finished = this.crossfade!.show((layer) => {
+    const crossfadeFinished = this.layerCrossfade!.show((layer) => {
       this.container!.removeAttribute(pendingAttribute);
-      this.renderInto(layer, entry);
+      this.renderInto(layer, textState);
     });
-    this.current = entry;
+    this.currentText = textState;
 
-    const completed = await finished;
-    if (!completed || transition !== this.transitionCount) return;
+    const wasCompleted = await crossfadeFinished;
+    if (!wasCompleted || transitionNumber !== this.latestTransitionNumber) {
+      return;
+    }
 
-    this.moveFocus(focusTarget);
+    this.moveFocus(focusSelector);
     this.isIntroComplete = true;
     this.isTransitioning = false;
     this.retruncateIfWidthChanged();
   }
 
-  private moveFocus(target?: FocusTarget) {
-    if (!target) return;
-    this.crossfade!.currentLayer?.querySelector<HTMLElement>(target)?.focus();
+  private moveFocus(focusSelector?: FocusSelector) {
+    if (!focusSelector) return;
+    this.layerCrossfade!.currentLayer?.querySelector<HTMLElement>(
+      focusSelector,
+    )?.focus();
   }
 
   private retruncateIfWidthChanged() {
-    const width = this.container!.getBoundingClientRect().width;
-    if (width === this.lastWidth || !this.current) return;
-    this.lastWidth = width;
-    this.renderInto(this.crossfade!.currentLayer!, this.current);
+    const currentWidth = this.container!.getBoundingClientRect().width;
+    if (currentWidth === this.lastRenderedWidth || !this.currentText) return;
+    this.lastRenderedWidth = currentWidth;
+    this.renderInto(this.layerCrossfade!.currentLayer!, this.currentText);
   }
 
-  private renderInto(layer: HTMLElement, entry: TextEntry) {
-    const maxHeight = this.collapsedMaxHeight();
-    const fits = () => layer.scrollHeight <= maxHeight + subpixelTolerance;
+  private renderInto(layer: HTMLElement, textState: TextState) {
+    const collapsedHeightLimit = this.collapsedMaxHeight();
+    const fitsCollapsedHeight = () =>
+      layer.scrollHeight <= collapsedHeightLimit + subpixelTolerance;
 
-    layer.replaceChildren(entry.truncator.full());
-    const isTruncated = !fits();
+    layer.replaceChildren(textState.truncator.full());
+    const isTruncated = !fitsCollapsedHeight();
     if (!isTruncated) return;
 
-    if (entry.isExpanded) {
+    if (textState.isExpanded) {
       layer.append(this.createShowLessRow());
     } else {
-      entry.truncator.longestFitting(
+      textState.truncator.longestFitting(
         (content) => layer.replaceChildren(content),
-        fits,
+        fitsCollapsedHeight,
       );
     }
   }
 
   private collapsedMaxHeight() {
     const styles = getComputedStyle(this.container!);
-    const lines = parseInt(styles.getPropertyValue('--collapsed-lines'), 10);
-    return parseFloat(styles.lineHeight) * lines;
+    const collapsedLines = parseInt(
+      styles.getPropertyValue('--collapsed-lines'),
+      10,
+    );
+    return parseFloat(styles.lineHeight) * collapsedLines;
   }
 }

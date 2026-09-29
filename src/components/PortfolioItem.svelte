@@ -1,9 +1,9 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { ExpandableText } from '../lib/expandable-text.svelte';
+  import { ExpandableTextController } from '../lib/expandable-text-controller.svelte';
   import { wholeCardLink } from '../lib/whole-card-link';
   import type { PortfolioEntry } from '../lib/portfolio';
-  import ExpandableTextView from './ExpandableText.svelte';
+  import ExpandableText from './ExpandableText.svelte';
   import SkillChips from './SkillChips.svelte';
 
   interface Props extends PortfolioEntry {
@@ -28,14 +28,14 @@
   const titleId = `portfolio-item-title-${instanceId}`;
 
   const fullHtml = untrack(() => (description ?? '').trim());
-  const expandable = new ExpandableText(fullHtml);
+  const textController = new ExpandableTextController(fullHtml);
   let linkElement = $state<HTMLAnchorElement>();
 </script>
 
 <div
   class="item"
   class:is-dimmed={isDimmed}
-  class:is-settled={expandable.isIntroComplete}
+  class:is-settled={textController.isIntroComplete}
   {@attach wholeCardLink(() => linkElement)}
 >
   <div class="item-row">
@@ -55,10 +55,10 @@
           <span class="item-title" id={titleId}>{@html title}</span>
         </span>
       </a>
-      {#if expandable.hasContent}
+      {#if textController.hasContent}
         <div class="item-description">
-          <ExpandableTextView
-            controller={expandable}
+          <ExpandableText
+            controller={textController}
             html={fullHtml}
             id={descriptionId}
             labelledBy={titleId}
@@ -72,7 +72,7 @@
     <SkillChips
       {skills}
       {activeSkills}
-      isRevealed={expandable.isIntroComplete}
+      isRevealed={textController.isIntroComplete}
     />
   </div>
 </div>

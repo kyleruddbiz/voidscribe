@@ -1,9 +1,9 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { ExpandableText } from '../lib/expandable-text.svelte';
+  import { ExpandableTextController } from '../lib/expandable-text-controller.svelte';
   import { selectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
-  import ExpandableTextView from './ExpandableText.svelte';
+  import ExpandableText from './ExpandableText.svelte';
 
   interface Props {
     bio: string;
@@ -21,14 +21,16 @@
     ).trim(),
   );
 
-  const expandable = new ExpandableText(untrack(() => currentHtml));
+  const textController = new ExpandableTextController(
+    untrack(() => currentHtml),
+  );
 
-  $effect(() => expandable.show(currentHtml));
+  $effect(() => textController.show(currentHtml));
 </script>
 
 <div class="bio">
-  <ExpandableTextView
-    controller={expandable}
+  <ExpandableText
+    controller={textController}
     html={untrack(() => currentHtml)}
     id={bioId}
   />

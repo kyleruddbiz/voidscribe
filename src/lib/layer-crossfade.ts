@@ -5,8 +5,8 @@ const layerClassName = 'layer';
 const prefersReducedMotion = () =>
   matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const fade = (layer: HTMLElement, from: number, to: number) =>
-  layer.animate([{ opacity: from }, { opacity: to }], {
+const fade = (layer: HTMLElement, fromOpacity: number, toOpacity: number) =>
+  layer.animate([{ opacity: fromOpacity }, { opacity: toOpacity }], {
     duration: transitionDurationMs,
     easing: transitionEasing,
     fill: 'forwards',
@@ -29,39 +29,41 @@ export class LayerCrossfade {
     return this.layers.at(-1);
   }
 
-  adopt(layer: HTMLElement) {
-    this.layers = [layer];
+  adopt(initialLayer: HTMLElement) {
+    this.layers = [initialLayer];
   }
 
   /**
-   * Fades `render`'s layer in over the existing ones while the container's
+   * Fades the layer filled by `renderContent` in over the existing ones while the container's
    * height animates to fit it. Resolves to false if a later call interrupted
    * this transition.
    */
-  async show(render: (layer: HTMLElement) => void): Promise<boolean> {
+  async show(renderContent: (layer: HTMLElement) => void): Promise<boolean> {
     const startHeight = this.container.getBoundingClientRect().height;
-    const outgoing = this.layers.map((layer) => ({
+    const fadingOutLayers = this.layers.map((layer) => ({
       layer,
-      opacity: parseFloat(getComputedStyle(layer).opacity),
+      startOpacity: parseFloat(getComputedStyle(layer).opacity),
     }));
     this.cancelAnimations();
 
-    for (const { layer } of outgoing) retireLayer(layer);
-    const layer = document.createElement('div');
-    layer.className = layerClassName;
-    this.container.append(layer);
-    this.layers.push(layer);
-    render(layer);
+    for (const { layer } of fadingOutLayers) retireLayer(layer);
+    const incomingLayer = document.createElement('div');
+    incomingLayer.className = layerClassName;
+    this.container.append(incomingLayer);
+    this.layers.push(incomingLayer);
+    renderContent(incomingLayer);
 
     if (prefersReducedMotion()) {
-      this.settle();
+      this.removeFadedOutLayers();
       return true;
     }
 
-    const endHeight = layer.getBoundingClientRect().height;
+    const endHeight = incomingLayer.getBoundingClientRect().height;
     this.animations = [
-      ...outgoing.map(({ layer, opacity }) => fade(layer, opacity, 0)),
-      fade(layer, 0, 1),
+      ...fadingOutLayers.map(({ layer, startOpacity }) =>
+        fade(layer, startOpacity, 0),
+      ),
+      fade(incomingLayer, 0, 1),
       this.container.animate(
         [{ height: `${startHeight}px` }, { height: `${endHeight}px` }],
         {
@@ -77,7 +79,7 @@ export class LayerCrossfade {
     } catch {
       return false;
     }
-    this.settle();
+    this.removeFadedOutLayers();
     return true;
   }
 
@@ -86,7 +88,7 @@ export class LayerCrossfade {
     this.animations = [];
   }
 
-  private settle() {
+  private removeFadedOutLayers() {
     this.cancelAnimations();
     for (const layer of this.layers.slice(0, -1)) layer.remove();
     this.layers = this.layers.slice(-1);

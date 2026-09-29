@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { ExpandableText } from '../lib/expandable-text.svelte';
+  import type { ExpandableTextController } from '../lib/expandable-text-controller.svelte';
 
   interface Props {
-    controller: ExpandableText;
+    controller: ExpandableTextController;
     html: string;
     id: string;
     labelledBy?: string;

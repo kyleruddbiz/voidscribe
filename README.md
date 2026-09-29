@@ -32,9 +32,6 @@ Page content lives in `src/content/`:
   use it as a value in the page's `.ts` file. Prettier formats these files, so `npm run format`
   will catch malformed markup.
 
-Bios live in `src/content/<page>/bio/*.html`: `general.html` is shown by default, and each role has
-its own file (e.g. `software-engineer.html`) that replaces it while that role is selected.
-
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.
 

@@ -11,8 +11,8 @@
     "astro": "astro",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint .",
-    "tidy": "eslint --fix . && prettier --write ."
+    "lint": "eslint . && stylelint \"**/*.{css,svelte,astro}\"",
+    "tidy": "eslint --fix . && stylelint \"**/*.{css,svelte,astro}\" && prettier --write ."
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -28,9 +28,13 @@
     "eslint-plugin-astro": "^1.7.0",
     "eslint-plugin-svelte": "^3.23.0",
     "globals": "^17.12.0",
+    "postcss-html": "^2.0.0",
     "prettier": "^3.9.8",
     "prettier-plugin-astro": "^1.0.1",
     "prettier-plugin-svelte": "^4.1.1",
+    "stylelint": "^17.15.0",
+    "stylelint-config-html": "^2.0.0",
+    "stylelint-config-recommended": "^18.0.0",
     "svelte-check": "^4.7.6",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.0"

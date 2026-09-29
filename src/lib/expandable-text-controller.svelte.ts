@@ -16,7 +16,7 @@ interface TextState {
 type FocusTarget = typeof showMoreSelector | typeof showLessSelector;
 
 export class ExpandableTextController {
-  isIntroFinished = $state(false);
+  isIntroCompleted = $state(false);
 
   readonly hasContent: boolean;
   private container?: HTMLElement;
@@ -140,15 +140,15 @@ export class ExpandableTextController {
     this.isTransitioning = true;
     this.lastWidth = this.container!.getBoundingClientRect().width;
 
-    const wasFinished = await this.crossfade!.show((layer) => {
+    const wasCompleted = await this.crossfade!.show((layer) => {
       this.container!.removeAttribute(pendingAttribute);
       this.renderInto(layer, textState);
       this.currentTextState = textState;
     });
-    if (!wasFinished || isSuperseded()) return;
+    if (!wasCompleted || isSuperseded()) return;
 
     this.moveFocus(focusTarget);
-    this.isIntroFinished = true;
+    this.isIntroCompleted = true;
     this.isTransitioning = false;
     this.retruncateIfWidthChanged();
   }

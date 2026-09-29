@@ -1,9 +1,11 @@
-import { tick } from 'svelte';
 import { LayerCrossfade } from './layer-crossfade';
 import { createTruncator, type HtmlTruncator } from './truncate-html';
 
 const subpixelTolerance = 1;
+const tailSelector = '.tail';
 const showMoreSelector = '.show-more';
+const showLessRowSelector = '.show-less-row';
+const showLessSelector = '.show-less';
 const pendingAttribute = 'data-pending';
 
 interface TextEntry {
@@ -11,24 +13,16 @@ interface TextEntry {
   isExpanded: boolean;
 }
 
-type FocusTarget = 'show-less' | 'show-more';
-
-const flushStyles = (element: HTMLElement) => {
-  void getComputedStyle(element).opacity;
-};
+type FocusTarget = typeof showMoreSelector | typeof showLessSelector;
 
 export class ExpandableText {
-  showLessElement?: HTMLButtonElement;
-
-  isExpanded = $state(false);
-  isTruncated = $state(false);
-  isShowLessTransparent = $state(false);
   isIntroComplete = $state(false);
 
   readonly hasContent: boolean;
   private container?: HTMLElement;
-  private tailTemplate?: HTMLElement;
+  private template?: HTMLElement;
   private showMoreId = '';
+  private showLessId = '';
   private crossfade?: LayerCrossfade;
   private entries = new Map<string, TextEntry>();
   private current?: TextEntry;
@@ -42,22 +36,19 @@ export class ExpandableText {
     this.requestedHtml = initialHtml;
   }
 
-  get isShowLessVisible() {
-    return this.isExpanded && this.isTruncated;
-  }
-
-  mount(container: HTMLElement, tailTemplate: HTMLElement) {
+  mount(container: HTMLElement, template: HTMLElement) {
     this.container = container;
-    this.tailTemplate = tailTemplate;
-    const showMoreButton = tailTemplate.querySelector(showMoreSelector)!;
-    this.showMoreId = showMoreButton.id;
-    showMoreButton.removeAttribute('id');
+    this.template = template;
+    this.showMoreId = this.takeTemplateId(showMoreSelector);
+    this.showLessId = this.takeTemplateId(showLessSelector);
 
     this.crossfade = new LayerCrossfade(container);
     this.crossfade.adopt(container.firstElementChild as HTMLElement);
 
     const onClick = (event: MouseEvent) => {
-      if ((event.target as Element).closest(showMoreSelector)) this.expand();
+      const target = event.target as Element;
+      if (target.closest(showMoreSelector)) this.expand();
+      else if (target.closest(showLessSelector)) this.collapse();
     };
     container.addEventListener('click', onClick);
 
@@ -83,13 +74,13 @@ export class ExpandableText {
   expand() {
     if (!this.current || this.current.isExpanded) return;
     this.current.isExpanded = true;
-    this.present(this.requestedHtml, 'show-less');
+    this.present(this.requestedHtml, showLessSelector);
   }
 
   collapse() {
     if (!this.current?.isExpanded) return;
     this.current.isExpanded = false;
-    this.present(this.requestedHtml, 'show-more');
+    this.present(this.requestedHtml, showMoreSelector);
   }
 
   private entryFor(html: string) {
@@ -104,71 +95,75 @@ export class ExpandableText {
     return entry;
   }
 
-  private createTail() {
-    const tail = this.tailTemplate!.firstElementChild!.cloneNode(
+  private takeTemplateId(selector: string) {
+    const element = this.template!.querySelector(selector)!;
+    const id = element.id;
+    element.removeAttribute('id');
+    return id;
+  }
+
+  private cloneFromTemplate(
+    containerSelector: string,
+    buttonSelector: string,
+    buttonId: string,
+  ) {
+    const clone = this.template!.querySelector(containerSelector)!.cloneNode(
       true,
     ) as HTMLElement;
-    tail.querySelector(showMoreSelector)!.id = this.showMoreId;
-    return tail;
+    const button = clone.matches(buttonSelector)
+      ? clone
+      : clone.querySelector(buttonSelector)!;
+    button.id = buttonId;
+    return clone;
+  }
+
+  private createTail() {
+    return this.cloneFromTemplate(
+      tailSelector,
+      showMoreSelector,
+      this.showMoreId,
+    );
+  }
+
+  private createShowLessRow() {
+    return this.cloneFromTemplate(
+      showLessRowSelector,
+      showLessSelector,
+      this.showLessId,
+    );
   }
 
   private async present(html: string, focusTarget?: FocusTarget) {
     const entry = this.entryFor(html);
     const transition = ++this.transitionCount;
-    const wasShowLessVisible = this.isShowLessVisible;
     this.isTransitioning = true;
     this.lastWidth = this.container!.getBoundingClientRect().width;
 
-    let isTruncated = false;
     const finished = this.crossfade!.show((layer) => {
       this.container!.removeAttribute(pendingAttribute);
-      isTruncated = this.renderInto(layer, entry);
+      this.renderInto(layer, entry);
     });
     this.current = entry;
-    this.isExpanded = entry.isExpanded;
-    this.isTruncated = isTruncated;
-    if (this.isShowLessVisible && !wasShowLessVisible) {
-      this.isShowLessTransparent = true;
-    }
 
     const completed = await finished;
     if (!completed || transition !== this.transitionCount) return;
 
-    if (this.isShowLessVisible && this.showLessElement) {
-      await this.fadeInShowLess(this.showLessElement);
-    }
     this.moveFocus(focusTarget);
     this.isIntroComplete = true;
     this.isTransitioning = false;
     this.retruncateIfWidthChanged();
   }
 
-  private async fadeInShowLess(element: HTMLElement) {
-    this.isShowLessTransparent = true;
-    await tick();
-    flushStyles(element);
-    this.isShowLessTransparent = false;
-    await tick();
-  }
-
   private moveFocus(target?: FocusTarget) {
-    if (target === 'show-less') {
-      this.showLessElement?.focus();
-    } else if (target === 'show-more') {
-      this.crossfade!.currentLayer?.querySelector<HTMLElement>(
-        showMoreSelector,
-      )?.focus();
-    }
+    if (!target) return;
+    this.crossfade!.currentLayer?.querySelector<HTMLElement>(target)?.focus();
   }
 
   private retruncateIfWidthChanged() {
     const width = this.container!.getBoundingClientRect().width;
     if (width === this.lastWidth || !this.current) return;
     this.lastWidth = width;
-    this.isTruncated = this.renderInto(
-      this.crossfade!.currentLayer!,
-      this.current,
-    );
+    this.renderInto(this.crossfade!.currentLayer!, this.current);
   }
 
   private renderInto(layer: HTMLElement, entry: TextEntry) {
@@ -177,13 +172,16 @@ export class ExpandableText {
 
     layer.replaceChildren(entry.truncator.full());
     const isTruncated = !fits();
-    if (isTruncated && !entry.isExpanded) {
+    if (!isTruncated) return;
+
+    if (entry.isExpanded) {
+      layer.append(this.createShowLessRow());
+    } else {
       entry.truncator.longestFitting(
         (content) => layer.replaceChildren(content),
         fits,
       );
     }
-    return isTruncated;
   }
 
   private collapsedMaxHeight() {

@@ -12,15 +12,15 @@
   let { controller, html, id, labelledBy }: Props = $props();
 
   let container = $state<HTMLDivElement>();
-  let tailTemplate = $state<HTMLDivElement>();
+  let template = $state<HTMLDivElement>();
 
-  onMount(() => controller.mount(container!, tailTemplate!));
+  onMount(() => controller.mount(container!, template!));
 </script>
 
 <div class="expandable" {id} data-pending bind:this={container}>
   <div class="layer">{@html html}</div>
 </div>
-<div hidden bind:this={tailTemplate}>
+<div hidden bind:this={template}>
   <span class="tail">
     <span aria-hidden="true">...</span>
     <button
@@ -34,6 +34,18 @@
       Show more
     </button>
   </span>
+  <div class="show-less-row">
+    <button
+      type="button"
+      class="show-less"
+      id="{id}-show-less"
+      aria-expanded="true"
+      aria-controls={id}
+      aria-labelledby={labelledBy && `${id}-show-less ${labelledBy}`}
+    >
+      Show less
+    </button>
+  </div>
 </div>
 
 <style>
@@ -78,10 +90,10 @@
     font-style: normal;
   }
 
-  .expandable :global(.show-more) {
+  .expandable :global(.show-more),
+  .expandable :global(.show-less) {
     position: relative;
     z-index: 1;
-    margin-left: 0.3em;
     padding: 0;
     border: none;
     background: none;
@@ -90,8 +102,18 @@
     cursor: pointer;
   }
 
+  .expandable :global(.show-more) {
+    margin-left: 0.3em;
+  }
+
+  .expandable :global(.show-less) {
+    font-size: 0.85rem;
+  }
+
   .expandable :global(.show-more:hover),
-  .expandable :global(.show-more:focus-visible) {
+  .expandable :global(.show-more:focus-visible),
+  .expandable :global(.show-less:hover),
+  .expandable :global(.show-less:focus-visible) {
     text-decoration: underline;
   }
 </style>

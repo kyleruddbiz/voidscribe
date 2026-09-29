@@ -4,7 +4,6 @@
   import { wholeCardLink } from '../lib/whole-card-link';
   import type { PortfolioEntry } from '../lib/portfolio';
   import ExpandableTextView from './ExpandableText.svelte';
-  import ShowLessButton from './ShowLessButton.svelte';
   import SkillChips from './SkillChips.svelte';
 
   interface Props extends PortfolioEntry {
@@ -27,7 +26,6 @@
   const instanceId = $props.id();
   const descriptionId = `portfolio-item-description-${instanceId}`;
   const titleId = `portfolio-item-title-${instanceId}`;
-  const showLessId = `portfolio-item-show-less-${instanceId}`;
 
   const fullHtml = untrack(() => (description ?? '').trim());
   const expandable = new ExpandableText(fullHtml);
@@ -70,16 +68,6 @@
     </div>
     <span class="item-meta">{callToAction} &rarr;</span>
   </div>
-  {#if expandable.hasContent}
-    <div class="item-show-less">
-      <ShowLessButton
-        controller={expandable}
-        id={showLessId}
-        controls={descriptionId}
-        labelledBy={titleId}
-      />
-    </div>
-  {/if}
   <div class="item-skills">
     <SkillChips
       {skills}
@@ -240,11 +228,6 @@
       text-align: center;
       white-space: normal;
       order: 3;
-    }
-
-    .item-show-less {
-      order: 2;
-      align-self: center;
     }
 
     .item-skills {

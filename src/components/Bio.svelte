@@ -4,7 +4,6 @@
   import { selectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
   import ExpandableTextView from './ExpandableText.svelte';
-  import ShowLessButton from './ShowLessButton.svelte';
 
   interface Props {
     bio: string;
@@ -15,7 +14,6 @@
 
   const instanceId = $props.id();
   const bioId = `bio-${instanceId}`;
-  const showLessId = `bio-show-less-${instanceId}`;
 
   const currentHtml = $derived(
     (
@@ -34,7 +32,6 @@
     html={untrack(() => currentHtml)}
     id={bioId}
   />
-  <ShowLessButton controller={expandable} id={showLessId} controls={bioId} />
 </div>
 
 <style>

@@ -21,7 +21,7 @@ Inline comments are still acceptable when the code is genuinely complex, or when
 ## Before calling a change done
 
 1. Re-read your diff for comments and delete any that don't meet the bar in [Code comments](#code-comments).
-2. `npm run fix` — auto-fix lint violations, then auto-format the diff (a couple of seconds; safe to run every time). Lint runs first because its fixes can leave code that needs reformatting. It fails on violations it can't fix.
+2. `npm run tidy` — auto-fix lint violations and auto-format (a couple of seconds).
 3. `npm run build` — type-check and build.
 
 ## Testing changes

@@ -69,8 +69,15 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
 
     <footer class="site-footer">
       <p>
-        Logo design by Garrett Christensen. &copy; {new Date().getFullYear()}{' '}
-        {site.name}.
+        Logo design by{' '}
+        <a
+          href="https://garrettcdesign.framer.website/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Garrett Christensen
+        </a>
+        . &copy; {new Date().getFullYear()} {site.name}.
       </p>
     </footer>
   </body>
@@ -126,5 +133,15 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
 
   .site-footer p {
     margin: 1.5rem 0 0;
+  }
+
+  .site-footer a {
+    color: inherit;
+    text-decoration-color: currentColor;
+  }
+
+  .site-footer a:hover,
+  .site-footer a:focus-visible {
+    color: inherit;
   }
 </style>

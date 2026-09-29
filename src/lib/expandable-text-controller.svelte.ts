@@ -18,7 +18,6 @@ type FocusTarget = typeof showMoreSelector | typeof showLessSelector;
 export class ExpandableTextController {
   isIntroCompleted = $state(false);
 
-  readonly hasContent: boolean;
   private container?: HTMLElement;
   private template?: HTMLElement;
   private showMoreId = '';
@@ -32,7 +31,6 @@ export class ExpandableTextController {
   private isTransitioning = false;
 
   constructor(initialHtml: string) {
-    this.hasContent = initialHtml.length > 0;
     this.requestedHtml = initialHtml;
   }
 

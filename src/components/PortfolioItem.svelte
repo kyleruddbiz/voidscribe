@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
-  import { ExpandableTextController } from '../lib/expandable-text-controller.svelte';
   import { wholeCardLink } from '../lib/whole-card-link';
   import type { PortfolioEntry } from '../lib/portfolio';
   import ExpandableText from './ExpandableText.svelte';
@@ -27,15 +25,15 @@
   const descriptionId = `portfolio-item-description-${instanceId}`;
   const titleId = `portfolio-item-title-${instanceId}`;
 
-  const fullHtml = untrack(() => (description ?? '').trim());
-  const textController = new ExpandableTextController(fullHtml);
+  const fullHtml = $derived((description ?? '').trim());
+  let isIntroCompleted = $state(false);
   let linkElement = $state<HTMLAnchorElement>();
 </script>
 
 <div
   class="item"
   class:is-dimmed={isDimmed}
-  class:is-settled={textController.isIntroCompleted}
+  class:is-settled={isIntroCompleted}
   {@attach wholeCardLink(() => linkElement)}
 >
   <div class="item-row">
@@ -55,13 +53,13 @@
           <span class="item-title" id={titleId}>{@html title}</span>
         </span>
       </a>
-      {#if textController.hasContent}
+      {#if fullHtml}
         <div class="item-description">
           <ExpandableText
-            controller={textController}
             html={fullHtml}
             id={descriptionId}
             labelledBy={titleId}
+            bind:isIntroCompleted
           />
         </div>
       {/if}
@@ -69,11 +67,7 @@
     <span class="item-meta">{callToAction} &rarr;</span>
   </div>
   <div class="item-skills">
-    <SkillChips
-      {skills}
-      {activeSkills}
-      isRevealed={textController.isIntroCompleted}
-    />
+    <SkillChips {skills} {activeSkills} isRevealed={isIntroCompleted} />
   </div>
 </div>
 

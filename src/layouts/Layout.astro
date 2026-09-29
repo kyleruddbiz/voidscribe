@@ -22,7 +22,14 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
     <link
       rel="icon"
       type="image/svg+xml"
-      href="/images/voidscribe-vortex.svg"
+      href="/images/voidscribe-vortex-light.svg"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="/images/voidscribe-vortex-dark.svg"
+      media="(prefers-color-scheme: dark)"
     />
     <meta name="theme-color" content="#0d0e12" />
     <meta name="description" content={description} />

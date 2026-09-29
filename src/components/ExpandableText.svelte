@@ -106,10 +106,6 @@
     margin-left: 0.3em;
   }
 
-  .expandable :global(.show-less) {
-    font-size: 0.85rem;
-  }
-
   .expandable :global(.show-more:hover),
   .expandable :global(.show-more:focus-visible),
   .expandable :global(.show-less:hover),

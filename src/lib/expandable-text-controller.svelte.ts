@@ -13,22 +13,22 @@ interface TextState {
   isExpanded: boolean;
 }
 
-type FocusSelector = typeof showMoreSelector | typeof showLessSelector;
+type FocusTarget = typeof showMoreSelector | typeof showLessSelector;
 
 export class ExpandableTextController {
-  isIntroComplete = $state(false);
+  isIntroFinished = $state(false);
 
   readonly hasContent: boolean;
   private container?: HTMLElement;
-  private buttonTemplate?: HTMLElement;
+  private template?: HTMLElement;
   private showMoreId = '';
   private showLessId = '';
-  private layerCrossfade?: LayerCrossfade;
+  private crossfade?: LayerCrossfade;
   private textStates = new Map<string, TextState>();
-  private currentText?: TextState;
+  private currentTextState?: TextState;
   private requestedHtml: string;
-  private lastRenderedWidth = -1;
-  private latestTransitionNumber = 0;
+  private lastWidth = -1;
+  private latestTransitionId = 0;
   private isTransitioning = false;
 
   constructor(initialHtml: string) {
@@ -36,50 +36,50 @@ export class ExpandableTextController {
     this.requestedHtml = initialHtml;
   }
 
-  mount(container: HTMLElement, buttonTemplate: HTMLElement) {
+  mount(container: HTMLElement, template: HTMLElement) {
     this.container = container;
-    this.buttonTemplate = buttonTemplate;
+    this.template = template;
     this.showMoreId = this.takeTemplateId(showMoreSelector);
     this.showLessId = this.takeTemplateId(showLessSelector);
 
-    this.layerCrossfade = new LayerCrossfade(container);
-    this.layerCrossfade.adopt(container.firstElementChild as HTMLElement);
+    this.crossfade = new LayerCrossfade(container);
+    this.crossfade.adopt(container.firstElementChild as HTMLElement);
 
-    const onContainerClick = (event: MouseEvent) => {
+    const onClick = (event: MouseEvent) => {
       const target = event.target as Element;
       if (target.closest(showMoreSelector)) this.expand();
       else if (target.closest(showLessSelector)) this.collapse();
     };
-    container.addEventListener('click', onContainerClick);
+    container.addEventListener('click', onClick);
 
-    const resizeObserver = new ResizeObserver(() => {
+    const observer = new ResizeObserver(() => {
       if (!this.isTransitioning) this.retruncateIfWidthChanged();
     });
-    resizeObserver.observe(container);
+    observer.observe(container);
 
     this.transitionTo(this.requestedHtml);
     return () => {
-      container.removeEventListener('click', onContainerClick);
-      resizeObserver.disconnect();
+      container.removeEventListener('click', onClick);
+      observer.disconnect();
     };
   }
 
   show(html: string) {
     this.requestedHtml = html;
-    if (!this.layerCrossfade) return;
+    if (!this.crossfade) return;
     const textState = this.textStateFor(html);
-    if (textState !== this.currentText) this.transitionTo(html);
+    if (textState !== this.currentTextState) this.transitionTo(html);
   }
 
   expand() {
-    if (!this.currentText || this.currentText.isExpanded) return;
-    this.currentText.isExpanded = true;
+    if (!this.currentTextState || this.currentTextState.isExpanded) return;
+    this.currentTextState.isExpanded = true;
     this.transitionTo(this.requestedHtml, showLessSelector);
   }
 
   collapse() {
-    if (!this.currentText?.isExpanded) return;
-    this.currentText.isExpanded = false;
+    if (!this.currentTextState?.isExpanded) return;
+    this.currentTextState.isExpanded = false;
     this.transitionTo(this.requestedHtml, showMoreSelector);
   }
 
@@ -96,7 +96,7 @@ export class ExpandableTextController {
   }
 
   private takeTemplateId(selector: string) {
-    const element = this.buttonTemplate!.querySelector(selector)!;
+    const element = this.template!.querySelector(selector)!;
     const id = element.id;
     element.removeAttribute('id');
     return id;
@@ -107,7 +107,7 @@ export class ExpandableTextController {
     buttonSelector: string,
     buttonId: string,
   ) {
-    const clone = this.buttonTemplate!.querySelector(
+    const clone = this.template!.querySelector(
       clonedElementSelector,
     )!.cloneNode(true) as HTMLElement;
     const button = clone.matches(buttonSelector)
@@ -133,50 +133,44 @@ export class ExpandableTextController {
     );
   }
 
-  private async transitionTo(html: string, focusSelector?: FocusSelector) {
+  private async transitionTo(html: string, focusTarget?: FocusTarget) {
     const textState = this.textStateFor(html);
-    const transitionNumber = ++this.latestTransitionNumber;
+    const transitionId = ++this.latestTransitionId;
+    const isSuperseded = () => transitionId !== this.latestTransitionId;
     this.isTransitioning = true;
-    this.lastRenderedWidth = this.container!.getBoundingClientRect().width;
+    this.lastWidth = this.container!.getBoundingClientRect().width;
 
-    const crossfadeFinished = this.layerCrossfade!.show((layer) => {
+    const wasFinished = await this.crossfade!.show((layer) => {
       this.container!.removeAttribute(pendingAttribute);
       this.renderInto(layer, textState);
+      this.currentTextState = textState;
     });
-    this.currentText = textState;
+    if (!wasFinished || isSuperseded()) return;
 
-    const wasCompleted = await crossfadeFinished;
-    if (!wasCompleted || transitionNumber !== this.latestTransitionNumber) {
-      return;
-    }
-
-    this.moveFocus(focusSelector);
-    this.isIntroComplete = true;
+    this.moveFocus(focusTarget);
+    this.isIntroFinished = true;
     this.isTransitioning = false;
     this.retruncateIfWidthChanged();
   }
 
-  private moveFocus(focusSelector?: FocusSelector) {
-    if (!focusSelector) return;
-    this.layerCrossfade!.currentLayer?.querySelector<HTMLElement>(
-      focusSelector,
-    )?.focus();
+  private moveFocus(target?: FocusTarget) {
+    if (!target) return;
+    this.crossfade!.currentLayer?.querySelector<HTMLElement>(target)?.focus();
   }
 
   private retruncateIfWidthChanged() {
-    const currentWidth = this.container!.getBoundingClientRect().width;
-    if (currentWidth === this.lastRenderedWidth || !this.currentText) return;
-    this.lastRenderedWidth = currentWidth;
-    this.renderInto(this.layerCrossfade!.currentLayer!, this.currentText);
+    const width = this.container!.getBoundingClientRect().width;
+    if (width === this.lastWidth || !this.currentTextState) return;
+    this.lastWidth = width;
+    this.renderInto(this.crossfade!.currentLayer!, this.currentTextState);
   }
 
   private renderInto(layer: HTMLElement, textState: TextState) {
-    const collapsedHeightLimit = this.collapsedMaxHeight();
-    const fitsCollapsedHeight = () =>
-      layer.scrollHeight <= collapsedHeightLimit + subpixelTolerance;
+    const maxHeight = this.collapsedMaxHeight();
+    const fits = () => layer.scrollHeight <= maxHeight + subpixelTolerance;
 
     layer.replaceChildren(textState.truncator.full());
-    const isTruncated = !fitsCollapsedHeight();
+    const isTruncated = !fits();
     if (!isTruncated) return;
 
     if (textState.isExpanded) {
@@ -184,17 +178,14 @@ export class ExpandableTextController {
     } else {
       textState.truncator.longestFitting(
         (content) => layer.replaceChildren(content),
-        fitsCollapsedHeight,
+        fits,
       );
     }
   }
 
   private collapsedMaxHeight() {
     const styles = getComputedStyle(this.container!);
-    const collapsedLines = parseInt(
-      styles.getPropertyValue('--collapsed-lines'),
-      10,
-    );
-    return parseFloat(styles.lineHeight) * collapsedLines;
+    const lines = parseInt(styles.getPropertyValue('--collapsed-lines'), 10);
+    return parseFloat(styles.lineHeight) * lines;
   }
 }

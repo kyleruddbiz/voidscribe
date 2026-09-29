@@ -5,8 +5,8 @@ const layerClassName = 'layer';
 const prefersReducedMotion = () =>
   matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const fade = (layer: HTMLElement, fromOpacity: number, toOpacity: number) =>
-  layer.animate([{ opacity: fromOpacity }, { opacity: toOpacity }], {
+const fade = (layer: HTMLElement, from: number, to: number) =>
+  layer.animate([{ opacity: from }, { opacity: to }], {
     duration: transitionDurationMs,
     easing: transitionEasing,
     fill: 'forwards',
@@ -29,16 +29,16 @@ export class LayerCrossfade {
     return this.layers.at(-1);
   }
 
-  adopt(initialLayer: HTMLElement) {
-    this.layers = [initialLayer];
+  adopt(layer: HTMLElement) {
+    this.layers = [layer];
   }
 
   /**
-   * Fades the layer filled by `renderContent` in over the existing ones while the container's
+   * Fades `render`'s layer in over the existing ones while the container's
    * height animates to fit it. Resolves to false if a later call interrupted
    * this transition.
    */
-  async show(renderContent: (layer: HTMLElement) => void): Promise<boolean> {
+  async show(render: (layer: HTMLElement) => void): Promise<boolean> {
     const startHeight = this.container.getBoundingClientRect().height;
     const fadingOutLayers = this.layers.map((layer) => ({
       layer,
@@ -51,7 +51,7 @@ export class LayerCrossfade {
     incomingLayer.className = layerClassName;
     this.container.append(incomingLayer);
     this.layers.push(incomingLayer);
-    renderContent(incomingLayer);
+    render(incomingLayer);
 
     if (prefersReducedMotion()) {
       this.removeFadedOutLayers();

@@ -35,7 +35,7 @@
 <div
   class="item"
   class:is-dimmed={isDimmed}
-  class:is-settled={textController.isIntroComplete}
+  class:is-settled={textController.isIntroFinished}
   {@attach wholeCardLink(() => linkElement)}
 >
   <div class="item-row">
@@ -72,7 +72,7 @@
     <SkillChips
       {skills}
       {activeSkills}
-      isRevealed={textController.isIntroComplete}
+      isRevealed={textController.isIntroFinished}
     />
   </div>
 </div>

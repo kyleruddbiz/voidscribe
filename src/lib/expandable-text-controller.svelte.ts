@@ -19,9 +19,7 @@ export class ExpandableTextController {
   isIntroCompleted = $state(false);
 
   private container?: HTMLElement;
-  private template?: HTMLElement;
-  private showMoreId = '';
-  private showLessId = '';
+  private template?: HTMLTemplateElement;
   private crossfade?: LayerCrossfade;
   private textStates = new Map<string, TextState>();
   private currentTextState?: TextState;
@@ -34,11 +32,9 @@ export class ExpandableTextController {
     this.requestedHtml = initialHtml;
   }
 
-  mount(container: HTMLElement, template: HTMLElement) {
+  mount(container: HTMLElement, template: HTMLTemplateElement) {
     this.container = container;
     this.template = template;
-    this.showMoreId = this.takeTemplateId(showMoreSelector);
-    this.showLessId = this.takeTemplateId(showLessSelector);
 
     this.crossfade = new LayerCrossfade(
       container,
@@ -118,44 +114,18 @@ export class ExpandableTextController {
     return textState;
   }
 
-  private takeTemplateId(selector: string) {
-    const element = this.template!.querySelector(selector)!;
-    const id = element.id;
-    element.removeAttribute('id');
-
-    return id;
-  }
-
-  private cloneFromTemplate(
-    clonedElementSelector: string,
-    buttonSelector: string,
-    buttonId: string,
-  ) {
-    const clone = this.template!.querySelector(
-      clonedElementSelector,
-    )!.cloneNode(true) as HTMLElement;
-    const button = clone.matches(buttonSelector)
-      ? clone
-      : clone.querySelector(buttonSelector)!;
-    button.id = buttonId;
-
-    return clone;
+  private clone(selector: string) {
+    return this.template!.content.querySelector(selector)!.cloneNode(
+      true,
+    ) as HTMLElement;
   }
 
   private createTail() {
-    return this.cloneFromTemplate(
-      tailSelector,
-      showMoreSelector,
-      this.showMoreId,
-    );
+    return this.clone(tailSelector);
   }
 
   private createShowLessRow() {
-    return this.cloneFromTemplate(
-      showLessRowSelector,
-      showLessSelector,
-      this.showLessId,
-    );
+    return this.clone(showLessRowSelector);
   }
 
   private async transitionTo(html: string, focusTarget?: FocusTarget) {

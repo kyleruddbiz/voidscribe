@@ -26,7 +26,7 @@
   });
 
   let container = $state<HTMLDivElement>();
-  let template = $state<HTMLDivElement>();
+  let template = $state<HTMLTemplateElement>();
 
   onMount(() => controller.mount(container!, template!));
 </script>
@@ -34,7 +34,7 @@
 <div class="expandable" {id} data-pending bind:this={container}>
   <div class="layer">{@html initialHtml}</div>
 </div>
-<div hidden bind:this={template}>
+<template bind:this={template}>
   <span class="tail">
     <span aria-hidden="true">...</span>
     <button
@@ -60,7 +60,7 @@
       Show less
     </button>
   </div>
-</div>
+</template>
 
 <style>
   .expandable {

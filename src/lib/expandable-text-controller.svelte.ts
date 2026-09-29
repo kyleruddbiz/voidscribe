@@ -49,6 +49,7 @@ export class ExpandableTextController {
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element;
+
       if (target.closest(showMoreSelector)) {
         this.expand();
       } else if (target.closest(showLessSelector)) {
@@ -75,11 +76,13 @@ export class ExpandableTextController {
 
   show(html: string) {
     this.requestedHtml = html;
+
     if (!this.crossfade) {
       return;
     }
 
     const textState = this.textStateFor(html);
+
     if (textState !== this.currentTextState) {
       this.transitionTo(html);
     }
@@ -105,6 +108,7 @@ export class ExpandableTextController {
 
   private textStateFor(html: string) {
     let textState = this.textStates.get(html);
+
     if (!textState) {
       textState = {
         truncator: createTruncator(html, () => this.createTail()),
@@ -168,6 +172,7 @@ export class ExpandableTextController {
       this.renderInto(layer, textState);
       this.currentTextState = textState;
     });
+
     if (!wasCompleted || isSuperseded()) {
       return;
     }
@@ -188,6 +193,7 @@ export class ExpandableTextController {
 
   private retruncateIfWidthChanged() {
     const width = this.container!.getBoundingClientRect().width;
+
     if (width === this.lastWidth || !this.currentTextState) {
       return;
     }
@@ -202,6 +208,7 @@ export class ExpandableTextController {
 
     layer.replaceChildren(textState.truncator.full());
     const isTruncated = !fits();
+
     if (!isTruncated) {
       return;
     }

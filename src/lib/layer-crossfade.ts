@@ -14,6 +14,7 @@ const fade = (layer: HTMLElement, from: number, to: number) =>
 
 const retireLayer = (layer: HTMLElement) => {
   layer.inert = true;
+
   for (const element of layer.querySelectorAll('[id]')) {
     element.removeAttribute('id');
   }
@@ -100,6 +101,7 @@ export class LayerCrossfade {
 
   private removeFadedOutLayers() {
     this.cancelAnimations();
+
     for (const layer of this.layers.slice(0, -1)) {
       layer.remove();
     }

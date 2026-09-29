@@ -18,16 +18,19 @@ export const wholeCardLink =
 
     const onClick = (event: MouseEvent) => {
       const isForwardedClick = !event.isTrusted;
+
       if (isForwardedClick) {
         return;
       }
 
       const target = event.target as Element;
+
       if (target.closest('button')) {
         return;
       }
 
       const selecting = hasTextSelection();
+
       if (target.closest('a')) {
         if (selecting) {
           event.preventDefault();
@@ -50,6 +53,7 @@ export const wholeCardLink =
 
     const onAuxClick = (event: MouseEvent) => {
       const target = event.target as Element;
+
       if (event.button !== middleButtonIndex || target.closest('a, button')) {
         return;
       }

@@ -21,6 +21,7 @@ const trailingSpaceAndPunctuation = /[\s.,;:!?…\-–—]+$/;
 const nonBlankTextNodes = (root: Node) => {
   const nodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (node.textContent!.trim()) {
       nodes.push(node as Text);
@@ -32,6 +33,7 @@ const nonBlankTextNodes = (root: Node) => {
 
 const outermostInlineAncestor = (node: Node): Node => {
   let outermost = node;
+
   while (
     outermost.parentElement &&
     inlineTags.has(outermost.parentElement.tagName)
@@ -78,8 +80,10 @@ export const createTruncator = (
     const clone = full();
     let charactersLeft = characterCount;
     let cutNode: Text | undefined;
+
     for (const node of nonBlankTextNodes(clone)) {
       cutNode = node;
+
       if (charactersLeft <= node.length) {
         break;
       }
@@ -104,9 +108,11 @@ export const createTruncator = (
   ) => {
     let low = 0;
     let high = totalCharacterCount;
+
     while (low < high) {
       const middle = Math.ceil((low + high) / 2);
       render(truncatedTo(middle));
+
       if (fits()) {
         low = middle;
       } else {

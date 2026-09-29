@@ -24,12 +24,16 @@
   );
 
   const onClick = (name: string) => {
-    if (hasTextSelection()) return;
+    if (hasTextSelection()) {
+      return;
+    }
     selectedRoles.toggleExclusive(name);
   };
 
   const onKeydown = (event: KeyboardEvent, name: string) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
     event.preventDefault();
     selectedRoles.toggleExclusive(name);
   };

@@ -57,7 +57,9 @@ export class ExpandableText {
     this.truncator = createTruncator(this.fullHtml, this.tailElement);
 
     const observer = new ResizeObserver(() => {
-      if (!this.isTransitioning) this.retruncateIfWidthChanged();
+      if (!this.isTransitioning) {
+        this.retruncateIfWidthChanged();
+      }
     });
     observer.observe(this.textElement);
     this.revealOnLoad();
@@ -65,7 +67,9 @@ export class ExpandableText {
   }
 
   async expand() {
-    if (this.isTransitioning || this.isExpanded || !this.textElement) return;
+    if (this.isTransitioning || this.isExpanded || !this.textElement) {
+      return;
+    }
     this.isTransitioning = true;
 
     this.isShowLessTransparent = true;
@@ -137,12 +141,16 @@ export class ExpandableText {
 
   private endTransition() {
     this.isTransitioning = false;
-    if (this.textElement) this.retruncateIfWidthChanged();
+    if (this.textElement) {
+      this.retruncateIfWidthChanged();
+    }
   }
 
   private retruncateIfWidthChanged() {
     const width = this.textElement!.getBoundingClientRect().width;
-    if (width === this.lastWidth) return;
+    if (width === this.lastWidth) {
+      return;
+    }
     this.lastWidth = width;
     this.updateTruncation();
   }
@@ -157,7 +165,9 @@ export class ExpandableText {
       this.bodyElement.replaceChildren(this.truncator.full());
     }
     this.isTruncated = !this.fitsWithin(maxHeight);
-    if (this.isTruncated && !this.isExpanded) this.renderTruncated(maxHeight);
+    if (this.isTruncated && !this.isExpanded) {
+      this.renderTruncated(maxHeight);
+    }
   }
 
   private measureCollapsed() {
@@ -191,7 +201,9 @@ export class ExpandableText {
     startHeight?: number,
   ) {
     const element = this.textElement;
-    if (!element) return;
+    if (!element) {
+      return;
+    }
     startHeight ??= element.getBoundingClientRect().height;
 
     this.pinnedMaxHeight = `${startHeight}px`;

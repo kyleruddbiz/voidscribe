@@ -18,17 +18,25 @@ export const wholeCardLink =
 
     const onClick = (event: MouseEvent) => {
       const isForwardedClick = !event.isTrusted;
-      if (isForwardedClick) return;
+      if (isForwardedClick) {
+        return;
+      }
 
       const target = event.target as Element;
-      if (target.closest('button')) return;
+      if (target.closest('button')) {
+        return;
+      }
 
       const selecting = hasTextSelection();
       if (target.closest('a')) {
-        if (selecting) event.preventDefault();
+        if (selecting) {
+          event.preventDefault();
+        }
         return;
       }
-      if (selecting) return;
+      if (selecting) {
+        return;
+      }
 
       clickLink({
         ctrlKey: event.ctrlKey,

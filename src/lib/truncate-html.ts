@@ -22,7 +22,9 @@ const nonBlankTextNodes = (root: Node) => {
   const nodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (node.textContent!.trim()) nodes.push(node as Text);
+    if (node.textContent!.trim()) {
+      nodes.push(node as Text);
+    }
   }
   return nodes;
 };
@@ -73,10 +75,14 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     let cutNode: Text | undefined;
     for (const node of nonBlankTextNodes(clone)) {
       cutNode = node;
-      if (charactersLeft <= node.length) break;
+      if (charactersLeft <= node.length) {
+        break;
+      }
       charactersLeft -= node.length;
     }
-    if (!cutNode) return clone;
+    if (!cutNode) {
+      return clone;
+    }
 
     deleteEverythingAfter(clone, cutNode, charactersLeft);
     cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');

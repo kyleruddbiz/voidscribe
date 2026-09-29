@@ -60,7 +60,7 @@ export class ExpandableTextController {
     });
     observer.observe(container);
 
-    this.transitionTo(this.requestedHtml);
+    this.transitionTo(this.textStateFor(this.requestedHtml));
 
     return () => {
       container.removeEventListener('click', onClick);
@@ -78,7 +78,7 @@ export class ExpandableTextController {
     const textState = this.textStateFor(html);
 
     if (textState !== this.currentTextState) {
-      this.transitionTo(html);
+      this.transitionTo(textState);
     }
   }
 
@@ -88,7 +88,7 @@ export class ExpandableTextController {
     }
 
     this.currentTextState.isExpanded = true;
-    this.transitionTo(this.requestedHtml, showLessSelector);
+    this.transitionTo(this.currentTextState, showLessSelector);
   }
 
   collapse() {
@@ -97,7 +97,7 @@ export class ExpandableTextController {
     }
 
     this.currentTextState.isExpanded = false;
-    this.transitionTo(this.requestedHtml, showMoreSelector);
+    this.transitionTo(this.currentTextState, showMoreSelector);
   }
 
   private textStateFor(html: string) {
@@ -128,8 +128,7 @@ export class ExpandableTextController {
     return this.clone(showLessRowSelector);
   }
 
-  private async transitionTo(html: string, focusTarget?: FocusTarget) {
-    const textState = this.textStateFor(html);
+  private async transitionTo(textState: TextState, focusTarget?: FocusTarget) {
     const transitionId = ++this.latestTransitionId;
     const isSuperseded = () => transitionId !== this.latestTransitionId;
     this.isTransitioning = true;
@@ -139,24 +138,24 @@ export class ExpandableTextController {
       this.container!.removeAttribute(pendingAttribute);
       this.renderInto(layer, textState);
       this.currentTextState = textState;
+      this.moveFocus(layer, focusTarget);
     });
 
     if (!wasCompleted || isSuperseded()) {
       return;
     }
 
-    this.moveFocus(focusTarget);
     this.isIntroCompleted = true;
     this.isTransitioning = false;
     this.retruncateIfWidthChanged();
   }
 
-  private moveFocus(target?: FocusTarget) {
+  private moveFocus(layer: HTMLElement, target?: FocusTarget) {
     if (!target) {
       return;
     }
 
-    this.crossfade!.currentLayer.querySelector<HTMLElement>(target)?.focus();
+    layer.querySelector<HTMLElement>(target)?.focus();
   }
 
   private retruncateIfWidthChanged() {

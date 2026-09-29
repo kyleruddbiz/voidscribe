@@ -47,7 +47,10 @@ export class LayerCrossfade {
     }));
     this.cancelAnimations();
 
-    for (const { layer } of fadingOutLayers) retireLayer(layer);
+    for (const { layer } of fadingOutLayers) {
+      retireLayer(layer);
+    }
+
     const incomingLayer = document.createElement('div');
     incomingLayer.className = layerClassName;
     this.container.append(incomingLayer);
@@ -56,6 +59,7 @@ export class LayerCrossfade {
 
     if (prefersReducedMotion()) {
       this.removeFadedOutLayers();
+
       return true;
     }
 
@@ -80,18 +84,26 @@ export class LayerCrossfade {
     } catch {
       return false;
     }
+
     this.removeFadedOutLayers();
+
     return true;
   }
 
   private cancelAnimations() {
-    for (const animation of this.animations) animation.cancel();
+    for (const animation of this.animations) {
+      animation.cancel();
+    }
+
     this.animations = [];
   }
 
   private removeFadedOutLayers() {
     this.cancelAnimations();
-    for (const layer of this.layers.slice(0, -1)) layer.remove();
+    for (const layer of this.layers.slice(0, -1)) {
+      layer.remove();
+    }
+
     this.layers = this.layers.slice(-1);
   }
 }

@@ -22,8 +22,11 @@ const nonBlankTextNodes = (root: Node) => {
   const nodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (node.textContent!.trim()) nodes.push(node as Text);
+    if (node.textContent!.trim()) {
+      nodes.push(node as Text);
+    }
   }
+
   return nodes;
 };
 
@@ -35,6 +38,7 @@ const outermostInlineAncestor = (node: Node): Node => {
   ) {
     outermost = outermost.parentElement;
   }
+
   return outermost;
 };
 
@@ -76,14 +80,21 @@ export const createTruncator = (
     let cutNode: Text | undefined;
     for (const node of nonBlankTextNodes(clone)) {
       cutNode = node;
-      if (charactersLeft <= node.length) break;
+      if (charactersLeft <= node.length) {
+        break;
+      }
+
       charactersLeft -= node.length;
     }
-    if (!cutNode) return clone;
+
+    if (!cutNode) {
+      return clone;
+    }
 
     deleteEverythingAfter(clone, cutNode, charactersLeft);
     cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');
     (outermostInlineAncestor(cutNode) as ChildNode).after(createTail());
+
     return clone;
   };
 
@@ -102,6 +113,7 @@ export const createTruncator = (
         high = middle - 1;
       }
     }
+
     render(truncatedTo(low));
   };
 

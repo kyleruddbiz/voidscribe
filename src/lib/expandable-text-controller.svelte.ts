@@ -49,17 +49,24 @@ export class ExpandableTextController {
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (target.closest(showMoreSelector)) this.expand();
-      else if (target.closest(showLessSelector)) this.collapse();
+      if (target.closest(showMoreSelector)) {
+        this.expand();
+      } else if (target.closest(showLessSelector)) {
+        this.collapse();
+      }
     };
+
     container.addEventListener('click', onClick);
 
     const observer = new ResizeObserver(() => {
-      if (!this.isTransitioning) this.retruncateIfWidthChanged();
+      if (!this.isTransitioning) {
+        this.retruncateIfWidthChanged();
+      }
     });
     observer.observe(container);
 
     this.transitionTo(this.requestedHtml);
+
     return () => {
       container.removeEventListener('click', onClick);
       observer.disconnect();
@@ -68,19 +75,30 @@ export class ExpandableTextController {
 
   show(html: string) {
     this.requestedHtml = html;
-    if (!this.crossfade) return;
+    if (!this.crossfade) {
+      return;
+    }
+
     const textState = this.textStateFor(html);
-    if (textState !== this.currentTextState) this.transitionTo(html);
+    if (textState !== this.currentTextState) {
+      this.transitionTo(html);
+    }
   }
 
   expand() {
-    if (!this.currentTextState || this.currentTextState.isExpanded) return;
+    if (!this.currentTextState || this.currentTextState.isExpanded) {
+      return;
+    }
+
     this.currentTextState.isExpanded = true;
     this.transitionTo(this.requestedHtml, showLessSelector);
   }
 
   collapse() {
-    if (!this.currentTextState?.isExpanded) return;
+    if (!this.currentTextState?.isExpanded) {
+      return;
+    }
+
     this.currentTextState.isExpanded = false;
     this.transitionTo(this.requestedHtml, showMoreSelector);
   }
@@ -94,6 +112,7 @@ export class ExpandableTextController {
       };
       this.textStates.set(html, textState);
     }
+
     return textState;
   }
 
@@ -101,6 +120,7 @@ export class ExpandableTextController {
     const element = this.template!.querySelector(selector)!;
     const id = element.id;
     element.removeAttribute('id');
+
     return id;
   }
 
@@ -116,6 +136,7 @@ export class ExpandableTextController {
       ? clone
       : clone.querySelector(buttonSelector)!;
     button.id = buttonId;
+
     return clone;
   }
 
@@ -147,7 +168,9 @@ export class ExpandableTextController {
       this.renderInto(layer, textState);
       this.currentTextState = textState;
     });
-    if (!wasCompleted || isSuperseded()) return;
+    if (!wasCompleted || isSuperseded()) {
+      return;
+    }
 
     this.moveFocus(focusTarget);
     this.isIntroCompleted = true;
@@ -156,13 +179,19 @@ export class ExpandableTextController {
   }
 
   private moveFocus(target?: FocusTarget) {
-    if (!target) return;
+    if (!target) {
+      return;
+    }
+
     this.crossfade!.currentLayer.querySelector<HTMLElement>(target)?.focus();
   }
 
   private retruncateIfWidthChanged() {
     const width = this.container!.getBoundingClientRect().width;
-    if (width === this.lastWidth || !this.currentTextState) return;
+    if (width === this.lastWidth || !this.currentTextState) {
+      return;
+    }
+
     this.lastWidth = width;
     this.renderInto(this.crossfade!.currentLayer, this.currentTextState);
   }
@@ -173,7 +202,9 @@ export class ExpandableTextController {
 
     layer.replaceChildren(textState.truncator.full());
     const isTruncated = !fits();
-    if (!isTruncated) return;
+    if (!isTruncated) {
+      return;
+    }
 
     if (textState.isExpanded) {
       layer.append(this.createShowLessRow());
@@ -188,6 +219,7 @@ export class ExpandableTextController {
   private collapsedMaxHeight() {
     const styles = getComputedStyle(this.container!);
     const lines = parseInt(styles.getPropertyValue('--collapsed-lines'), 10);
+
     return parseFloat(styles.lineHeight) * lines;
   }
 }

@@ -59,8 +59,7 @@
     mix-blend-mode: plus-lighter;
   }
 
-  .expandable :global(.layer p),
-  .expandable :global(.layer blockquote) {
+  .expandable :global(.layer :where(p, blockquote)) {
     margin: 0;
   }
 

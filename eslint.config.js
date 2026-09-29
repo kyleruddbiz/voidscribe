@@ -13,5 +13,8 @@ export default [
     languageOptions: { parserOptions: { parser: tseslint.parser } },
   },
   prettier,
-  { rules: { curly: ['error', 'all'] } },
+  {
+    files: ['**/*.{js,mjs,ts,astro,svelte}'],
+    rules: { curly: ['error', 'all'] },
+  },
 ];

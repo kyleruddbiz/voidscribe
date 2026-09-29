@@ -298,13 +298,6 @@
     cursor: pointer;
   }
 
-  .item-show-more:hover,
-  .item-show-more:focus-visible,
-  .item-show-less:hover,
-  .item-show-less:focus-visible {
-    text-decoration: underline;
-  }
-
   .item-show-more {
     margin-left: 0.3em;
     font-size: inherit;
@@ -314,6 +307,13 @@
     margin-top: 0.4rem;
     font-size: 0.85rem;
     transition: var(--fade-in);
+  }
+
+  .item-show-more:hover,
+  .item-show-more:focus-visible,
+  .item-show-less:hover,
+  .item-show-less:focus-visible {
+    text-decoration: underline;
   }
 
   .item-tail.is-transparent,

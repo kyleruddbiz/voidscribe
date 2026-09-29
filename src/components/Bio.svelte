@@ -39,6 +39,6 @@
 <style>
   .bio {
     --collapsed-lines: 6;
-    max-width: var(--measure);
+    max-width: 38rem;
   }
 </style>

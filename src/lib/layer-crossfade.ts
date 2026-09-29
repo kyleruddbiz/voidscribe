@@ -20,17 +20,18 @@ const retireLayer = (layer: HTMLElement) => {
 };
 
 export class LayerCrossfade {
-  private layers: HTMLElement[] = [];
+  private layers: HTMLElement[];
   private animations: Animation[] = [];
 
-  constructor(private readonly container: HTMLElement) {}
-
-  get currentLayer(): HTMLElement | undefined {
-    return this.layers.at(-1);
+  constructor(
+    private readonly container: HTMLElement,
+    initialLayer: HTMLElement,
+  ) {
+    this.layers = [initialLayer];
   }
 
-  adopt(layer: HTMLElement) {
-    this.layers = [layer];
+  get currentLayer(): HTMLElement {
+    return this.layers.at(-1)!;
   }
 
   /**

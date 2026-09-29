@@ -42,8 +42,10 @@ export class ExpandableTextController {
     this.showMoreId = this.takeTemplateId(showMoreSelector);
     this.showLessId = this.takeTemplateId(showLessSelector);
 
-    this.crossfade = new LayerCrossfade(container);
-    this.crossfade.adopt(container.firstElementChild as HTMLElement);
+    this.crossfade = new LayerCrossfade(
+      container,
+      container.firstElementChild as HTMLElement,
+    );
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element;
@@ -155,14 +157,14 @@ export class ExpandableTextController {
 
   private moveFocus(target?: FocusTarget) {
     if (!target) return;
-    this.crossfade!.currentLayer?.querySelector<HTMLElement>(target)?.focus();
+    this.crossfade!.currentLayer.querySelector<HTMLElement>(target)?.focus();
   }
 
   private retruncateIfWidthChanged() {
     const width = this.container!.getBoundingClientRect().width;
     if (width === this.lastWidth || !this.currentTextState) return;
     this.lastWidth = width;
-    this.renderInto(this.crossfade!.currentLayer!, this.currentTextState);
+    this.renderInto(this.crossfade!.currentLayer, this.currentTextState);
   }
 
   private renderInto(layer: HTMLElement, textState: TextState) {

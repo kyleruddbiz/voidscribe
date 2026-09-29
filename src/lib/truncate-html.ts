@@ -57,7 +57,10 @@ export interface HtmlTruncator {
   ): void;
 }
 
-export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
+export const createTruncator = (
+  html: string,
+  createTail: () => Node,
+): HtmlTruncator => {
   const template = document.createElement('template');
   template.innerHTML = html;
   const totalCharacterCount = nonBlankTextNodes(template.content).reduce(
@@ -80,7 +83,7 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
 
     deleteEverythingAfter(clone, cutNode, charactersLeft);
     cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');
-    (outermostInlineAncestor(cutNode) as ChildNode).after(tail);
+    (outermostInlineAncestor(cutNode) as ChildNode).after(createTail());
     return clone;
   };
 

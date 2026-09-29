@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { onMount, untrack } from 'svelte';
+  import { untrack } from 'svelte';
   import { ExpandableText } from '../lib/expandable-text.svelte';
   import { wholeCardLink } from '../lib/whole-card-link';
   import type { PortfolioEntry } from '../lib/portfolio';
+  import ExpandableTextView from './ExpandableText.svelte';
+  import ShowLessButton from './ShowLessButton.svelte';
   import SkillChips from './SkillChips.svelte';
 
   interface Props extends PortfolioEntry {
@@ -25,14 +27,11 @@
   const instanceId = $props.id();
   const descriptionId = `portfolio-item-description-${instanceId}`;
   const titleId = `portfolio-item-title-${instanceId}`;
-  const showMoreId = `portfolio-item-show-more-${instanceId}`;
   const showLessId = `portfolio-item-show-less-${instanceId}`;
 
   const fullHtml = untrack(() => (description ?? '').trim());
   const expandable = new ExpandableText(fullHtml);
   let linkElement = $state<HTMLAnchorElement>();
-
-  onMount(() => expandable.mount());
 </script>
 
 <div
@@ -59,56 +58,27 @@
         </span>
       </a>
       {#if expandable.hasContent}
-        <div
-          class="item-description"
-          class:is-expanded={expandable.isExpanded}
-          class:is-revealed={expandable.isTextRevealed}
-          id={descriptionId}
-          style:max-height={expandable.pinnedMaxHeight}
-          bind:this={expandable.textElement}
-        >
-          <div bind:this={expandable.bodyElement}>{@html fullHtml}</div>
-        </div>
-        <div hidden>
-          <span
-            class="item-tail"
-            class:is-transparent={expandable.isTailTransparent}
-            bind:this={expandable.tailElement}
-          >
-            <span aria-hidden="true">...</span>
-            <button
-              type="button"
-              class="item-show-more"
-              id={showMoreId}
-              bind:this={expandable.showMoreElement}
-              aria-expanded="false"
-              aria-controls={descriptionId}
-              aria-labelledby="{showMoreId} {titleId}"
-              onclick={() => expandable.expand()}
-            >
-              Show more
-            </button>
-          </span>
+        <div class="item-description">
+          <ExpandableTextView
+            controller={expandable}
+            html={fullHtml}
+            id={descriptionId}
+            labelledBy={titleId}
+          />
         </div>
       {/if}
     </div>
     <span class="item-meta">{callToAction} &rarr;</span>
   </div>
   {#if expandable.hasContent}
-    <button
-      type="button"
-      class="item-show-less"
-      class:is-transparent={expandable.isShowLessTransparent}
-      id={showLessId}
-      bind:this={expandable.showLessElement}
-      aria-expanded={expandable.isExpanded}
-      aria-controls={descriptionId}
-      aria-labelledby="{showLessId} {titleId}"
-      hidden={!expandable.isExpanded || !expandable.isTruncated}
-      onclick={() => expandable.collapse()}
-    >
-      Show less
-    </button>
+    <div class="item-show-less">
+      <ShowLessButton
+        controller={expandable}
+        id={showLessId}
+        controls={descriptionId}
+        labelledBy={titleId}
+      />
+    </div>
   {/if}
   <div class="item-skills">
     <SkillChips
@@ -229,96 +199,16 @@
     margin: 0.4rem 0 0;
     color: var(--color-text-dim);
     font-size: 0.9rem;
-    line-height: 1.5;
-    max-height: calc(1em * 1.5 * var(--collapsed-lines));
-    overflow: hidden;
-    transition:
-      max-height 0.6s ease,
-      opacity 0.6s ease;
-  }
-
-  .item-description.is-expanded {
-    max-height: none;
-  }
-
-  :global(.js) .item-description:not(.is-revealed) {
-    max-height: 0;
-    opacity: 0;
   }
 
   :global(.js) .item:not(.is-settled) .item-meta {
     opacity: 0;
   }
 
-  @media (scripting: none) {
-    .item-description {
-      max-height: none;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .item-description,
-    .item-show-less,
-    .item-tail,
     .item-meta {
       transition: none;
     }
-  }
-
-  .item-description :global(p),
-  .item-description :global(blockquote) {
-    margin: 0;
-  }
-
-  .item-description :global(div > * + *) {
-    margin-top: 0.6em;
-  }
-
-  .item-description :global(blockquote) {
-    padding-left: 0.75em;
-    border-left: 2px solid var(--color-border);
-    font-style: italic;
-  }
-
-  .item-tail {
-    white-space: nowrap;
-    font-style: normal;
-    transition: var(--fade-in);
-  }
-
-  .item-show-more,
-  .item-show-less {
-    position: relative;
-    z-index: 1;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--color-accent-bright);
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .item-show-more:hover,
-  .item-show-more:focus-visible,
-  .item-show-less:hover,
-  .item-show-less:focus-visible {
-    text-decoration: underline;
-  }
-
-  .item-show-more {
-    margin-left: 0.3em;
-    font-size: inherit;
-  }
-
-  .item-show-less {
-    margin-top: 0.4rem;
-    font-size: 0.85rem;
-    transition: var(--fade-in);
-  }
-
-  .item-tail.is-transparent,
-  .item-show-less.is-transparent {
-    opacity: 0;
   }
 
   @media (max-width: 480px) {

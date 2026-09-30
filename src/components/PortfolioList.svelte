@@ -37,7 +37,7 @@
 
   const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce', false);
   const flipDuration = $derived(
-    selectedRoles.isSettled && !reducedMotion.current ? 320 : 0,
+    !reducedMotion.current && selectedRoles.isSettled ? 320 : 0,
   );
 </script>
 

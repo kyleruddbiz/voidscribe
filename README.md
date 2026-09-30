@@ -33,6 +33,9 @@ Page content lives in `src/content/`:
   portfolio description. Import it with `?raw` (e.g. `import x from './kyle-rudd/x.html?raw'`) and
   use it as a value in the page's `.ts` file. Prettier formats these files, so `npm run format`
   will catch malformed markup.
+- `<page>/<gallery>.ts` — the ordered image list for a gallery portfolio entry (for example
+  `kyle-rudd/aethereal-art.ts`). Reorder the gallery by moving lines; the images sit in a folder
+  of the same name.
 
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.

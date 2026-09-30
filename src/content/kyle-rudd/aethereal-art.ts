@@ -12,13 +12,13 @@ import tomDidntDie from './aethereal-art/tom-didnt-die.jpg';
 
 export const aetherealArt: GalleryEntry[] = [
   { image: frogGod, alt: 'Frog God' },
-  { image: tomDidntDie, alt: "Tom Didn't Die" },
-  { image: aetherealize, alt: 'Ætherealize' },
-  { image: theGreatBird, alt: 'The Great Bird' },
-  { image: thorns, alt: 'Thorns' },
   { image: lighthouse, alt: 'Lighthouse' },
+  { image: shatteredSouls, alt: 'Shattered Souls' },
+  { image: tomDidntDie, alt: "Tom Didn't Die" },
   { image: coloradoFlag, alt: 'Colorado Flag' },
   { image: coloradoShirtFront, alt: 'Colorado Shirt Front' },
   { image: coloradoShirtBack, alt: 'Colorado Shirt Back' },
-  { image: shatteredSouls, alt: 'Shattered Souls' },
+  { image: aetherealize, alt: 'Ætherealize' },
+  { image: theGreatBird, alt: 'The Great Bird' },
+  { image: thorns, alt: 'Thorns' },
 ];

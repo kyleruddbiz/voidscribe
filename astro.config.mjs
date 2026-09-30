@@ -7,6 +7,7 @@ const site = 'https://voidscribestudios.com';
 
 export default defineConfig({
   site,
+  build: { format: 'file' },
   integrations: [svelte(), sitemap({ filter: (page) => page !== `${site}/` })],
   env: {
     schema: {

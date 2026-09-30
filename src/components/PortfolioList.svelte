@@ -1,17 +1,18 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
-  import { onMount } from 'svelte';
+  import { MediaQuery } from 'svelte/reactivity';
   import PortfolioItem from './PortfolioItem.svelte';
-  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { PortfolioEntry, Role } from '../lib/portfolio';
 
   interface Props {
-    items: readonly PortfolioEntry[];
-    roles: readonly Role[];
+    items: PortfolioEntry[];
+    roles: Role[];
   }
 
   let { items, roles }: Props = $props();
+  const selectedRoles = getSelectedRoles();
 
   const activeSkills = $derived([
     ...new Set(
@@ -34,12 +35,10 @@
       : items,
   );
 
-  let flipDuration = $state(320);
-  onMount(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      flipDuration = 0;
-    }
-  });
+  const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce', false);
+  const flipDuration = $derived(
+    !reducedMotion.current && selectedRoles.isSettled ? 320 : 0,
+  );
 </script>
 
 <div class="portfolio-list">

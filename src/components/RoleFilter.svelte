@@ -1,13 +1,14 @@
 <script lang="ts">
   import { hasTextSelection } from '../lib/selection';
-  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
 
   interface Props {
-    roles: readonly Role[];
+    roles: Role[];
   }
 
   let { roles }: Props = $props();
+  const selectedRoles = getSelectedRoles();
   const primary = $derived(roles[0]);
   const rest = $derived(roles.slice(1));
 
@@ -47,6 +48,7 @@
     class="role-toggle"
     class:is-primary={isPrimary}
     class:is-selected={selectedRoles.has(role.name)}
+    class:is-intro-selected={selectedRoles.introNames.includes(role.name)}
     style="--role-delay: {delay}ms"
     role="button"
     tabindex="0"
@@ -128,6 +130,20 @@
     }
   }
 
+  @keyframes role-select {
+    0% {
+      color: var(--color-text-dim);
+      text-decoration-color: transparent;
+      text-decoration-thickness: 1px;
+    }
+    40%,
+    100% {
+      color: var(--color-accent-bright);
+      text-decoration-color: var(--color-accent-bright);
+      text-decoration-thickness: 2px;
+    }
+  }
+
   .role-letter {
     animation: letter-hint var(--role-hint-duration) ease-in-out;
   }
@@ -140,6 +156,33 @@
     40% {
       color: var(--color-text);
     }
+  }
+
+  @keyframes letter-select {
+    0% {
+      color: var(--color-text-dim);
+    }
+    40% {
+      color: var(--color-text);
+    }
+    100% {
+      color: var(--color-accent-bright);
+    }
+  }
+
+  :global(.role-pending) .role-toggle,
+  :global(.role-pending) .role-letter {
+    animation-play-state: paused;
+  }
+
+  .role-toggle.is-intro-selected {
+    animation-name: role-select;
+    animation-fill-mode: both;
+  }
+
+  .role-toggle.is-intro-selected .role-letter {
+    animation-name: letter-select;
+    animation-fill-mode: both;
   }
 
   .role-toggle.is-primary {
@@ -168,7 +211,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     .role-toggle,
-    .role-letter {
+    .role-toggle.is-intro-selected,
+    .role-letter,
+    .role-toggle.is-intro-selected .role-letter {
       animation: none;
     }
   }

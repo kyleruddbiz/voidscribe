@@ -1,14 +1,15 @@
 <script lang="ts">
-  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
   import ExpandableText from './ExpandableText.svelte';
 
   interface Props {
     bio: string;
-    roles: readonly Role[];
+    roles: Role[];
   }
 
   let { bio, roles }: Props = $props();
+  const selectedRoles = getSelectedRoles();
 
   const instanceId = $props.id();
   const bioId = `bio-${instanceId}`;

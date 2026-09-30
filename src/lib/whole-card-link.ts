@@ -1,5 +1,5 @@
 import type { Attachment } from 'svelte/attachments';
-import { hasTextSelection } from './selection';
+import { hasTextSelection, targetElement } from './selection';
 
 const middleButtonIndex = 1;
 const openInBackgroundTabModifiers = { ctrlKey: true, metaKey: true };
@@ -23,7 +23,7 @@ export const wholeCardLink =
         return;
       }
 
-      const target = event.target as Element;
+      const target = targetElement(event);
 
       if (target.closest('button')) {
         return;
@@ -52,7 +52,7 @@ export const wholeCardLink =
     };
 
     const onAuxClick = (event: MouseEvent) => {
-      const target = event.target as Element;
+      const target = targetElement(event);
 
       if (event.button !== middleButtonIndex || target.closest('a, button')) {
         return;

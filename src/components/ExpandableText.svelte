@@ -12,21 +12,30 @@
   let { html, id, labelledBy, onIntroCompleted }: Props = $props();
 
   const initialHtml = untrack(() => html);
-  const controller = new ExpandableTextController(
-    initialHtml,
-    onIntroCompleted,
-  );
 
-  $effect(() => controller.show(html));
+  let container: HTMLDivElement;
+  let initialLayer: HTMLDivElement;
+  let template: HTMLTemplateElement;
+  let controller = $state<ExpandableTextController>();
 
-  let container = $state<HTMLDivElement>();
-  let template = $state<HTMLTemplateElement>();
+  $effect(() => controller?.show(html));
 
-  onMount(() => controller.mount(container!, template!));
+  onMount(() => {
+    const mounted = new ExpandableTextController(
+      container,
+      initialLayer,
+      template,
+      initialHtml,
+      onIntroCompleted,
+    );
+    controller = mounted;
+
+    return () => mounted.destroy();
+  });
 </script>
 
 <div class="expandable" {id} data-pending bind:this={container}>
-  <div class="layer">{@html initialHtml}</div>
+  <div class="layer" bind:this={initialLayer}>{@html initialHtml}</div>
 </div>
 <template bind:this={template}>
   <span class="tail">

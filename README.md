@@ -11,15 +11,17 @@ npm run dev
 
 Dev server: `http://localhost:4321`.
 
-Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded — e.g. `encodeURIComponent(value)`) to fully render the MTG Simulator portfolio link. Without it, the link still builds but points to the locked itch.io URL for the project. Use the same encoded value for the `ITCH_ACCESS_CODE` build variable in your hosting platform.
+Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded). It's required — dev and build fail without it. Set the same value as a build variable in production.
 
 ## Scripts
 
 - `npm run dev` / `npm run start` — start the dev server.
-- `npm run build` — type-check (`astro check`) and build for production.
+- `npm run build` — type-check and build for production.
 - `npm run preview` — serve the production build locally.
 - `npm run format` — format the repo with Prettier.
 - `npm run format:check` — check formatting without writing changes.
+- `npm run lint` — run ESLint and Stylelint.
+- `npm run tidy` — auto-fix lint violations and format the repo.
 
 ## Content
 
@@ -34,6 +36,10 @@ Page content lives in `src/content/`:
 
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.
+
+## Workflow
+
+See [AGENTS.md](./AGENTS.md) for the branching model and the checks to run before calling a change done.
 
 ## Dependencies
 

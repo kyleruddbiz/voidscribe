@@ -9,9 +9,9 @@
 </script>
 
 <span class="item-main">
-  <svg class="item-icon" viewBox="0 0 24 24" aria-hidden="true"
-    ><path d={icon} /></svg
-  >
+  <svg class="item-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d={icon} />
+  </svg>
   <span class="item-title" id={titleId}>{@html title}</span>
 </span>
 

@@ -117,6 +117,7 @@
       var(--chip-font-size) * var(--chip-line-height) + 2 *
         var(--chip-padding-y)
     );
+    --chip-gap: 3px;
     --tray-inset: 0.875rem;
     position: relative;
     isolation: isolate;
@@ -143,7 +144,7 @@
   .chips {
     display: flex;
     flex-wrap: wrap;
-    row-gap: 0.5rem;
+    row-gap: var(--chip-gap);
     justify-content: var(--chips-align, flex-start);
     margin: 0;
     padding: 0;
@@ -154,7 +155,7 @@
   .chip {
     position: relative;
     z-index: 1;
-    margin-left: 3px;
+    margin-left: var(--chip-gap);
     padding: var(--chip-padding-y) 0.7rem;
     transform: skewX(-14deg);
     background: var(--color-accent-bright);

@@ -14,6 +14,7 @@
 
   let { skills, activeSkills, isDimmed, isSettled, children, ...rest }: Props =
     $props();
+  let hasWrappedSkills = $state(false);
 </script>
 
 <div
@@ -21,10 +22,16 @@
   class="item"
   class:is-dimmed={isDimmed}
   class:is-settled={isSettled}
+  class:has-wrapped-skills={hasWrappedSkills}
 >
   {@render children()}
   <div class="item-skills">
-    <SkillChips {skills} {activeSkills} isRevealed={isSettled} />
+    <SkillChips
+      {skills}
+      {activeSkills}
+      isRevealed={isSettled}
+      bind:isWrapped={hasWrappedSkills}
+    />
   </div>
 </div>
 
@@ -32,6 +39,7 @@
   .item {
     --fade-in: opacity 1.2s ease;
     --icon-fill: var(--color-text-dim);
+    --chips-tray-border: var(--color-border);
     position: relative;
     padding: 1rem 1.25rem 1.5rem;
     border: 1px solid var(--color-border);
@@ -45,7 +53,12 @@
   .item:hover,
   .item:focus-within {
     --icon-fill: var(--color-accent);
+    --chips-tray-border: var(--color-accent);
     border-color: var(--color-accent);
+  }
+
+  .item.has-wrapped-skills {
+    margin-bottom: 1.5rem;
   }
 
   .item.is-dimmed {
@@ -58,10 +71,12 @@
   }
 
   .item-skills {
+    --chip-height: 1.24rem;
     position: absolute;
     left: 1.25rem;
-    bottom: 0;
-    transform: translateY(50%);
+    right: 1.25rem;
+    top: 100%;
+    margin-top: calc(var(--chip-height) / -2);
     z-index: 1;
     cursor: var(--skills-cursor, auto);
   }
@@ -77,6 +92,7 @@
       left: 0;
       right: 0;
       --chips-align: center;
+      --chips-wrap-indent: 0;
     }
   }
 </style>

@@ -59,8 +59,7 @@ const portfolio = [
     icon: githubIconPath,
     title: 'Void Scribe Studios',
     skills: [Skill.softwareEngineering, Skill.uiUxDesign],
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat... Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Is that all there is?',
+    description: 'Coming Soon.',
   },
   {
     href: mtgSimulatorHref,
@@ -70,7 +69,7 @@ const portfolio = [
     title: '<cite>Magic: The Gathering</cite> Simulator',
     skills: [Skill.gameDevelopment],
     description:
-      'A learning project to practice Unity 3D, online multiplayer, and game architecture. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris?',
+      'A learning project to practice Unity 3D, online multiplayer, and game architecture.',
   },
   {
     href: 'https://www.youtube.com/watch?v=tcXh7IcB0-I',

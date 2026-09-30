@@ -1,6 +1,7 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
+  import { MediaQuery } from 'svelte/reactivity';
   import PortfolioItem from './PortfolioItem.svelte';
   import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { PortfolioEntry, Role } from '../lib/portfolio';
@@ -34,7 +35,10 @@
       : items,
   );
 
-  const flipDuration = $derived(selectedRoles.isSettled ? 320 : 0);
+  const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce', false);
+  const flipDuration = $derived(
+    selectedRoles.isSettled && !reducedMotion.current ? 320 : 0,
+  );
 </script>
 
 <div class="portfolio-list">

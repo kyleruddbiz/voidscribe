@@ -1,7 +1,6 @@
 <script lang="ts">
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
-  import { onMount } from 'svelte';
   import PortfolioItem from './PortfolioItem.svelte';
   import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { PortfolioEntry, Role } from '../lib/portfolio';
@@ -35,12 +34,7 @@
       : items,
   );
 
-  let flipDuration = $state(320);
-  onMount(() => {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      flipDuration = 0;
-    }
-  });
+  const flipDuration = $derived(selectedRoles.isSettled ? 320 : 0);
 </script>
 
 <div class="portfolio-list">

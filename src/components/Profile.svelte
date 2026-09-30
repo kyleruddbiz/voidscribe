@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount, tick } from 'svelte';
   import type { Profile } from '../lib/portfolio';
   import {
     SelectedRoles,
@@ -14,7 +15,14 @@
 
   let { profile }: Props = $props();
 
-  setSelectedRoles(new SelectedRoles());
+  const selectedRoles = new SelectedRoles();
+  setSelectedRoles(selectedRoles);
+
+  onMount(async () => {
+    selectedRoles.applyFromUrl(profile.roles);
+    await tick();
+    selectedRoles.isSettled = true;
+  });
 </script>
 
 <section class="profile">

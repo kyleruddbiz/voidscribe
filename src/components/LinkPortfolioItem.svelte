@@ -36,7 +36,7 @@
   {activeSkills}
   {isDimmed}
   isSettled={isIntroCompleted}
-  style="--skills-cursor: pointer"
+  style="--skills-cursor: pointer; --skills-pointer-events: auto"
   {@attach wholeCardLink(() => linkElement)}
 >
   <div class="item-row">

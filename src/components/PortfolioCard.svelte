@@ -79,6 +79,7 @@
     top: 100%;
     z-index: 1;
     cursor: var(--skills-cursor, auto);
+    pointer-events: var(--skills-pointer-events, none);
   }
 
   @media (max-width: 480px) {

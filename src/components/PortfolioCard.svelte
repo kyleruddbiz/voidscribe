@@ -40,8 +40,9 @@
     --fade-in: opacity 1.2s ease;
     --icon-fill: var(--color-text-dim);
     --chips-tray-border: var(--color-border);
+    --card-padding-x: 1.25rem;
     position: relative;
-    padding: 1rem 1.25rem 1.5rem;
+    padding: 1rem var(--card-padding-x) 1.5rem;
     border: 1px solid var(--color-border);
     border-radius: 4px;
     background: var(--color-bg-raised);
@@ -71,12 +72,11 @@
   }
 
   .item-skills {
-    --chip-height: 1.24rem;
+    --chips-wrap-start: var(--card-padding-x);
     position: absolute;
-    left: 1.25rem;
-    right: 1.25rem;
+    left: var(--card-padding-x);
+    right: var(--card-padding-x);
     top: 100%;
-    margin-top: calc(var(--chip-height) / -2);
     z-index: 1;
     cursor: var(--skills-cursor, auto);
   }

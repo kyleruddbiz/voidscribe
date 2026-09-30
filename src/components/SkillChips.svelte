@@ -10,7 +10,6 @@
   }
 
   const revealStaggerMs = 500;
-  const trayInsetX = 14;
 
   let {
     skills,
@@ -27,13 +26,16 @@
 
   function measure() {
     const rendered = chips.filter(Boolean);
+
+    if (rendered.length === 0) {
+      return;
+    }
+
     const first = rendered[0];
-    wrapIndex = first
-      ? rendered.findIndex((chip) => chip.offsetTop > first.offsetTop)
-      : -1;
+    wrapIndex = rendered.findIndex((chip) => chip.offsetTop > first.offsetTop);
     isWrapped = wrapIndex >= 0;
 
-    if (!first || wrapIndex < 0) {
+    if (!isWrapped) {
       return;
     }
 
@@ -46,14 +48,11 @@
       chip.offsetTop + chip.offsetHeight / 2;
     const top = rowCenter(first);
     const bottom = Math.max(...wrapped.map(rowCenter));
-    tray = {
-      left: left - trayInsetX,
-      top,
-      width: right - left + trayInsetX * 2,
-      height: bottom - top,
-    };
+    tray = { left, top, width: right - left, height: bottom - top };
   }
 
+  // Indenting the first wrapped chip moves it without resizing anything, so the
+  // ResizeObserver below never reports it; re-measure once that indent applies.
   $effect(() => {
     if (wrapIndex >= 0) {
       untrack(measure);
@@ -81,10 +80,10 @@
         class:is-hidden={!isRevealed}
         aria-hidden="true"
         style:--reveal-delay={`${wrapIndex * revealStaggerMs}ms`}
-        style:left={`${tray.left}px`}
-        style:top={`${tray.top}px`}
-        style:width={`${tray.width}px`}
-        style:height={`${tray.height}px`}
+        style:--tray-left={`${tray.left}px`}
+        style:--tray-top={`${tray.top}px`}
+        style:--tray-width={`${tray.width}px`}
+        style:--tray-height={`${tray.height}px`}
       ></div>
     {/if}
     <ul
@@ -97,7 +96,6 @@
         <li
           bind:this={chips[i]}
           class="chip"
-          class:is-wrapped={wrapIndex >= 0 && i >= wrapIndex}
           class:is-wrap-start={i === wrapIndex}
           class:is-active={activeSkills.includes(skill)}
           class:is-hidden={!isRevealed}
@@ -112,13 +110,26 @@
 
 <style>
   .chips-wrap {
+    --chip-font-size: 0.8rem;
+    --chip-line-height: 1.5;
+    --chip-padding-y: 0.02rem;
+    --chip-height: calc(
+      var(--chip-font-size) * var(--chip-line-height) + 2 *
+        var(--chip-padding-y)
+    );
+    --tray-inset: 0.875rem;
     position: relative;
     isolation: isolate;
+    margin-top: calc(var(--chip-height) / -2);
   }
 
   .tray {
     position: absolute;
     z-index: -1;
+    left: calc(var(--tray-left) - var(--tray-inset));
+    top: var(--tray-top);
+    width: calc(var(--tray-width) + 2 * var(--tray-inset));
+    height: var(--tray-height);
     box-sizing: border-box;
     border: 1px solid var(--chips-tray-border, var(--color-border));
     border-top: none;
@@ -143,18 +154,16 @@
   .chip {
     position: relative;
     z-index: 1;
-    box-sizing: border-box;
-    height: var(--chip-height);
     margin-left: 3px;
-    padding: 0.02rem 0.7rem;
+    padding: var(--chip-padding-y) 0.7rem;
     transform: skewX(-14deg);
     background: var(--color-accent-bright);
     color: var(--color-bg);
-    font-size: 0.8rem;
+    font-size: var(--chip-font-size);
     font-weight: 600;
     font-variant-caps: all-small-caps;
     letter-spacing: 0.08em;
-    line-height: 1.5;
+    line-height: var(--chip-line-height);
     white-space: nowrap;
     transition:
       background-color 0.2s ease,
@@ -166,7 +175,10 @@
   }
 
   .chip.is-wrap-start {
-    margin-left: var(--chips-wrap-indent, 2.125rem);
+    margin-left: var(
+      --chips-wrap-indent,
+      calc(var(--chips-wrap-start, 0px) + var(--tray-inset))
+    );
   }
 
   .chip > span {

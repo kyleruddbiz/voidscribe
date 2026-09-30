@@ -39,6 +39,7 @@ const mtgSimulatorHref = withAccessCode(
 
 const portfolio: PortfolioEntry[] = [
   {
+    kind: 'link',
     href: 'https://www.linkedin.com/in/kyle-n-rudd/',
     callToAction: 'View profile',
     icon: linkedinIconPath,
@@ -48,6 +49,7 @@ const portfolio: PortfolioEntry[] = [
       "See what I've been up to as a professional software engineer.",
   },
   {
+    kind: 'link',
     href: 'https://github.com/kyleruddbiz/voidscribe',
     callToAction: 'View on GitHub',
     icon: githubIconPath,
@@ -56,6 +58,7 @@ const portfolio: PortfolioEntry[] = [
     description: 'Coming Soon.',
   },
   {
+    kind: 'link',
     href: mtgSimulatorHref,
     rel: 'noopener noreferrer nofollow',
     callToAction: 'Play on itch.io',
@@ -66,6 +69,7 @@ const portfolio: PortfolioEntry[] = [
       'A learning project to practice Unity 3D, online multiplayer, and game architecture.',
   },
   {
+    kind: 'link',
     href: 'https://www.youtube.com/watch?v=tcXh7IcB0-I',
     callToAction: 'Watch on YouTube',
     icon: youtubeIconPath,

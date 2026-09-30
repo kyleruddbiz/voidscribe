@@ -1,0 +1,82 @@
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
+  import type { Skill } from '../lib/portfolio';
+  import SkillChips from './SkillChips.svelte';
+
+  interface Props extends HTMLAttributes<HTMLDivElement> {
+    skills: Skill[];
+    activeSkills: Skill[];
+    isDimmed: boolean;
+    isSettled: boolean;
+    children: Snippet;
+  }
+
+  let { skills, activeSkills, isDimmed, isSettled, children, ...rest }: Props =
+    $props();
+</script>
+
+<div
+  {...rest}
+  class="item"
+  class:is-dimmed={isDimmed}
+  class:is-settled={isSettled}
+>
+  {@render children()}
+  <div class="item-skills">
+    <SkillChips {skills} {activeSkills} isRevealed={isSettled} />
+  </div>
+</div>
+
+<style>
+  .item {
+    --fade-in: opacity 1.2s ease;
+    --icon-fill: var(--color-text-dim);
+    position: relative;
+    padding: 1rem 1.25rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-bg-raised);
+    transition:
+      opacity 0.25s ease,
+      border-color 0.2s ease;
+  }
+
+  .item:hover,
+  .item:focus-within {
+    --icon-fill: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .item.is-dimmed {
+    opacity: 0.45;
+  }
+
+  .item.is-dimmed:hover,
+  .item.is-dimmed:focus-within {
+    opacity: 1;
+  }
+
+  .item-skills {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 0;
+    transform: translateY(50%);
+    z-index: 1;
+    cursor: var(--skills-cursor, auto);
+  }
+
+  @media (max-width: 480px) {
+    .item {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .item-skills {
+      left: 0;
+      right: 0;
+      --chips-align: center;
+    }
+  }
+</style>

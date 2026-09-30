@@ -2,7 +2,7 @@
   import { flip } from 'svelte/animate';
   import { cubicOut } from 'svelte/easing';
   import { MediaQuery } from 'svelte/reactivity';
-  import PortfolioItem from './PortfolioItem.svelte';
+  import LinkPortfolioItem from './LinkPortfolioItem.svelte';
   import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { PortfolioEntry, Role } from '../lib/portfolio';
 
@@ -47,7 +47,7 @@
       class="portfolio-card"
       animate:flip={{ duration: flipDuration, easing: cubicOut }}
     >
-      <PortfolioItem
+      <LinkPortfolioItem
         {...item}
         {activeSkills}
         isDimmed={isFiltering && !matchesFilter(item)}

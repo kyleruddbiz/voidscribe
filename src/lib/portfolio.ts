@@ -8,15 +8,21 @@ export const Skill = {
 
 export type Skill = (typeof Skill)[keyof typeof Skill];
 
-export interface PortfolioEntry {
-  href: string;
-  rel?: string;
-  callToAction: string;
+interface PortfolioEntryBase {
   icon: string;
   description?: string;
   title: string;
   skills: Skill[];
 }
+
+export interface LinkPortfolioEntry extends PortfolioEntryBase {
+  kind: 'link';
+  href: string;
+  rel?: string;
+  callToAction: string;
+}
+
+export type PortfolioEntry = LinkPortfolioEntry;
 
 export const RoleName = {
   softwareEngineer: 'Software Engineer',

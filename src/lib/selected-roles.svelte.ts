@@ -8,6 +8,7 @@ export const slugFor = (name: string) =>
 
 export class SelectedRoles {
   names = $state<string[]>([]);
+  introNames = $state<string[]>([]);
   isSettled = $state(false);
 
   has(name: string) {
@@ -15,11 +16,13 @@ export class SelectedRoles {
   }
 
   toggleExclusive(name: string) {
+    this.introNames = [];
     this.names = this.has(name) ? [] : [name];
     this.writeUrl();
   }
 
   toggle(name: string) {
+    this.introNames = [];
     this.names = this.has(name)
       ? this.names.filter((selected) => selected !== name)
       : [...this.names, name];
@@ -33,6 +36,7 @@ export class SelectedRoles {
       .filter((role) => role !== undefined);
 
     this.names = known.slice(0, 1).map((role) => role.name);
+    this.introNames = this.names;
   }
 
   private writeUrl() {

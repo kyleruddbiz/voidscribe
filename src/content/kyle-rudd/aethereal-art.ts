@@ -1,6 +1,8 @@
 import type { GalleryEntry } from '../../lib/gallery-images';
 import aetherealize from './aethereal-art/aetherealize.jpg';
 import coloradoFlag from './aethereal-art/colorado-flag.jpg';
+import coloradoShirtBack from './aethereal-art/colorado-shirt-back.jpg';
+import coloradoShirtFront from './aethereal-art/colorado-shirt-front.jpg';
 import frogGod from './aethereal-art/frog-god.jpg';
 import lighthouse from './aethereal-art/lighthouse.jpg';
 import shatteredSouls from './aethereal-art/shattered-souls.jpg';
@@ -16,5 +18,7 @@ export const aetherealArt: GalleryEntry[] = [
   { image: thorns, alt: 'Thorns' },
   { image: lighthouse, alt: 'Lighthouse' },
   { image: coloradoFlag, alt: 'Colorado Flag' },
+  { image: coloradoShirtFront, alt: 'Colorado Shirt Front' },
+  { image: coloradoShirtBack, alt: 'Colorado Shirt Back' },
   { image: shatteredSouls, alt: 'Shattered Souls' },
 ];

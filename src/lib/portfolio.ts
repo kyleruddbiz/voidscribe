@@ -18,8 +18,15 @@ interface PortfolioEntryBase {
   skills: Skill[];
 }
 
+export interface ResponsiveImage {
+  src: string;
+  srcset: string;
+  sizes: string;
+}
+
 export interface LinkPortfolioEntry extends PortfolioEntryBase {
   kind: 'link';
+  preview?: ResponsiveImage;
   href: string;
   rel?: string;
   callToAction: string;
@@ -27,7 +34,7 @@ export interface LinkPortfolioEntry extends PortfolioEntryBase {
 
 export interface GalleryImage {
   alt: string;
-  thumbnail: { src: string; srcset: string; sizes: string };
+  thumbnail: ResponsiveImage;
   full: { src: string; width: number; height: number };
 }
 

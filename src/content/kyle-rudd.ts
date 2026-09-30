@@ -8,8 +8,9 @@ import { RoleName, Skill } from '../lib/portfolio';
 import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
 import { withAccessCode } from '../lib/itch-access';
 import { aetherealArtIconPath } from '../lib/custom-icons';
-import { buildGallery } from '../lib/gallery-images';
+import { buildGallery, buildPreview } from '../lib/gallery-images';
 import { aetherealArt } from './kyle-rudd/aethereal-art';
+import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
 import softwareEngineerBio from './kyle-rudd/bio/software-engineer.html?raw';
@@ -86,6 +87,7 @@ const portfolio: PortfolioEntry[] = [
     title: 'Family Trip Mix 2 (Sellout Edition)',
     skills: [Skill.videoEditing, Skill.mixtapeProduction],
     description: familyTripMixDescription,
+    preview: await buildPreview(familyTripMixImage),
   },
   {
     kind: 'gallery',

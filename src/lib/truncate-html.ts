@@ -31,7 +31,7 @@ const nonBlankTextNodes = (root: Node) => {
   return nodes;
 };
 
-const outermostInlineAncestor = (node: Node): Node => {
+const outermostInlineAncestor = (node: ChildNode): ChildNode => {
   let outermost = node;
 
   while (
@@ -97,7 +97,7 @@ export const createTruncator = (
 
     deleteEverythingAfter(clone, cutNode, charactersLeft);
     cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');
-    (outermostInlineAncestor(cutNode) as ChildNode).after(createTail());
+    outermostInlineAncestor(cutNode).after(createTail());
 
     return clone;
   };

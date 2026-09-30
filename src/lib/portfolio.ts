@@ -10,5 +10,6 @@ export interface PortfolioEntry {
 
 export interface Role {
   name: string;
+  bio: string;
   skills: readonly string[];
 }

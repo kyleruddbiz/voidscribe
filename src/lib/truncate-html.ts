@@ -21,6 +21,7 @@ const trailingSpaceAndPunctuation = /[\s.,;:!?…\-–—]+$/;
 const nonBlankTextNodes = (root: Node) => {
   const nodes: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (node.textContent!.trim()) {
       nodes.push(node as Text);
@@ -32,6 +33,7 @@ const nonBlankTextNodes = (root: Node) => {
 
 const outermostInlineAncestor = (node: Node): Node => {
   let outermost = node;
+
   while (
     outermost.parentElement &&
     inlineTags.has(outermost.parentElement.tagName)
@@ -61,7 +63,10 @@ export interface HtmlTruncator {
   ): void;
 }
 
-export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
+export const createTruncator = (
+  html: string,
+  createTail: () => Node,
+): HtmlTruncator => {
   const template = document.createElement('template');
   template.innerHTML = html;
   const totalCharacterCount = nonBlankTextNodes(template.content).reduce(
@@ -75,8 +80,10 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
     const clone = full();
     let charactersLeft = characterCount;
     let cutNode: Text | undefined;
+
     for (const node of nonBlankTextNodes(clone)) {
       cutNode = node;
+
       if (charactersLeft <= node.length) {
         break;
       }
@@ -90,7 +97,7 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
 
     deleteEverythingAfter(clone, cutNode, charactersLeft);
     cutNode.data = cutNode.data.replace(trailingSpaceAndPunctuation, '');
-    (outermostInlineAncestor(cutNode) as ChildNode).after(tail);
+    (outermostInlineAncestor(cutNode) as ChildNode).after(createTail());
 
     return clone;
   };
@@ -101,9 +108,11 @@ export const createTruncator = (html: string, tail: Node): HtmlTruncator => {
   ) => {
     let low = 0;
     let high = totalCharacterCount;
+
     while (low < high) {
       const middle = Math.ceil((low + high) / 2);
       render(truncatedTo(middle));
+
       if (fits()) {
         low = middle;
       } else {

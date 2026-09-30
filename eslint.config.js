@@ -28,6 +28,7 @@ export default [
       'padding-line-between-statements': [
         'error',
         { blankLine: 'always', prev: 'block-like', next: '*' },
+        { blankLine: 'always', prev: '*', next: 'block-like' },
         { blankLine: 'always', prev: '*', next: 'return' },
       ],
     },

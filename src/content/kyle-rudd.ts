@@ -6,6 +6,10 @@ import {
 } from '../lib/simple-icons';
 import { withAccessCode } from '../lib/itch-access';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
+import generalBio from './kyle-rudd/bio/general.html?raw';
+import softwareEngineerBio from './kyle-rudd/bio/software-engineer.html?raw';
+import musicProducerBio from './kyle-rudd/bio/music-producer.html?raw';
+import digitalArtistBio from './kyle-rudd/bio/digital-artist.html?raw';
 
 const name = 'Kyle Rudd';
 
@@ -20,11 +24,17 @@ const Skill = {
 const roles = [
   {
     name: 'Software Engineer',
+    bio: softwareEngineerBio,
     skills: [Skill.softwareEngineering, Skill.gameDevelopment],
   },
-  { name: 'Music Producer', skills: [Skill.mixtapeProduction] },
+  {
+    name: 'Music Producer',
+    bio: musicProducerBio,
+    skills: [Skill.mixtapeProduction],
+  },
   {
     name: 'Digital Artist',
+    bio: digitalArtistBio,
     skills: [Skill.gameDevelopment, Skill.videoEditing, Skill.uiUxDesign],
   },
 ] as const;
@@ -73,6 +83,7 @@ const portfolio = [
 
 export const kyleRudd = {
   name,
+  bio: generalBio,
   roles,
   tagline: `${new Intl.ListFormat('en').format(roles.map((role) => role.name))}.`,
   portfolio,

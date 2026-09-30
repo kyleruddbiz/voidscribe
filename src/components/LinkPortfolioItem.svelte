@@ -18,6 +18,7 @@
     description,
     title,
     skills,
+    preview,
     activeSkills = [],
     isDimmed = false,
   }: Props = $props();
@@ -36,9 +37,22 @@
   {activeSkills}
   {isDimmed}
   isSettled={isIntroCompleted}
+  class={preview && 'has-preview'}
   style="--skills-cursor: pointer; --skills-pointer-events: auto"
   {@attach wholeCardLink(() => linkElement)}
 >
+  {#if preview}
+    <div class="item-preview">
+      <img
+        src={preview.src}
+        srcset={preview.srcset}
+        sizes={preview.sizes}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  {/if}
   <div class="item-row">
     <div class="item-content">
       <a
@@ -67,6 +81,34 @@
 </PortfolioCard>
 
 <style>
+  :global(.item.has-preview) {
+    --preview-size: 6rem;
+    --banner-height: 10rem;
+    --content-offset: calc(var(--preview-size) + 1rem);
+  }
+
+  .item-preview {
+    position: absolute;
+    top: 1rem;
+    left: var(--card-padding-x);
+    width: var(--preview-size);
+    height: var(--preview-size);
+    overflow: hidden;
+    border-radius: 2px;
+    transition: var(--fade-in);
+  }
+
+  .item-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  :global(.js) :global(.item:not(.is-settled)) .item-preview {
+    opacity: 0;
+  }
+
   .item-row {
     display: flex;
     align-items: center;
@@ -78,6 +120,11 @@
     flex: 1 1 auto;
     min-width: 0;
     padding-right: 1.5rem;
+  }
+
+  :global(.has-preview) .item-row {
+    min-height: var(--preview-size);
+    padding-left: var(--content-offset);
   }
 
   .overlay-link {
@@ -117,12 +164,21 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .item-meta {
+    .item-meta,
+    .item-preview {
       transition: none;
     }
   }
 
   @media (max-width: 480px) {
+    .item-preview {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--banner-height);
+      border-radius: 3px 3px 0 0;
+    }
+
     .item-row {
       display: contents;
     }
@@ -130,6 +186,15 @@
     .item-content {
       padding-right: 0;
       order: 1;
+    }
+
+    :global(.has-preview) .item-row {
+      min-height: 0;
+      padding-left: 0;
+    }
+
+    :global(.has-preview) .item-content {
+      padding-top: calc(var(--banner-height) - 1rem + 0.75rem);
     }
 
     .item-description {

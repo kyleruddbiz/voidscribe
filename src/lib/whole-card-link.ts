@@ -25,7 +25,7 @@ export const wholeCardLink =
 
       const target = targetElement(event);
 
-      if (!target || target.closest('button')) {
+      if (target.closest('button')) {
         return;
       }
 
@@ -54,11 +54,7 @@ export const wholeCardLink =
     const onAuxClick = (event: MouseEvent) => {
       const target = targetElement(event);
 
-      if (
-        !target ||
-        event.button !== middleButtonIndex ||
-        target.closest('a, button')
-      ) {
+      if (event.button !== middleButtonIndex || target.closest('a, button')) {
         return;
       }
 

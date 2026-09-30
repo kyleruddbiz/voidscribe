@@ -80,9 +80,9 @@ export class ExpandableTextController {
   private onClick = (event: MouseEvent) => {
     const target = targetElement(event);
 
-    if (target?.closest(showMoreSelector)) {
+    if (target.closest(showMoreSelector)) {
       this.expand();
-    } else if (target?.closest(showLessSelector)) {
+    } else if (target.closest(showLessSelector)) {
       this.collapse();
     }
   };

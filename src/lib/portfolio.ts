@@ -4,19 +4,39 @@ export const Skill = {
   uiUxDesign: 'UI/UX Design',
   videoEditing: 'Video Editing',
   mixtapeProduction: 'Mixtape Production',
+  digitalCollage: 'Digital Collage',
+  photoManipulation: 'Photo Manipulation',
+  surrealismGlitch: 'Surrealism & Glitch',
 } as const;
 
 export type Skill = (typeof Skill)[keyof typeof Skill];
 
-export interface PortfolioEntry {
-  href: string;
-  rel?: string;
-  callToAction: string;
+interface PortfolioEntryBase {
   icon: string;
   description?: string;
   title: string;
   skills: Skill[];
 }
+
+export interface LinkPortfolioEntry extends PortfolioEntryBase {
+  kind: 'link';
+  href: string;
+  rel?: string;
+  callToAction: string;
+}
+
+export interface GalleryImage {
+  alt: string;
+  thumbnail: { src: string; srcset: string; sizes: string };
+  full: { src: string; width: number; height: number };
+}
+
+export interface GalleryPortfolioEntry extends PortfolioEntryBase {
+  kind: 'gallery';
+  images: GalleryImage[];
+}
+
+export type PortfolioEntry = LinkPortfolioEntry | GalleryPortfolioEntry;
 
 export const RoleName = {
   softwareEngineer: 'Software Engineer',

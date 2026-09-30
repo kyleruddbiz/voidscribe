@@ -42,7 +42,7 @@
     <span aria-hidden="true">...</span>
     <button
       type="button"
-      class="show-more"
+      class="show-more text-button"
       id="{id}-show-more"
       aria-expanded="false"
       aria-controls={id}
@@ -54,7 +54,7 @@
   <div class="show-less-row">
     <button
       type="button"
-      class="show-less"
+      class="show-less text-button"
       id="{id}-show-less"
       aria-expanded="true"
       aria-controls={id}
@@ -111,22 +111,9 @@
   .expandable :global(.show-less) {
     position: relative;
     z-index: 1;
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--color-accent-bright);
-    font: inherit;
-    cursor: pointer;
   }
 
   .expandable :global(.show-more) {
     margin-left: 0.3em;
-  }
-
-  .expandable :global(.show-more:hover),
-  .expandable :global(.show-more:focus-visible),
-  .expandable :global(.show-less:hover),
-  .expandable :global(.show-less:focus-visible) {
-    text-decoration: underline;
   }
 </style>

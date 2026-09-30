@@ -7,6 +7,9 @@ import {
 import { RoleName, Skill } from '../lib/portfolio';
 import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
 import { withAccessCode } from '../lib/itch-access';
+import { aetherealArtIconPath } from '../lib/custom-icons';
+import { buildGallery } from '../lib/gallery-images';
+import { aetherealArt } from './kyle-rudd/aethereal-art';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
 import softwareEngineerBio from './kyle-rudd/bio/software-engineer.html?raw';
@@ -29,7 +32,14 @@ const roles: Role[] = [
   {
     name: RoleName.digitalArtist,
     bio: digitalArtistBio,
-    skills: [Skill.gameDevelopment, Skill.videoEditing, Skill.uiUxDesign],
+    skills: [
+      Skill.gameDevelopment,
+      Skill.videoEditing,
+      Skill.uiUxDesign,
+      Skill.digitalCollage,
+      Skill.photoManipulation,
+      Skill.surrealismGlitch,
+    ],
   },
 ];
 
@@ -39,6 +49,7 @@ const mtgSimulatorHref = withAccessCode(
 
 const portfolio: PortfolioEntry[] = [
   {
+    kind: 'link',
     href: 'https://www.linkedin.com/in/kyle-n-rudd/',
     callToAction: 'View profile',
     icon: linkedinIconPath,
@@ -48,6 +59,7 @@ const portfolio: PortfolioEntry[] = [
       "See what I've been up to as a professional software engineer.",
   },
   {
+    kind: 'link',
     href: 'https://github.com/kyleruddbiz/voidscribe',
     callToAction: 'View on GitHub',
     icon: githubIconPath,
@@ -56,6 +68,7 @@ const portfolio: PortfolioEntry[] = [
     description: 'Coming Soon.',
   },
   {
+    kind: 'link',
     href: mtgSimulatorHref,
     rel: 'noopener noreferrer nofollow',
     callToAction: 'Play on itch.io',
@@ -66,12 +79,25 @@ const portfolio: PortfolioEntry[] = [
       'A learning project to practice Unity 3D, online multiplayer, and game architecture.',
   },
   {
+    kind: 'link',
     href: 'https://www.youtube.com/watch?v=tcXh7IcB0-I',
     callToAction: 'Watch on YouTube',
     icon: youtubeIconPath,
     title: 'Family Trip Mix 2 (Sellout Edition)',
     skills: [Skill.videoEditing, Skill.mixtapeProduction],
     description: familyTripMixDescription,
+  },
+  {
+    kind: 'gallery',
+    icon: aetherealArtIconPath,
+    title: 'Æthereal Art',
+    skills: [
+      Skill.digitalCollage,
+      Skill.photoManipulation,
+      Skill.surrealismGlitch,
+    ],
+    description: "Some of my favorite art pieces I've done.",
+    images: await buildGallery(aetherealArt),
   },
 ];
 

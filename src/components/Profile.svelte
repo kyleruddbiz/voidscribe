@@ -22,6 +22,7 @@
     selectedRoles.applyFromUrl(profile.roles);
     await tick();
     selectedRoles.isSettled = true;
+    document.documentElement.classList.remove('role-pending');
   });
 </script>
 
@@ -38,6 +39,17 @@
 </section>
 
 <style>
+  :global(.role-pending) .profile {
+    visibility: hidden;
+    animation: reveal-fallback 0s 2s forwards;
+  }
+
+  @keyframes reveal-fallback {
+    to {
+      visibility: visible;
+    }
+  }
+
   h1 {
     font-size: clamp(1.75rem, 4vw, 2.25rem);
     margin: 0 0 0.25rem;

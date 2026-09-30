@@ -4,6 +4,8 @@ import {
   linkedinIconPath,
   youtubeIconPath,
 } from '../lib/simple-icons';
+import { Skill } from '../lib/portfolio';
+import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
 import { withAccessCode } from '../lib/itch-access';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
@@ -13,15 +15,7 @@ import digitalArtistBio from './kyle-rudd/bio/digital-artist.html?raw';
 
 const name = 'Kyle Rudd';
 
-const Skill = {
-  softwareEngineering: 'Software Engineering',
-  gameDevelopment: 'Game Development',
-  uiUxDesign: 'UI/UX Design',
-  videoEditing: 'Video Editing',
-  mixtapeProduction: 'Mixtape Production',
-} as const;
-
-const roles = [
+const roles: Role[] = [
   {
     name: 'Software Engineer',
     bio: softwareEngineerBio,
@@ -37,13 +31,13 @@ const roles = [
     bio: digitalArtistBio,
     skills: [Skill.gameDevelopment, Skill.videoEditing, Skill.uiUxDesign],
   },
-] as const;
+];
 
 const mtgSimulatorHref = withAccessCode(
   'https://voidscribestudios.itch.io/mtg-simulator',
 );
 
-const portfolio = [
+const portfolio: PortfolioEntry[] = [
   {
     href: 'https://www.linkedin.com/in/kyle-n-rudd/',
     callToAction: 'View profile',
@@ -79,12 +73,12 @@ const portfolio = [
     skills: [Skill.videoEditing, Skill.mixtapeProduction],
     description: familyTripMixDescription,
   },
-] as const;
+];
 
-export const kyleRudd = {
+export const kyleRudd: Profile = {
   name,
   bio: generalBio,
   roles,
   tagline: `${new Intl.ListFormat('en').format(roles.map((role) => role.name))}.`,
   portfolio,
-} as const;
+};

@@ -7,8 +7,8 @@
   import type { PortfolioEntry, Role } from '../lib/portfolio';
 
   interface Props {
-    items: readonly PortfolioEntry[];
-    roles: readonly Role[];
+    items: PortfolioEntry[];
+    roles: Role[];
   }
 
   let { items, roles }: Props = $props();

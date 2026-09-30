@@ -4,7 +4,7 @@
   import type { Role } from '../lib/portfolio';
 
   interface Props {
-    roles: readonly Role[];
+    roles: Role[];
   }
 
   let { roles }: Props = $props();

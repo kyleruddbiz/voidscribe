@@ -1,11 +1,11 @@
 <script lang="ts">
   import { wholeCardLink } from '../lib/whole-card-link';
-  import type { PortfolioEntry } from '../lib/portfolio';
+  import type { PortfolioEntry, Skill } from '../lib/portfolio';
   import ExpandableText from './ExpandableText.svelte';
   import SkillChips from './SkillChips.svelte';
 
   interface Props extends PortfolioEntry {
-    activeSkills?: readonly string[];
+    activeSkills?: Skill[];
     isDimmed?: boolean;
   }
 

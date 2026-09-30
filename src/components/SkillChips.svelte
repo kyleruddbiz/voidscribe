@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { Skill } from '../lib/portfolio';
+
   interface Props {
-    skills: readonly string[];
-    activeSkills?: readonly string[];
+    skills: Skill[];
+    activeSkills?: Skill[];
     isRevealed?: boolean;
   }
 

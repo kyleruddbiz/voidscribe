@@ -5,7 +5,7 @@
 
   interface Props {
     bio: string;
-    roles: readonly Role[];
+    roles: Role[];
   }
 
   let { bio, roles }: Props = $props();

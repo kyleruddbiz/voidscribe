@@ -16,8 +16,6 @@ interface TextState {
 type FocusTarget = typeof showMoreSelector | typeof showLessSelector;
 
 export class ExpandableTextController {
-  isIntroCompleted = $state(false);
-
   private container?: HTMLElement;
   private template?: HTMLTemplateElement;
   private crossfade?: LayerCrossfade;
@@ -27,8 +25,12 @@ export class ExpandableTextController {
   private lastWidth = -1;
   private latestTransitionId = 0;
   private isTransitioning = false;
+  private isIntroCompleted = false;
 
-  constructor(initialHtml: string) {
+  constructor(
+    initialHtml: string,
+    private readonly onIntroCompleted?: () => void,
+  ) {
     this.requestedHtml = initialHtml;
   }
 
@@ -145,9 +147,18 @@ export class ExpandableTextController {
       return;
     }
 
-    this.isIntroCompleted = true;
+    this.completeIntro();
     this.isTransitioning = false;
     this.retruncateIfWidthChanged();
+  }
+
+  private completeIntro() {
+    if (this.isIntroCompleted) {
+      return;
+    }
+
+    this.isIntroCompleted = true;
+    this.onIntroCompleted?.();
   }
 
   private moveFocus(layer: HTMLElement, target?: FocusTarget) {

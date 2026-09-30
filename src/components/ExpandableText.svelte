@@ -6,24 +6,18 @@
     html: string;
     id: string;
     labelledBy?: string;
-    isIntroCompleted?: boolean;
+    onIntroCompleted?: () => void;
   }
 
-  let {
-    html,
-    id,
-    labelledBy,
-    // eslint-disable-next-line no-useless-assignment -- written by the effect below
-    isIntroCompleted = $bindable(),
-  }: Props = $props();
+  let { html, id, labelledBy, onIntroCompleted }: Props = $props();
 
   const initialHtml = untrack(() => html);
-  const controller = new ExpandableTextController(initialHtml);
+  const controller = new ExpandableTextController(
+    initialHtml,
+    onIntroCompleted,
+  );
 
   $effect(() => controller.show(html));
-  $effect(() => {
-    isIntroCompleted = controller.isIntroCompleted;
-  });
 
   let container = $state<HTMLDivElement>();
   let template = $state<HTMLTemplateElement>();

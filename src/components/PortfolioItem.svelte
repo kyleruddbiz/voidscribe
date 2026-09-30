@@ -59,7 +59,7 @@
             html={fullHtml}
             id={descriptionId}
             labelledBy={titleId}
-            bind:isIntroCompleted
+            onIntroCompleted={() => (isIntroCompleted = true)}
           />
         </div>
       {/if}

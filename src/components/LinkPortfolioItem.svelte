@@ -29,6 +29,7 @@
 
   const fullHtml = $derived((description ?? '').trim());
   let isIntroCompleted = $state(false);
+  let isExpanded = $state(false);
   let linkElement = $state<HTMLAnchorElement>();
 </script>
 
@@ -42,7 +43,7 @@
   {@attach wholeCardLink(() => linkElement)}
 >
   {#if preview}
-    <div class="item-preview">
+    <div class="item-preview" class:is-strip={isExpanded}>
       <img
         src={preview.src}
         srcset={preview.srcset}
@@ -72,6 +73,7 @@
             id={descriptionId}
             labelledBy={titleId}
             onIntroCompleted={() => (isIntroCompleted = true)}
+            onExpandedChange={(expanded) => (isExpanded = expanded)}
           />
         </div>
       {/if}
@@ -84,6 +86,7 @@
   :global(.item.has-preview) {
     --preview-size: 6rem;
     --banner-height: 10rem;
+    --preview-morph: 600ms ease;
     --content-offset: calc(var(--preview-size) + 1rem);
   }
 
@@ -95,7 +98,21 @@
     height: var(--preview-size);
     overflow: hidden;
     border-radius: 2px;
-    transition: var(--fade-in);
+    transition:
+      var(--fade-in),
+      top var(--preview-morph),
+      left var(--preview-morph),
+      width var(--preview-morph),
+      height var(--preview-morph),
+      border-radius var(--preview-morph);
+  }
+
+  .item-preview.is-strip {
+    top: 0;
+    left: 0;
+    width: calc(var(--content-offset) + var(--card-padding-x) - 1.25rem);
+    height: 100%;
+    border-radius: 3px 0 0 3px;
   }
 
   .item-preview img {
@@ -171,7 +188,8 @@
   }
 
   @media (max-width: 480px) {
-    .item-preview {
+    .item-preview,
+    .item-preview.is-strip {
       top: 0;
       left: 0;
       width: 100%;

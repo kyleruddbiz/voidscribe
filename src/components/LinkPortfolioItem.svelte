@@ -92,7 +92,7 @@
 
   .item-preview {
     position: absolute;
-    top: 1rem;
+    top: calc(50% - 0.25rem - var(--preview-size) / 2);
     left: var(--card-padding-x);
     width: var(--preview-size);
     height: var(--preview-size);

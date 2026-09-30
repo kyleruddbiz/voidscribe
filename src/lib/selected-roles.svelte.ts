@@ -1,4 +1,6 @@
-class SelectedRoles {
+import { createContext } from 'svelte';
+
+export class SelectedRoles {
   names = $state<string[]>([]);
 
   has(name: string) {
@@ -16,4 +18,5 @@ class SelectedRoles {
   }
 }
 
-export const selectedRoles = new SelectedRoles();
+export const [getSelectedRoles, setSelectedRoles] =
+  createContext<SelectedRoles>();

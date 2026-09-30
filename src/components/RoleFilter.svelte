@@ -1,6 +1,6 @@
 <script lang="ts">
   import { hasTextSelection } from '../lib/selection';
-  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
 
   interface Props {
@@ -8,6 +8,7 @@
   }
 
   let { roles }: Props = $props();
+  const selectedRoles = getSelectedRoles();
   const primary = $derived(roles[0]);
   const rest = $derived(roles.slice(1));
 

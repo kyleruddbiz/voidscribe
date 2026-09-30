@@ -3,7 +3,7 @@
   import { cubicOut } from 'svelte/easing';
   import { onMount } from 'svelte';
   import PortfolioItem from './PortfolioItem.svelte';
-  import { selectedRoles } from '../lib/selected-roles.svelte';
+  import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { PortfolioEntry, Role } from '../lib/portfolio';
 
   interface Props {
@@ -12,6 +12,7 @@
   }
 
   let { items, roles }: Props = $props();
+  const selectedRoles = getSelectedRoles();
 
   const activeSkills = $derived([
     ...new Set(

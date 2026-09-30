@@ -1,0 +1,31 @@
+---
+import { landingSlugs } from '../content/landing-slugs';
+
+const destination = (slug: string) => `/kyle-rudd?role=${slug}`;
+const fallback = destination(landingSlugs[0]);
+const destinations = landingSlugs.map(destination);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d0e12" />
+    <meta name="robots" content="noindex" />
+    <title>Void Scribe Studios</title>
+    <noscript>
+      <meta http-equiv="refresh" content={`0; url=${fallback}`} />
+    </noscript>
+    <style>
+      html {
+        background: #0d0e12;
+      }
+    </style>
+    <script is:inline define:vars={{ destinations }}>
+      const pick = Math.floor(Math.random() * destinations.length);
+      location.replace(destinations[pick]);
+    </script>
+  </head>
+  <body></body>
+</html>

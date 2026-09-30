@@ -3,9 +3,11 @@ import { defineConfig, envField } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 
+const site = 'https://voidscribestudios.com';
+
 export default defineConfig({
-  site: 'https://voidscribestudios.com',
-  integrations: [svelte(), sitemap()],
+  site,
+  integrations: [svelte(), sitemap({ filter: (page) => page !== `${site}/` })],
   env: {
     schema: {
       ITCH_ACCESS_CODE: envField.string({
@@ -13,8 +15,5 @@ export default defineConfig({
         access: 'public',
       }),
     },
-  },
-  redirects: {
-    '/': '/kyle-rudd?role=all',
   },
 });

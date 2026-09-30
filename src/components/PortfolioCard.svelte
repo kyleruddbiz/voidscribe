@@ -12,14 +12,21 @@
     children: Snippet;
   }
 
-  let { skills, activeSkills, isDimmed, isSettled, children, ...rest }: Props =
-    $props();
+  let {
+    skills,
+    activeSkills,
+    isDimmed,
+    isSettled,
+    children,
+    class: className,
+    ...rest
+  }: Props = $props();
   let hasWrappedSkills = $state(false);
 </script>
 
 <div
   {...rest}
-  class="item"
+  class={['item', className]}
   class:is-dimmed={isDimmed}
   class:is-settled={isSettled}
   class:has-wrapped-skills={hasWrappedSkills}

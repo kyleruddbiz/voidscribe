@@ -32,6 +32,7 @@ export class ExpandableTextController {
     private readonly template: HTMLTemplateElement,
     initialHtml: string,
     private readonly onIntroCompleted?: () => void,
+    private readonly onExpandedChange?: (isExpanded: boolean) => void,
   ) {
     this.crossfade = new LayerCrossfade(container, initialLayer);
     container.addEventListener('click', this.onClick);
@@ -65,6 +66,7 @@ export class ExpandableTextController {
     }
 
     this.currentTextState.isExpanded = true;
+    this.onExpandedChange?.(true);
     this.transitionTo(this.currentTextState, showLessSelector);
   }
 
@@ -74,6 +76,7 @@ export class ExpandableTextController {
     }
 
     this.currentTextState.isExpanded = false;
+    this.onExpandedChange?.(false);
     this.transitionTo(this.currentTextState, showMoreSelector);
   }
 

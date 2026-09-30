@@ -7,9 +7,11 @@
     id: string;
     labelledBy?: string;
     onIntroCompleted?: () => void;
+    onExpandedChange?: (isExpanded: boolean) => void;
   }
 
-  let { html, id, labelledBy, onIntroCompleted }: Props = $props();
+  let { html, id, labelledBy, onIntroCompleted, onExpandedChange }: Props =
+    $props();
 
   const initialHtml = untrack(() => html);
 
@@ -27,6 +29,7 @@
       template,
       initialHtml,
       onIntroCompleted,
+      onExpandedChange,
     );
     controller = mounted;
 

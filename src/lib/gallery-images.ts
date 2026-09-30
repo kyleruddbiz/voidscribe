@@ -1,6 +1,6 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import type { GalleryImage } from './portfolio';
+import type { GalleryImage, ResponsiveImage } from './portfolio';
 
 export interface GalleryEntry {
   image: ImageMetadata;
@@ -9,18 +9,31 @@ export interface GalleryEntry {
 
 const thumbnailWidths = [320, 640];
 const thumbnailSizes = '(max-width: 480px) 45vw, 10rem';
+const previewWidths = [480, 960, 1280];
 const maxFullWidth = 2400;
+
+const buildResponsiveImage = async (
+  image: ImageMetadata,
+  widths: number[],
+  sizes: string,
+): Promise<ResponsiveImage> => {
+  const built = await getImage({ src: image, format: 'webp', widths, sizes });
+
+  return { src: built.src, srcset: built.srcSet.attribute, sizes };
+};
+
+export const buildPreview = (image: ImageMetadata) =>
+  buildResponsiveImage(image, previewWidths, '(max-width: 480px) 100vw, 40rem');
 
 const buildImage = async ({
   image,
   alt,
 }: GalleryEntry): Promise<GalleryImage> => {
-  const thumbnail = await getImage({
-    src: image,
-    format: 'webp',
-    widths: thumbnailWidths,
-    sizes: thumbnailSizes,
-  });
+  const thumbnail = await buildResponsiveImage(
+    image,
+    thumbnailWidths,
+    thumbnailSizes,
+  );
   const full = await getImage({
     src: image,
     format: 'webp',
@@ -29,11 +42,7 @@ const buildImage = async ({
 
   return {
     alt,
-    thumbnail: {
-      src: thumbnail.src,
-      srcset: thumbnail.srcSet.attribute,
-      sizes: thumbnailSizes,
-    },
+    thumbnail,
     full: {
       src: full.src,
       width: Number(full.attributes.width),

@@ -19,7 +19,7 @@
   setSelectedRoles(selectedRoles);
 
   onMount(async () => {
-    selectedRoles.applyFromUrl(profile.roles);
+    selectedRoles.applyFromUrl(profile.roles, profile.defaultRole);
     await tick();
     selectedRoles.isSettled = true;
     document.documentElement.classList.remove('role-pending');

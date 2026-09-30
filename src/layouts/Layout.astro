@@ -35,11 +35,7 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
     <meta name="description" content={description} />
     <script is:inline>
       const root = document.documentElement;
-      root.classList.add('js');
-
-      if (new URLSearchParams(location.search).has('role')) {
-        root.classList.add('role-pending');
-      }
+      root.classList.add('js', 'role-pending');
     </script>
     <link rel="canonical" href={canonical} />
     <title>{pageTitle}</title>

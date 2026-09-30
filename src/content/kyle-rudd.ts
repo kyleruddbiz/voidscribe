@@ -4,7 +4,7 @@ import {
   linkedinIconPath,
   youtubeIconPath,
 } from '../lib/simple-icons';
-import { Skill } from '../lib/portfolio';
+import { RoleName, Skill } from '../lib/portfolio';
 import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
 import { withAccessCode } from '../lib/itch-access';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
@@ -17,17 +17,17 @@ const name = 'Kyle Rudd';
 
 const roles: Role[] = [
   {
-    name: 'Software Engineer',
+    name: RoleName.softwareEngineer,
     bio: softwareEngineerBio,
     skills: [Skill.softwareEngineering, Skill.gameDevelopment],
   },
   {
-    name: 'Music Producer',
+    name: RoleName.musicProducer,
     bio: musicProducerBio,
     skills: [Skill.mixtapeProduction],
   },
   {
-    name: 'Digital Artist',
+    name: RoleName.digitalArtist,
     bio: digitalArtistBio,
     skills: [Skill.gameDevelopment, Skill.videoEditing, Skill.uiUxDesign],
   },
@@ -79,6 +79,7 @@ export const kyleRudd: Profile = {
   name,
   bio: generalBio,
   roles,
+  defaultRole: RoleName.softwareEngineer,
   tagline: `${new Intl.ListFormat('en').format(roles.map((role) => role.name))}.`,
   portfolio,
 };

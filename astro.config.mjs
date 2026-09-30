@@ -15,6 +15,6 @@ export default defineConfig({
     },
   },
   redirects: {
-    '/': '/kyle-rudd',
+    '/': '/kyle-rudd?role=all',
   },
 });

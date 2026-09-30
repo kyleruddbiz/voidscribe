@@ -1,5 +1,5 @@
 import { createContext } from 'svelte';
-import type { Role } from './portfolio';
+import type { Role, RoleName } from './portfolio';
 
 const roleParam = 'role';
 
@@ -29,14 +29,21 @@ export class SelectedRoles {
     this.writeUrl();
   }
 
-  applyFromUrl(roles: Role[]) {
-    const slugs = new URLSearchParams(location.search).getAll(roleParam);
+  applyFromUrl(roles: Role[], defaultRole?: RoleName) {
+    const params = new URLSearchParams(location.search);
+    const hasRoleParam = params.has(roleParam);
+    const fallbackSlugs = defaultRole ? [slugFor(defaultRole)] : [];
+    const slugs = hasRoleParam ? params.getAll(roleParam) : fallbackSlugs;
     const known = slugs
       .map((slug) => roles.find((role) => slugFor(role.name) === slug))
       .filter((role) => role !== undefined);
 
     this.names = known.slice(0, 1).map((role) => role.name);
     this.introNames = this.names;
+
+    if (!hasRoleParam) {
+      this.writeUrl();
+    }
   }
 
   private writeUrl() {

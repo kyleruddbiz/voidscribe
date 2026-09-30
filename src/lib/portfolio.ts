@@ -18,8 +18,16 @@ export interface PortfolioEntry {
   skills: Skill[];
 }
 
+export const RoleName = {
+  softwareEngineer: 'Software Engineer',
+  musicProducer: 'Music Producer',
+  digitalArtist: 'Digital Artist',
+} as const;
+
+export type RoleName = (typeof RoleName)[keyof typeof RoleName];
+
 export interface Role {
-  name: string;
+  name: RoleName;
   bio: string;
   skills: Skill[];
 }
@@ -29,5 +37,6 @@ export interface Profile {
   tagline: string;
   bio: string;
   roles: Role[];
+  defaultRole?: RoleName;
   portfolio: PortfolioEntry[];
 }

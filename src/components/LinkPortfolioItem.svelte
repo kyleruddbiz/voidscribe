@@ -39,7 +39,7 @@
   {isDimmed}
   isSettled={isIntroCompleted}
   class={preview && 'has-preview'}
-  style="--skills-cursor: pointer; --skills-pointer-events: auto"
+  style="--skills-cursor: pointer; --skills-pointer-events: auto; --skills-inset-right: 12rem"
   {@attach wholeCardLink(() => linkElement)}
 >
   {#if preview}
@@ -78,7 +78,7 @@
         </div>
       {/if}
     </div>
-    <span class="item-meta">{callToAction} &rarr;</span>
+    <span class="item-meta">{callToAction} &nearr;</span>
   </div>
 </PortfolioCard>
 
@@ -129,15 +129,13 @@
 
   .item-row {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .item-content {
-    flex: 1 1 auto;
     min-width: 0;
-    padding-right: 1.5rem;
   }
 
   :global(.has-preview) .item-row {
@@ -166,12 +164,15 @@
     color: var(--color-accent-bright);
     font-size: 0.9rem;
     white-space: nowrap;
-    flex-shrink: 0;
+    align-self: flex-end;
+    margin-right: -0.5rem;
+    margin-bottom: -1.25rem;
     transition: var(--fade-in);
   }
 
   .item-description {
     --collapsed-lines: 3;
+    max-width: 56ch;
     margin: 0.4rem 0 0;
     color: var(--color-text-dim);
     font-size: 0.9rem;
@@ -211,7 +212,6 @@
     }
 
     .item-content {
-      padding-right: 0;
       order: 1;
     }
 
@@ -228,7 +228,10 @@
     }
 
     .item-meta {
+      align-self: stretch;
       margin-top: 0.75rem;
+      margin-right: 0;
+      margin-bottom: 0;
       text-align: center;
       white-space: normal;
       order: 3;

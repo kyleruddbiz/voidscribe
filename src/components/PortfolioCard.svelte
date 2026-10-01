@@ -82,7 +82,7 @@
     --chips-wrap-start: var(--card-padding-x);
     position: absolute;
     left: var(--card-padding-x);
-    right: var(--card-padding-x);
+    right: calc(var(--card-padding-x) + var(--skills-inset-right, 0px));
     top: 100%;
     z-index: 1;
     cursor: var(--skills-cursor, auto);

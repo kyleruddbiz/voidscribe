@@ -26,11 +26,25 @@ Inline comments are still acceptable when the code is genuinely complex, or when
 
 ## Testing changes
 
-Verify UI/content changes in the browser (`claude-in-chrome` tools) before calling them done:
+Verify UI/content changes in the browser (`claude-in-chrome` tools) before calling them done.
 
-1. Start the dev server.
-2. Load `localhost:4321`.
-3. Check rendering, console, and interactions.
+### Set up before editing code
+
+If the task will need browser testing, set up the test environment **before any code edit**:
+
+1. Run `powershell -File scripts/start-test-env.ps1`. It gets Chrome and the dev server running, configured so the tab keeps rendering when other windows cover it. Don't ask the user to launch Chrome. Don't minimize the window.
+2. `tabs_context_mcp` / `tabs_create_mcp`, then navigate to `http://localhost:4321`.
+3. Select the tab. New tabs open in the background, where `document.hidden` is `true` and `ResizeObserver`, `requestAnimationFrame` and CSS transitions are paused.
+   1. Stamp a unique title with the JS tool: `document.title = 'mcp-tab-<tabId>'`.
+   2. Run `powershell -File scripts/select-chrome-tab.ps1 -Title mcp-tab-<tabId>`.
+   3. Reload the page to restore the real title.
+   4. Confirm `document.hidden === false`.
+4. Only if step 3 fails, ask the user to click the tab now, before starting the code work, so they can step away.
+
+### Checking the change
+
+1. Load `localhost:4321`.
+2. Check rendering, console, and interactions.
 
 Leave the dev server running and the browser tab open when you're done testing. Reuse the same tab for further checks. Close things down only if asked — see [If asked to close the browser down](#if-asked-to-close-the-browser-down).
 
@@ -56,8 +70,7 @@ The same technique also tests width-dependent JS, like description truncation: s
 
 ### Browser tools report "not connected"
 
-1. Launch Chrome yourself, don't ask the user to: `"/c/Program Files/Google/Chrome/Application/chrome.exe"` (Bash).
-2. Wait a couple seconds, then retry `tabs_context_mcp`.
+Run `scripts/start-test-env.ps1` yourself — see step 1 of [Set up before editing code](#set-up-before-editing-code).
 
 ### A resize/animation/timer-dependent check silently does nothing
 
@@ -65,4 +78,4 @@ The same technique also tests width-dependent JS, like description truncation: s
 
 **Unaffected:** screenshots, clicks, JS exec, DOM reads, and the pure CSS `@media` checks in [Testing responsive/mobile layouts](#testing-responsivemobile-layouts).
 
-**Fix:** confirm with `document.hidden` (JS tool). No tool can select a tab — ask the user to click it in Chrome's tab strip.
+**Fix:** confirm with `document.hidden` (JS tool). Re-run the tab selection from step 3 of [Set up before editing code](#set-up-before-editing-code) — the tab loses selection if the user switches tabs. Only if that fails, ask the user to click the tab in Chrome's tab strip.

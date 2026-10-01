@@ -2,6 +2,7 @@ import {
   githubIconPath,
   itchIoIconPath,
   linkedinIconPath,
+  soundcloudIconPath,
   youtubeIconPath,
 } from '../lib/simple-icons';
 import { RoleName, Skill } from '../lib/portfolio';
@@ -10,6 +11,9 @@ import { withAccessCode } from '../lib/itch-access';
 import { aetherealArtIconPath } from '../lib/custom-icons';
 import { buildGallery, buildPreview } from '../lib/gallery-images';
 import { aetherealArt } from './kyle-rudd/aethereal-art';
+import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
+import synthesisImage from './kyle-rudd/synthesis.jpg';
+import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
 import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
@@ -28,7 +32,7 @@ const roles: Role[] = [
   {
     name: RoleName.musicProducer,
     bio: musicProducerBio,
-    skills: [Skill.mixtapeProduction],
+    skills: [Skill.mixtapeProduction, Skill.musicProduction, Skill.songwriting],
   },
   {
     name: RoleName.digitalArtist,
@@ -78,6 +82,36 @@ const portfolio: PortfolioEntry[] = [
     skills: [Skill.gameDevelopment],
     description:
       'A learning project to practice Unity 3D, online multiplayer, and game architecture.',
+  },
+  {
+    kind: 'link',
+    href: 'https://soundcloud.com/eszense/newtons-flaming-laser-sword',
+    callToAction: 'Listen on SoundCloud',
+    icon: soundcloudIconPath,
+    title: "Newton's Flaming Laser Sword",
+    skills: [Skill.musicProduction, Skill.songwriting],
+    description: 'Coming soon.',
+    preview: await buildPreview(newtonsFlamingLaserSwordImage),
+  },
+  {
+    kind: 'link',
+    href: 'https://on.soundcloud.com/D8LmqAx94iJ004q58i',
+    callToAction: 'Listen on SoundCloud',
+    icon: soundcloudIconPath,
+    title: '[Work In Progress] Synthesis',
+    skills: [Skill.musicProduction, Skill.songwriting],
+    description: 'Coming soon.',
+    preview: await buildPreview(synthesisImage),
+  },
+  {
+    kind: 'link',
+    href: 'https://soundcloud.com/eszense/the-fox-knows?in=eszense/sets/zombies-from-the-song-graveyard',
+    callToAction: 'Listen on SoundCloud',
+    icon: soundcloudIconPath,
+    title: 'The Fox Knows',
+    skills: [Skill.musicProduction, Skill.songwriting],
+    description: 'Coming soon.',
+    preview: await buildPreview(theFoxKnowsImage),
   },
   {
     kind: 'link',

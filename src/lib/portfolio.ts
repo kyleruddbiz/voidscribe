@@ -4,6 +4,8 @@ export const Skill = {
   uiUxDesign: 'UI/UX Design',
   videoEditing: 'Video Editing',
   mixtapeProduction: 'Mixtape Production',
+  musicProduction: 'Music Production',
+  songwriting: 'Songwriting',
   digitalCollage: 'Digital Collage',
   photoManipulation: 'Photo Manipulation',
   surrealismGlitch: 'Surrealism & Glitch',

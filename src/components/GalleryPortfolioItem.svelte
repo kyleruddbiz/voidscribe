@@ -146,13 +146,16 @@
   .grid-wrapper {
     --collapsed-height: 12rem;
     margin-top: 1rem;
-    max-height: var(--collapsed-height);
-    overflow: hidden;
-    mask-image: linear-gradient(to bottom, #000 60%, transparent);
     transition: max-height 0.35s ease;
   }
 
-  .grid-wrapper.is-expanded {
+  :global(.js) .grid-wrapper {
+    max-height: var(--collapsed-height);
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  }
+
+  :global(.js) .grid-wrapper.is-expanded {
     max-height: var(--expanded-height, none);
     mask-image: none;
   }

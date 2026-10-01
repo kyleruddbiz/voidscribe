@@ -1,7 +1,7 @@
 export const landingSlugs = [
-  'as-above-so-below',
-  'would-you-kindly',
-  'the-dice',
+  'the-bones',
+  'those-dice',
+  'over',
   'shameless-reimagineer',
-  'cartographer',
+  'silent-cartographer',
 ] as const;

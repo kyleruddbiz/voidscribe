@@ -1,5 +1,6 @@
 export const Skill = {
   softwareEngineering: 'Software Engineering',
+  architectureDesign: 'Architecture & Design',
   gameDevelopment: 'Game Development',
   uiUxDesign: 'UI/UX Design',
   videoEditing: 'Video Editing',

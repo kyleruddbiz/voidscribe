@@ -11,6 +11,7 @@ import { withAccessCode } from '../lib/itch-access';
 import { aetherealArtIconPath } from '../lib/custom-icons';
 import { buildGallery, buildPreview } from '../lib/gallery-images';
 import { aetherealArt } from './kyle-rudd/aethereal-art';
+import linkedinImage from './kyle-rudd/linkedin.jpg';
 import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
 import synthesisImage from './kyle-rudd/synthesis.jpg';
 import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
@@ -27,7 +28,11 @@ const roles: Role[] = [
   {
     name: RoleName.softwareEngineer,
     bio: softwareEngineerBio,
-    skills: [Skill.softwareEngineering, Skill.gameDevelopment],
+    skills: [
+      Skill.softwareEngineering,
+      Skill.architectureDesign,
+      Skill.gameDevelopment,
+    ],
   },
   {
     name: RoleName.musicProducer,
@@ -59,9 +64,10 @@ const portfolio: PortfolioEntry[] = [
     callToAction: 'View profile',
     icon: linkedinIconPath,
     title: 'LinkedIn',
-    skills: [Skill.softwareEngineering],
+    skills: [Skill.softwareEngineering, Skill.architectureDesign],
     description:
       "See what I've been up to as a professional software engineer.",
+    preview: await buildPreview(linkedinImage),
   },
   {
     kind: 'link',

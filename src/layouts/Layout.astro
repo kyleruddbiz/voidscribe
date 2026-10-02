@@ -14,6 +14,11 @@ const canonical = new URL(
   Astro.url.pathname.replace(/\.html$/, ''),
   Astro.site,
 );
+const currentYear = new Date().getFullYear();
+const copyrightYears =
+  currentYear > site.copyrightStartYear
+    ? `${site.copyrightStartYear}-${currentYear}`
+    : `${site.copyrightStartYear}`;
 const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
 ---
 
@@ -88,7 +93,7 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
         >
           Garrett Christensen
         </a>
-        . &copy; {new Date().getFullYear()} {site.name}.
+        . &copy; {copyrightYears} {site.name}.
       </p>
     </footer>
   </body>

@@ -13,6 +13,7 @@ import { buildGallery, buildPreview } from '../lib/gallery-images';
 import { aetherealArt } from './kyle-rudd/aethereal-art';
 import linkedinImage from './kyle-rudd/linkedin.jpg';
 import voidScribeStudiosImage from './kyle-rudd/void-scribe-studios.jpg';
+import mtgSimulatorImage from './kyle-rudd/mtg-simulator.jpg';
 import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
 import synthesisImage from './kyle-rudd/synthesis.jpg';
 import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
@@ -90,6 +91,7 @@ const portfolio: PortfolioEntry[] = [
     skills: [Skill.gameDevelopment],
     description:
       'A learning project to practice Unity 3D, online multiplayer, and game architecture.',
+    preview: await buildPreview(mtgSimulatorImage),
   },
   {
     kind: 'link',

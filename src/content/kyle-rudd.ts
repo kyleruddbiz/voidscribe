@@ -115,7 +115,7 @@ const portfolio: PortfolioEntry[] = [
   },
   {
     kind: 'link',
-    href: 'https://soundcloud.com/eszense/the-fox-knows?in=eszense/sets/zombies-from-the-song-graveyard',
+    href: 'https://on.soundcloud.com/Hd8CN4KxjKU9v7lDgl',
     callToAction: 'Listen on SoundCloud',
     icon: soundcloudIconPath,
     title: 'The Fox Knows',

@@ -4,7 +4,7 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 ## Branching
 
-Trunk-based development. Commit directly to `main` unless told otherwise.
+Work on whichever branch is currently checked out. Commit and push there, and never create a new branch just to push a change unless told to. Trunk-based development: when `main` is checked out, commit directly to it.
 
 Push every commit immediately after making it.
 

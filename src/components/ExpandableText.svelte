@@ -88,7 +88,6 @@
   .expandable :global(.layer) {
     grid-area: 1 / 1;
     align-self: start;
-    mix-blend-mode: plus-lighter;
   }
 
   .expandable :global(.layer :where(p, blockquote)) {

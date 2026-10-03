@@ -128,7 +128,7 @@ const portfolio: PortfolioEntry[] = [
   },
   {
     kind: 'link',
-    href: 'https://on.soundcloud.com/Hd8CN4KxjKU9v7lDgl',
+    href: 'https://soundcloud.com/eszense/the-fox-knows',
     callToAction: 'Listen on SoundCloud',
     icon: soundcloudIconPath,
     title: 'The Fox Knows',

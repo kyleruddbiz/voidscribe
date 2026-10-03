@@ -34,13 +34,19 @@ const roles: Role[] = [
     skills: [
       Skill.softwareEngineering,
       Skill.architectureDesign,
+      Skill.agenticCoding,
       Skill.gameDevelopment,
     ],
   },
   {
     name: RoleName.musicProducer,
     bio: musicProducerBio,
-    skills: [Skill.mixtapeProduction, Skill.musicProduction, Skill.songwriting],
+    skills: [
+      Skill.mixtapeProduction,
+      Skill.musicProduction,
+      Skill.mixingMastering,
+      Skill.songwriting,
+    ],
   },
   {
     name: RoleName.digitalArtist,
@@ -67,7 +73,11 @@ const portfolio: PortfolioEntry[] = [
     callToAction: 'View profile',
     icon: linkedinIconPath,
     title: 'LinkedIn',
-    skills: [Skill.softwareEngineering, Skill.architectureDesign],
+    skills: [
+      Skill.softwareEngineering,
+      Skill.architectureDesign,
+      Skill.agenticCoding,
+    ],
     description:
       "See what I've been up to as a professional software engineer.",
     preview: await buildPreview(linkedinImage),
@@ -78,7 +88,7 @@ const portfolio: PortfolioEntry[] = [
     callToAction: 'View on GitHub',
     icon: githubIconPath,
     title: 'Void Scribe Studios',
-    skills: [Skill.softwareEngineering, Skill.uiUxDesign],
+    skills: [Skill.softwareEngineering, Skill.uiUxDesign, Skill.agenticCoding],
     description:
       'This website is my way of expressing my various skills, built with Astro, Svelte, and TypeScript. Check out the code on GitHub.',
     preview: await buildPreview(voidScribeStudiosImage),
@@ -90,7 +100,7 @@ const portfolio: PortfolioEntry[] = [
     callToAction: 'Play on itch.io',
     icon: itchIoIconPath,
     title: '<cite>Magic: The Gathering</cite> Simulator',
-    skills: [Skill.gameDevelopment],
+    skills: [Skill.gameDevelopment, Skill.agenticCoding],
     description:
       "I've spent a significant amount of time lately learning game development with Unity (and some Unreal Engine). This project was my way to pull those learnings together in one place without worrying about making a commercially viable product. This is in active development.",
     preview: await buildPreview(mtgSimulatorImage),
@@ -101,7 +111,7 @@ const portfolio: PortfolioEntry[] = [
     callToAction: 'Listen on SoundCloud',
     icon: soundcloudIconPath,
     title: "Newton's Flaming Laser Sword",
-    skills: [Skill.musicProduction, Skill.songwriting],
+    skills: [Skill.musicProduction, Skill.mixingMastering, Skill.songwriting],
     description: newtonsFlamingLaserSwordDescription,
     preview: await buildPreview(newtonsFlamingLaserSwordImage),
   },

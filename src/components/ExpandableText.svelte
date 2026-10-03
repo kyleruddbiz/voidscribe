@@ -105,6 +105,12 @@
     font-style: italic;
   }
 
+  .expandable :global(.layer blockquote footer) {
+    margin-top: 0.25em;
+    font-size: 0.9em;
+    font-style: normal;
+  }
+
   .expandable :global(.tail) {
     white-space: nowrap;
     font-style: normal;

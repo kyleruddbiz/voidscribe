@@ -19,6 +19,7 @@ import synthesisImage from './kyle-rudd/synthesis.jpg';
 import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
 import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
+import newtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
 import softwareEngineerBio from './kyle-rudd/bio/software-engineer.html?raw';
 import musicProducerBio from './kyle-rudd/bio/music-producer.html?raw';
@@ -78,7 +79,8 @@ const portfolio: PortfolioEntry[] = [
     icon: githubIconPath,
     title: 'Void Scribe Studios',
     skills: [Skill.softwareEngineering, Skill.uiUxDesign],
-    description: 'Coming Soon.',
+    description:
+      'This website is my way of expressing my various skills, built with Astro, Svelte, and TypeScript. Check out the code on GitHub.',
     preview: await buildPreview(voidScribeStudiosImage),
   },
   {
@@ -90,7 +92,7 @@ const portfolio: PortfolioEntry[] = [
     title: '<cite>Magic: The Gathering</cite> Simulator',
     skills: [Skill.gameDevelopment],
     description:
-      'A learning project to practice Unity 3D, online multiplayer, and game architecture.',
+      "I've spent a significant amount of time lately learning game development with Unity (and some Unreal Engine). This project was my way to pull those learnings together in one place without worrying about making a commercially viable product. This is in active development.",
     preview: await buildPreview(mtgSimulatorImage),
   },
   {
@@ -100,7 +102,7 @@ const portfolio: PortfolioEntry[] = [
     icon: soundcloudIconPath,
     title: "Newton's Flaming Laser Sword",
     skills: [Skill.musicProduction, Skill.songwriting],
-    description: 'Coming soon.',
+    description: newtonsFlamingLaserSwordDescription,
     preview: await buildPreview(newtonsFlamingLaserSwordImage),
   },
   {
@@ -110,7 +112,8 @@ const portfolio: PortfolioEntry[] = [
     icon: soundcloudIconPath,
     title: '[Work In Progress] Synthesis',
     skills: [Skill.musicProduction, Skill.songwriting],
-    description: 'Coming soon.',
+    description:
+      'I made this over numerous sessions while in Costa Rica for a music production retreat. It includes many foley sounds I recorded, such as birds and banging on metal. This one shows a lot of promise and I hope to finish it one day.',
     preview: await buildPreview(synthesisImage),
   },
   {
@@ -120,7 +123,8 @@ const portfolio: PortfolioEntry[] = [
     icon: soundcloudIconPath,
     title: 'The Fox Knows',
     skills: [Skill.musicProduction, Skill.songwriting],
-    description: 'Coming soon.',
+    description:
+      "An older song. It's a bit chaotic, but I still love this one.",
     preview: await buildPreview(theFoxKnowsImage),
   },
   {
@@ -142,7 +146,7 @@ const portfolio: PortfolioEntry[] = [
       Skill.photoManipulation,
       Skill.surrealismGlitch,
     ],
-    description: "Some of my favorite art pieces I've done.",
+    description: "Art pieces I've made over the years.",
     images: await buildGallery(aetherealArt),
   },
 ];

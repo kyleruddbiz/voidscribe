@@ -4,13 +4,11 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 ## Branching
 
-Work on whichever branch is currently checked out. Commit and push there, and never create a new branch just to push a change unless told to. Trunk-based development: when `main` is checked out, commit directly to it.
+Work on whichever branch is currently checked out, and never create a new branch unless told to.
 
-Push every commit immediately after making it.
+`main` is the live website. Never push to `main` until the user has reviewed the commits and given permission. Commit locally in the meantime.
 
-Single-commit task: review the change with the user before committing.
-
-Multi-commit task: commit and push each commit as you go, without pausing for review in between. The user reviews everything at the end.
+On any other branch, push each commit immediately.
 
 ## Code comments
 

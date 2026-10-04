@@ -39,6 +39,11 @@ Page content lives in `src/content/`:
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.
 
+## Tools
+
+Developer tooling lives in `tools/` with its own dependencies, such as converting video clips for the
+looping video component. See [tools/README.md](./tools/README.md).
+
 ## Workflow
 
 See [AGENTS.md](./AGENTS.md) for the branching model and the checks to run before calling a change done.

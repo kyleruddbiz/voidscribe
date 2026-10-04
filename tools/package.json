@@ -1,0 +1,11 @@
+{
+  "name": "voidscribe-tools",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "ffmpeg-static": "5.2.0"
+  },
+  "allowScripts": {
+    "ffmpeg-static@5.2.0": true
+  }
+}

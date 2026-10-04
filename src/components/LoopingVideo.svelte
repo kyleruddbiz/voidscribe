@@ -13,30 +13,16 @@
     class: className,
   }: Props = $props();
 
-  let video: HTMLVideoElement | undefined = $state();
   let isHydrated = $state(false);
-  let isPlaying = $state(false);
+  let isPaused = $state(true);
 
   onMount(() => {
     isHydrated = true;
   });
-
-  const toggle = () => {
-    if (!video) {
-      return;
-    }
-
-    if (video.paused) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  };
 </script>
 
 <div class="looping-video {className ?? ''}">
   <video
-    bind:this={video}
     {poster}
     {width}
     {height}
@@ -47,8 +33,7 @@
     controls={!isHydrated}
     aria-label={alt}
     aria-hidden={isHydrated || undefined}
-    onplay={() => (isPlaying = true)}
-    onpause={() => (isPlaying = false)}
+    bind:paused={isPaused}
   >
     {#each sources as source (source.src)}
       <source src={source.src} type={source.type} />
@@ -58,10 +43,10 @@
   {#if isHydrated}
     <button
       type="button"
-      class:playing={isPlaying}
-      aria-pressed={isPlaying}
+      class:playing={!isPaused}
+      aria-pressed={!isPaused}
       aria-label="Play animation: {alt}"
-      onclick={toggle}
+      onclick={() => (isPaused = !isPaused)}
     >
       <span class="icon icon-play" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>

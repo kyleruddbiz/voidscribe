@@ -41,8 +41,7 @@ because the content is authored in this repo, but don't feed it anything user-su
 
 ## Tools
 
-Developer tooling lives in `tools/` with its own dependencies, such as converting video clips for the
-looping video component. See [tools/README.md](./tools/README.md).
+Developer tooling lives in `tools/` with its own dependencies. See [tools/README.md](./tools/README.md).
 
 ## Workflow
 

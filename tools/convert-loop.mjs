@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { mkdirSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 
 const maxWidth = 960;
 const warnBytes = 3 * 1024 * 1024;
@@ -18,21 +19,6 @@ const loadFfmpeg = () => {
   }
 };
 
-const parseArgs = (argv) => {
-  const positional = [];
-  const options = {};
-
-  for (let i = 0; i < argv.length; i += 1) {
-    if (argv[i].startsWith('--')) {
-      options[argv[i].slice(2)] = argv[(i += 1)];
-    } else {
-      positional.push(argv[i]);
-    }
-  }
-
-  return { positional, options };
-};
-
 const run = (ffmpeg, args) => {
   const result = spawnSync(ffmpeg, ['-y', '-loglevel', 'error', ...args], {
     stdio: 'inherit',
@@ -43,14 +29,18 @@ const run = (ffmpeg, args) => {
   }
 };
 
-const formatSize = (path) => {
-  const { size } = statSync(path);
+const getFileSize = (path) => statSync(path).size;
 
-  return { size, label: `${(size / 1024).toFixed(0)} KB` };
-};
+const formatSize = (bytes) => `${(bytes / 1024).toFixed(0)} KB`;
 
 const main = () => {
-  const { positional, options } = parseArgs(process.argv.slice(2));
+  const { positionals: positional, values: options } = parseArgs({
+    allowPositionals: true,
+    options: {
+      start: { type: 'string' },
+      duration: { type: 'string' },
+    },
+  });
 
   if (positional.length !== 2) {
     throw new Error(usage);
@@ -67,6 +57,8 @@ const main = () => {
 
   mkdirSync(dirname(base), { recursive: true });
 
+  // ffmpeg options reference: https://ffmpeg.org/ffmpeg.html#Options
+  // H.264 encoding guide (crf, preset, profile, faststart): https://trac.ffmpeg.org/wiki/Encode/H.264
   run(ffmpeg, [
     ...trim,
     '-i',
@@ -101,13 +93,13 @@ const main = () => {
     `${base}.jpg`,
   ]);
 
-  const mp4 = formatSize(`${base}.mp4`);
-  const jpg = formatSize(`${base}.jpg`);
+  const mp4Size = getFileSize(`${base}.mp4`);
+  const jpgSize = getFileSize(`${base}.jpg`);
 
-  console.log(`${base}.mp4  ${mp4.label}`);
-  console.log(`${base}.jpg  ${jpg.label}`);
+  console.log(`${base}.mp4  ${formatSize(mp4Size)}`);
+  console.log(`${base}.jpg  ${formatSize(jpgSize)}`);
 
-  if (mp4.size > warnBytes) {
+  if (mp4Size > warnBytes) {
     console.warn('Warning: MP4 is over 3 MB. Trim the clip or shorten it.');
   }
 };

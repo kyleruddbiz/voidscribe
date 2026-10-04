@@ -36,6 +36,7 @@ export default [
   {
     files: ['tools/**/*.mjs'],
     languageOptions: { globals: globals.node },
+    rules: { 'no-console': 'off' },
   },
   {
     files: ['src/env.d.ts'],

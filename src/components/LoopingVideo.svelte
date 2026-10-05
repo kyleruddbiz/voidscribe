@@ -2,7 +2,11 @@
   import { onMount } from 'svelte';
   import type { LoopingVideo } from '../lib/looping-video';
 
-  type Props = LoopingVideo & { class?: string };
+  type Props = LoopingVideo & {
+    class?: string;
+    isPaused?: boolean;
+    onPlayRequested?: () => void;
+  };
 
   let {
     alt,
@@ -11,10 +15,19 @@
     height,
     sources,
     class: className,
+    isPaused = $bindable(true),
+    onPlayRequested,
   }: Props = $props();
 
   let isHydrated = $state(false);
-  let isPaused = $state(true);
+
+  const togglePlayback = () => {
+    isPaused = !isPaused;
+
+    if (!isPaused) {
+      onPlayRequested?.();
+    }
+  };
 
   onMount(() => {
     isHydrated = true;
@@ -46,7 +59,7 @@
       class:playing={!isPaused}
       aria-pressed={!isPaused}
       aria-label="Play animation: {alt}"
-      onclick={() => (isPaused = !isPaused)}
+      onclick={togglePlayback}
     >
       <span class="icon icon-play" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>

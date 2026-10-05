@@ -3,15 +3,15 @@
 
   interface Props {
     label: string;
+    isExpanded?: boolean;
     children: Snippet;
   }
 
-  let { label, children }: Props = $props();
+  let { label, isExpanded = $bindable(false), children }: Props = $props();
 
   const instanceId = $props.id();
   const contentId = `collapsible-media-${instanceId}`;
 
-  let isExpanded = $state(false);
   let isOverflowing = $state(false);
   let wrapperElement: HTMLDivElement;
   let contentElement: HTMLDivElement;
@@ -34,12 +34,6 @@
     measure();
     isExpanded = !isExpanded;
   };
-
-  const expand = () => {
-    if (!isExpanded) {
-      toggle();
-    }
-  };
 </script>
 
 <div
@@ -48,7 +42,7 @@
   bind:this={wrapperElement}
   style:--expanded-height={contentHeight && `${contentHeight}px`}
 >
-  <div id={contentId} bind:this={contentElement} onplaycapture={expand}>
+  <div id={contentId} bind:this={contentElement}>
     {@render children()}
   </div>
 </div>

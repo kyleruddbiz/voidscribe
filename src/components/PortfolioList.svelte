@@ -36,6 +36,10 @@
       : items,
   );
 
+  const firstDimmedItem = $derived(
+    isFiltering ? items.find((item) => !matchesFilter(item)) : undefined,
+  );
+
   const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce', false);
   const flipDuration = $derived(
     !reducedMotion.current && selectedRoles.isSettled ? 320 : 0,
@@ -46,6 +50,7 @@
   {#each orderedItems as item (item.title)}
     <div
       class="portfolio-card"
+      class:starts-dimmed-group={item === firstDimmedItem}
       animate:flip={{ duration: flipDuration, easing: cubicOut }}
     >
       {#if item.kind === 'gallery'}
@@ -70,5 +75,13 @@
     display: flex;
     flex-direction: column;
     gap: 1.75rem;
+  }
+
+  .portfolio-card {
+    transition: margin-top 0.25s ease;
+  }
+
+  .portfolio-card.starts-dimmed-group {
+    margin-top: 1.25rem;
   }
 </style>

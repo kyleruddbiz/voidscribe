@@ -70,7 +70,7 @@
   }
 
   .item.is-dimmed {
-    opacity: 0.45;
+    opacity: 0.3;
   }
 
   .item.is-dimmed:hover,

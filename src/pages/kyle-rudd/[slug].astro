@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import PortfolioPage from '../../components/PortfolioPage.svelte';
 import { kyleRudd } from '../../content/kyle-rudd';
+import { firstLandingHref } from '../../lib/landing-destination';
 import type { LinkPortfolioEntry } from '../../lib/portfolio';
 
 export function getStaticPaths() {
@@ -18,11 +19,27 @@ const plainTitle = entry.title.replace(/<[^>]*>/g, '');
 ---
 
 <Layout title={plainTitle} description={entry.description}>
-  <a slot="header-end" class="back-link" href="/kyle-rudd">
+  <a
+    slot="header-end"
+    class="back-link"
+    data-back-link
+    href={firstLandingHref()}
+  >
     &larr; Portfolio
   </a>
   <PortfolioPage {entry} />
 </Layout>
+
+<script>
+  import { randomLandingHref } from '../../lib/landing-destination';
+
+  const backLink =
+    document.querySelector<HTMLAnchorElement>('[data-back-link]');
+
+  if (backLink) {
+    backLink.href = randomLandingHref();
+  }
+</script>
 
 <style>
   .back-link {

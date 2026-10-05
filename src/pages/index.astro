@@ -1,9 +1,7 @@
 ---
-import { landingSlugs } from '../content/landing-slugs';
+import { firstLandingHref } from '../lib/landing-destination';
 
-const destination = (slug: string) => `/kyle-rudd?role=${slug}`;
-const fallback = destination(landingSlugs[0]);
-const destinations = landingSlugs.map(destination);
+const fallback = firstLandingHref();
 ---
 
 <!doctype html>
@@ -22,9 +20,10 @@ const destinations = landingSlugs.map(destination);
         background: #0d0e12;
       }
     </style>
-    <script is:inline define:vars={{ destinations }}>
-      const pick = Math.floor(Math.random() * destinations.length);
-      location.replace(destinations[pick]);
+    <script>
+      import { randomLandingHref } from '../lib/landing-destination';
+
+      location.replace(randomLandingHref());
     </script>
   </head>
   <body></body>

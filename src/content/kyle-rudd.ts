@@ -98,7 +98,7 @@ const portfolio: PortfolioEntry[] = [
     title: 'Void Scribe Studios',
     skills: [Skill.softwareEngineering, Skill.uiUxDesign, Skill.agenticCoding],
     description:
-      'What is this website? I have a very eclectic skillset and this can look like chaos at first glance. My aim is to remedy that chaos.',
+      'What is this website? I have a very eclectic skillset and this can look like chaos at first glance. My aim here is to remedy that chaos.',
     preview: await buildPreview(voidScribeStudiosImage),
   },
   {

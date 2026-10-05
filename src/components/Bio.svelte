@@ -48,6 +48,7 @@
       <CollapsibleMedia
         label={currentRole.video.alt}
         bind:isExpanded={mediaState.isExpanded}
+        onCollapse={() => (mediaState.isPaused = true)}
       >
         <LoopingVideo
           {...currentRole.video}

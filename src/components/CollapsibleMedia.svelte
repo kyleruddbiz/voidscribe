@@ -4,10 +4,16 @@
   interface Props {
     label: string;
     isExpanded?: boolean;
+    onCollapse?: () => void;
     children: Snippet;
   }
 
-  let { label, isExpanded = $bindable(false), children }: Props = $props();
+  let {
+    label,
+    isExpanded = $bindable(false),
+    onCollapse,
+    children,
+  }: Props = $props();
 
   const instanceId = $props.id();
   const contentId = `collapsible-media-${instanceId}`;
@@ -33,6 +39,10 @@
   const toggle = () => {
     measure();
     isExpanded = !isExpanded;
+
+    if (!isExpanded) {
+      onCollapse?.();
+    }
   };
 </script>
 

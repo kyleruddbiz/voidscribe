@@ -29,6 +29,8 @@
   };
 
   onMount(() => {
+    measure();
+
     const observer = new ResizeObserver(measure);
     observer.observe(wrapperElement);
     observer.observe(contentElement);

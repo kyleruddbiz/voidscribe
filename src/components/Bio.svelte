@@ -1,6 +1,9 @@
 <script lang="ts">
   import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
+  import { slide } from 'svelte/transition';
+  import { transitionDurationMs } from '../lib/layer-crossfade';
+  import CollapsibleMedia from './CollapsibleMedia.svelte';
   import LoopingVideo from './LoopingVideo.svelte';
   import ExpandableText from './ExpandableText.svelte';
 
@@ -15,6 +18,12 @@
   const instanceId = $props.id();
   const bioId = `bio-${instanceId}`;
 
+  const videoTransition = () => ({
+    duration: matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 0
+      : transitionDurationMs,
+  });
+
   const currentRole = $derived(
     roles.find((role) => role.name === selectedRoles.names[0]),
   );
@@ -23,7 +32,11 @@
 
 <div class="bio">
   {#if currentRole?.video}
-    <LoopingVideo {...currentRole.video} class="bio-video" />
+    <div class="bio-video" transition:slide={videoTransition()}>
+      <CollapsibleMedia label={currentRole.video.alt}>
+        <LoopingVideo {...currentRole.video} />
+      </CollapsibleMedia>
+    </div>
   {/if}
   <ExpandableText html={currentHtml} id={bioId} />
 </div>
@@ -34,7 +47,7 @@
     max-width: 38rem;
   }
 
-  .bio :global(.bio-video) {
+  .bio-video {
     margin-bottom: 0.75rem;
   }
 </style>

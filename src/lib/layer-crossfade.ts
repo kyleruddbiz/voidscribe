@@ -1,4 +1,4 @@
-const transitionDurationMs = 600;
+export const transitionDurationMs = 600;
 const transitionEasing = 'ease';
 const layerClassName = 'layer';
 

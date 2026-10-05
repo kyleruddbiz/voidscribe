@@ -5,6 +5,7 @@
   type Props = LoopingVideo & {
     class?: string;
     isPaused?: boolean;
+    currentTime?: number;
     onPlayRequested?: () => void;
   };
 
@@ -16,6 +17,7 @@
     sources,
     class: className,
     isPaused = $bindable(true),
+    currentTime = $bindable(0),
     onPlayRequested,
   }: Props = $props();
 
@@ -47,6 +49,7 @@
     aria-label={alt}
     aria-hidden={isHydrated || undefined}
     bind:paused={isPaused}
+    bind:currentTime
   >
     {#each sources as source (source.src)}
       <source src={source.src} type={source.type} />

@@ -24,7 +24,10 @@
       Object.fromEntries(
         roles
           .filter((role) => role.video)
-          .map((role) => [role.name, { isExpanded: false, isPaused: true }]),
+          .map((role) => [
+            role.name,
+            { isExpanded: false, isPaused: true, currentTime: 0 },
+          ]),
       ),
     ),
   );
@@ -53,6 +56,7 @@
         <LoopingVideo
           {...currentRole.video}
           bind:isPaused={mediaState.isPaused}
+          bind:currentTime={mediaState.currentTime}
           onPlayRequested={() => (mediaState.isExpanded = true)}
         />
       </CollapsibleMedia>

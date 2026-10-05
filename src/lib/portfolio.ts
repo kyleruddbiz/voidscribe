@@ -1,3 +1,5 @@
+import type { LoopingVideo } from './looping-video';
+
 export const Skill = {
   softwareEngineering: 'Software Engineering',
   architectureDesign: 'Architecture',
@@ -61,6 +63,7 @@ export type RoleName = (typeof RoleName)[keyof typeof RoleName];
 export interface Role {
   name: RoleName;
   bio: string;
+  video?: LoopingVideo;
   skills: Skill[];
 }
 

@@ -10,7 +10,10 @@ import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
 import { withAccessCode } from '../lib/itch-access';
 import { aetherealArtIconPath } from '../lib/custom-icons';
 import { buildGallery, buildPreview } from '../lib/gallery-images';
+import { buildLoopingVideo } from '../lib/looping-video';
 import { aetherealArt } from './kyle-rudd/aethereal-art';
+import djingInCostaRicaPoster from './kyle-rudd/djing-in-costa-rica.jpg';
+import djingInCostaRicaVideoUrl from './kyle-rudd/djing-in-costa-rica.mp4?url';
 import linkedinImage from './kyle-rudd/linkedin.jpg';
 import voidScribeStudiosImage from './kyle-rudd/void-scribe-studios.jpg';
 import mtgSimulatorImage from './kyle-rudd/mtg-simulator.jpg';
@@ -41,6 +44,11 @@ const roles: Role[] = [
   {
     name: RoleName.musicProducer,
     bio: musicProducerBio,
+    video: await buildLoopingVideo({
+      poster: djingInCostaRicaPoster,
+      sources: [{ src: djingInCostaRicaVideoUrl, type: 'video/mp4' }],
+      alt: 'DJing in Costa Rica',
+    }),
     skills: [
       Skill.mixtapeProduction,
       Skill.musicProduction,

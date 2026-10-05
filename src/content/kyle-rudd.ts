@@ -23,6 +23,7 @@ import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
 import voidScribeStudiosDescription from './kyle-rudd/void-scribe-studios.html?raw';
 import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
+import mtgSimulatorDescription from './kyle-rudd/mtg-simulator.html?raw';
 import newtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
 import softwareEngineerBio from './kyle-rudd/bio/software-engineer.html?raw';
@@ -114,8 +115,7 @@ const portfolio: PortfolioEntry[] = [
     icon: itchIoIconPath,
     title: '<cite>Magic: The Gathering</cite> Simulator',
     skills: [Skill.gameDevelopment, Skill.agenticCoding],
-    description:
-      'I’ve spent a significant amount of time lately learning game development with Unity (and some Unreal Engine). This project was my way to pull those learnings together in one place without worrying about making a commercially viable product. This is in active development.',
+    description: mtgSimulatorDescription,
     preview: await buildPreview(mtgSimulatorImage),
   },
   {

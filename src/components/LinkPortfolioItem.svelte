@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { portfolioPagePath } from '../lib/portfolio-page-path';
   import { wholeCardLink } from '../lib/whole-card-link';
   import type { LinkPortfolioEntry, Skill } from '../lib/portfolio';
   import ExpandableText from './ExpandableText.svelte';
@@ -19,6 +20,7 @@
     title,
     skills,
     preview,
+    page,
     activeSkills = [],
     isDimmed = false,
   }: Props = $props();
@@ -27,6 +29,7 @@
   const descriptionId = `portfolio-item-description-${instanceId}`;
   const titleId = `portfolio-item-title-${instanceId}`;
 
+  const linkHref = $derived(page ? portfolioPagePath(page.slug) : href);
   const fullHtml = $derived((description ?? '').trim());
   let isIntroCompleted = $state(false);
   let isExpanded = $state(false);
@@ -58,9 +61,9 @@
     <div class="item-content">
       <a
         class="overlay-link"
-        {href}
-        target="_blank"
-        {rel}
+        href={linkHref}
+        target={page ? undefined : '_blank'}
+        rel={page ? undefined : rel}
         draggable="false"
         bind:this={linkElement}
       >
@@ -78,7 +81,13 @@
         </div>
       {/if}
     </div>
-    <span class="item-meta">{callToAction} &nearr;</span>
+    <span class="item-meta">
+      {#if page}
+        Would you like to know more? &rarr;
+      {:else}
+        {callToAction} &nearr;
+      {/if}
+    </span>
   </div>
 </PortfolioCard>
 

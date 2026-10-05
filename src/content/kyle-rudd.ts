@@ -20,6 +20,7 @@ import mtgSimulatorImage from './kyle-rudd/mtg-simulator.jpg';
 import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
 import synthesisImage from './kyle-rudd/synthesis.jpg';
 import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
+import voidScribeStudiosDescription from './kyle-rudd/void-scribe-studios.html?raw';
 import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import newtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.html?raw';
@@ -98,8 +99,12 @@ const portfolio: PortfolioEntry[] = [
     title: 'Void Scribe Studios',
     skills: [Skill.softwareEngineering, Skill.uiUxDesign, Skill.agenticCoding],
     description:
-      'This website is my way of expressing my various skills, built with Astro, Svelte, and TypeScript. Check out the code on GitHub.',
+      'What is this website? I have a very eclectic skillset and this can look like chaos at first glance. My aim here is to remedy that chaos.',
     preview: await buildPreview(voidScribeStudiosImage),
+    page: {
+      slug: 'void-scribe-studios',
+      description: voidScribeStudiosDescription,
+    },
   },
   {
     kind: 'link',

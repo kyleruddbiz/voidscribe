@@ -1,0 +1,33 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PortfolioPage from '../../components/PortfolioPage.svelte';
+import { kyleRudd } from '../../content/kyle-rudd';
+import type { LinkPortfolioEntry } from '../../lib/portfolio';
+
+export function getStaticPaths() {
+  return kyleRudd.portfolio
+    .filter(
+      (entry): entry is LinkPortfolioEntry & { page: { slug: string } } =>
+        entry.kind === 'link' && entry.page !== undefined,
+    )
+    .map((entry) => ({ params: { slug: entry.page.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const plainTitle = entry.title.replace(/<[^>]*>/g, '');
+---
+
+<Layout title={plainTitle} description={entry.description}>
+  <a slot="header-end" class="back-link" href="/kyle-rudd">
+    &larr; Portfolio
+  </a>
+  <PortfolioPage {entry} />
+</Layout>
+
+<style>
+  .back-link {
+    color: var(--color-accent-bright);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+</style>

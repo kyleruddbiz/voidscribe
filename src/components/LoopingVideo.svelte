@@ -44,7 +44,7 @@
     muted
     loop
     playsinline
-    preload="none"
+    preload={currentTime > 0 ? 'auto' : 'none'}
     controls={!isHydrated}
     aria-label={alt}
     aria-hidden={isHydrated || undefined}

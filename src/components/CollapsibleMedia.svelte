@@ -87,7 +87,9 @@
 
   :global(.js) .wrapper.is-expanded {
     max-height: var(--expanded-height, none);
-    mask-image: none;
+    /* An opaque mask instead of `none` keeps the video out of Chrome’s
+       direct-composition overlay path, which flashes when the video unmounts. */
+    mask-image: linear-gradient(#000, #000);
   }
 
   .toggle-row {

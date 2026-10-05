@@ -16,6 +16,10 @@ Inline comments are a code smell. Resist the urge to fill the codebase with them
 
 Inline comments are still acceptable when the code is genuinely complex, or when they provide meaningful context the code can't express on its own (e.g. a browser quirk, a workaround, or the reason a non-obvious choice was made).
 
+## User-facing copy
+
+Use curly apostrophes (`’`) in all user-facing text — contractions and possessives alike (`I’ve`, `Newton’s`). Straight apostrophes (`'`) are for code only. Agents and editors tend to normalize to straight ones, so check pasted or generated copy.
+
 ## Before calling a change done
 
 1. Re-read your diff for comments and delete any that don't meet the bar in [Code comments](#code-comments).

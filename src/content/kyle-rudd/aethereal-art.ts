@@ -14,7 +14,7 @@ export const aetherealArt: GalleryEntry[] = [
   { image: frogGod, alt: 'Frog God' },
   { image: lighthouse, alt: 'Lighthouse' },
   { image: shatteredSouls, alt: 'Shattered Souls' },
-  { image: tomDidntDie, alt: "Tom Didn't Die" },
+  { image: tomDidntDie, alt: 'Tom Didn’t Die' },
   { image: coloradoFlag, alt: 'Colorado Flag' },
   { image: coloradoShirtFront, alt: 'Colorado Shirt Front' },
   { image: coloradoShirtBack, alt: 'Colorado Shirt Back' },

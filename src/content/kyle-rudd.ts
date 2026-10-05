@@ -79,7 +79,7 @@ const portfolio: PortfolioEntry[] = [
       Skill.agenticCoding,
     ],
     description:
-      "See what I've been up to as a professional software engineer.",
+      'See what I’ve been up to as a professional software engineer.',
     preview: await buildPreview(linkedinImage),
   },
   {
@@ -102,7 +102,7 @@ const portfolio: PortfolioEntry[] = [
     title: '<cite>Magic: The Gathering</cite> Simulator',
     skills: [Skill.gameDevelopment, Skill.agenticCoding],
     description:
-      "I've spent a significant amount of time lately learning game development with Unity (and some Unreal Engine). This project was my way to pull those learnings together in one place without worrying about making a commercially viable product. This is in active development.",
+      'I’ve spent a significant amount of time lately learning game development with Unity (and some Unreal Engine). This project was my way to pull those learnings together in one place without worrying about making a commercially viable product. This is in active development.',
     preview: await buildPreview(mtgSimulatorImage),
   },
   {
@@ -110,7 +110,7 @@ const portfolio: PortfolioEntry[] = [
     href: 'https://soundcloud.com/eszense/newtons-flaming-laser-sword',
     callToAction: 'Listen on SoundCloud',
     icon: soundcloudIconPath,
-    title: "Newton's Flaming Laser Sword",
+    title: 'Newton’s Flaming Laser Sword',
     skills: [Skill.musicProduction, Skill.mixingMastering, Skill.songwriting],
     description: newtonsFlamingLaserSwordDescription,
     preview: await buildPreview(newtonsFlamingLaserSwordImage),
@@ -134,7 +134,7 @@ const portfolio: PortfolioEntry[] = [
     title: 'The Fox Knows',
     skills: [Skill.musicProduction, Skill.songwriting],
     description:
-      "An older song. It's a bit chaotic, but I still love this one.",
+      'An older song. It’s a bit chaotic, but I still love this one.',
     preview: await buildPreview(theFoxKnowsImage),
   },
   {
@@ -156,7 +156,7 @@ const portfolio: PortfolioEntry[] = [
       Skill.photoManipulation,
       Skill.surrealismGlitch,
     ],
-    description: "Art pieces I've made over the years.",
+    description: 'Art pieces I’ve made over the years.',
     images: await buildGallery(aetherealArt),
   },
 ];

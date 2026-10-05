@@ -34,6 +34,12 @@
     measure();
     isExpanded = !isExpanded;
   };
+
+  const expand = () => {
+    if (!isExpanded) {
+      toggle();
+    }
+  };
 </script>
 
 <div
@@ -42,7 +48,7 @@
   bind:this={wrapperElement}
   style:--expanded-height={contentHeight && `${contentHeight}px`}
 >
-  <div id={contentId} bind:this={contentElement}>
+  <div id={contentId} bind:this={contentElement} onplaycapture={expand}>
     {@render children()}
   </div>
 </div>

@@ -2,7 +2,7 @@
   import { getSelectedRoles } from '../lib/selected-roles.svelte';
   import type { Role } from '../lib/portfolio';
   import { untrack } from 'svelte';
-  import { slide } from 'svelte/transition';
+  import { slide, type TransitionConfig } from 'svelte/transition';
   import { transitionDurationMs } from '../lib/layer-crossfade';
   import CollapsibleMedia from './CollapsibleMedia.svelte';
   import LoopingVideo from './LoopingVideo.svelte';
@@ -32,11 +32,17 @@
     ),
   );
 
-  const videoTransition = () => ({
-    duration: matchMedia('(prefers-reduced-motion: reduce)').matches
+  const slideAndFade = (node: Element): TransitionConfig => {
+    const duration = matchMedia('(prefers-reduced-motion: reduce)').matches
       ? 0
-      : transitionDurationMs,
-  });
+      : transitionDurationMs;
+    const sliding = slide(node, { duration });
+
+    return {
+      ...sliding,
+      css: (t, u) => `${sliding.css?.(t, u)}; opacity: ${t}`,
+    };
+  };
 
   const currentRole = $derived(
     roles.find((role) => role.name === selectedRoles.names[0]),
@@ -47,7 +53,7 @@
 <div class="bio">
   {#if currentRole?.video}
     {@const mediaState = mediaStates[currentRole.name]}
-    <div class="bio-video" transition:slide={videoTransition()}>
+    <div class="bio-video" transition:slideAndFade>
       <CollapsibleMedia
         label={currentRole.video.alt}
         bind:isExpanded={mediaState.isExpanded}

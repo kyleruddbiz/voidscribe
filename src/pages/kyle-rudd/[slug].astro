@@ -18,5 +18,16 @@ const plainTitle = entry.title.replace(/<[^>]*>/g, '');
 ---
 
 <Layout title={plainTitle} description={entry.description}>
-  <PortfolioPage {entry} backLabel={kyleRudd.name} />
+  <a slot="header-end" class="back-link" href="/kyle-rudd">
+    &larr; Portfolio
+  </a>
+  <PortfolioPage {entry} />
 </Layout>
+
+<style>
+  .back-link {
+    color: var(--color-accent-bright);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+</style>

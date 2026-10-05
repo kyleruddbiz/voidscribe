@@ -4,10 +4,9 @@
 
   interface Props {
     entry: LinkPortfolioEntry;
-    backLabel: string;
   }
 
-  const { entry, backLabel }: Props = $props();
+  const { entry }: Props = $props();
   const {
     icon,
     title,
@@ -19,9 +18,7 @@
   } = $derived(entry);
 </script>
 
-<main class="portfolio-page">
-  <a class="back-link" href="/kyle-rudd">&larr; {backLabel}</a>
-
+<article class="portfolio-page">
   <header class="page-header">
     {#if preview}
       <img
@@ -50,26 +47,14 @@
     <p>{@html entry.description}</p>
     {@html entry.page?.description}
   </div>
-</main>
+</article>
 
 <style>
-  .portfolio-page {
-    max-width: 48rem;
-    margin: 0 auto;
-    padding: 2rem 1rem 4rem;
-  }
-
-  .back-link {
-    color: var(--color-accent-bright);
-    font-size: 0.9rem;
-    text-decoration: none;
-  }
-
   .page-header {
     display: flex;
     align-items: flex-start;
     gap: 1.5rem;
-    margin: 1.5rem 0 2rem;
+    margin: 0 0 1.25rem;
   }
 
   .page-preview {
@@ -104,7 +89,7 @@
     width: 1.5rem;
     height: 1.5rem;
     flex-shrink: 0;
-    fill: var(--color-accent);
+    fill: var(--color-accent-bright);
   }
 
   .page-cta {

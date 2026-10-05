@@ -116,12 +116,18 @@
     }
 
     .page-heading {
+      --chips-align: center;
+      --chips-wrap-indent: 0;
       align-items: center;
       text-align: center;
     }
 
     .page-title {
       justify-content: center;
+    }
+
+    .page-heading :global(.chips-wrap) {
+      align-self: stretch;
     }
   }
 </style>

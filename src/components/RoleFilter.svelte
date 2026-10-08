@@ -60,7 +60,7 @@
         class="role-letter"
         aria-hidden="true"
         style="animation-delay: calc(var(--role-delay) + {i *
-          letterStaggerMs}ms)">{letter}</span
+          letterStaggerMs}ms)">{letter === ' ' ? ' ' : letter}</span
       >{/each}</span
   >
 {/snippet}

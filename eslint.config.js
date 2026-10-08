@@ -34,7 +34,7 @@ export default [
     },
   },
   {
-    files: ['tools/**/*.mjs'],
+    files: ['tools/**/*.mjs', 'scripts/**/*.mjs'],
     languageOptions: { globals: globals.node },
     rules: { 'no-console': 'off' },
   },

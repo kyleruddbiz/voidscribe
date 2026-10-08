@@ -23,6 +23,8 @@ Copy `.env.example` to `.env` and set `ITCH_ACCESS_CODE` (URL-encoded). It's req
 - `npm run lint` — run ESLint and Stylelint.
 - `npm run tidy` — auto-fix lint violations and format the repo.
 
+A Claude Code hook runs `scripts/tidy.mjs` on every edited file, so agent edits are tidied like VS Code’s format-on-save.
+
 ## Content
 
 Page content lives in `src/content/`:

@@ -6,7 +6,7 @@ See [README.md](./README.md) for the project overview, scripts, and testing proc
 
 Work on whichever branch is currently checked out, and never create a new branch unless told to.
 
-`main` is the live website. Never push to `main` until the user has reviewed the commits and given permission. Commit locally in the meantime.
+`main` is the live website. Only push to `main` when the user asks. Commit locally in the meantime.
 
 On any other branch, push each commit immediately.
 

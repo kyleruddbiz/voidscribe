@@ -31,13 +31,13 @@ const plainTitle = entry.title.replace(/<[^>]*>/g, '');
 </Layout>
 
 <script>
-  import { randomLandingHref } from '../../lib/landing-destination';
+  import { returnLandingHref } from '../../lib/landing-destination';
 
   const backLink =
     document.querySelector<HTMLAnchorElement>('[data-back-link]');
 
   if (backLink) {
-    backLink.href = randomLandingHref();
+    backLink.href = returnLandingHref();
   }
 </script>
 

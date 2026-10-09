@@ -1,5 +1,6 @@
 import { createContext } from 'svelte';
 import type { Role, RoleName } from './portfolio';
+import { writeRememberedRole } from './remembered-role';
 
 const roleParam = 'role';
 
@@ -41,9 +42,15 @@ export class SelectedRoles {
     this.names = known.slice(0, 1).map((role) => role.name);
     this.introNames = this.names;
 
-    if (!hasRoleParam) {
+    if (hasRoleParam) {
+      this.remember();
+    } else {
       this.writeUrl();
     }
+  }
+
+  private remember() {
+    writeRememberedRole(this.names[0] && slugFor(this.names[0]));
   }
 
   private writeUrl() {
@@ -55,6 +62,7 @@ export class SelectedRoles {
     }
 
     history.replaceState(history.state, '', url);
+    this.remember();
   }
 }
 

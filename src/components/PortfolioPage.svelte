@@ -31,15 +31,14 @@
       />
     {/if}
     <div class="page-heading">
-      <h1 class="page-title">
+      <h1 class="page-title">{@html title}</h1>
+      <SkillChips {skills} />
+      <a class="page-cta" {href} target="_blank" {rel}>
         <svg class="page-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d={icon} />
         </svg>
-        <span>{@html title}</span>
-      </h1>
-      <SkillChips {skills} />
-      <a class="page-cta" {href} target="_blank" {rel}>{callToAction} &nearr;</a
-      >
+        <span>{callToAction} &nearr;</span>
+      </a>
     </div>
   </header>
 
@@ -75,9 +74,6 @@
   }
 
   .page-title {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
     margin: 0;
     font-family: var(--font-display);
     font-size: 1.6rem;
@@ -86,13 +82,16 @@
   }
 
   .page-icon {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.1rem;
+    height: 1.1rem;
     flex-shrink: 0;
-    fill: var(--color-accent-bright);
+    fill: var(--color-text);
   }
 
   .page-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     color: var(--color-accent-bright);
     font-size: 0.9rem;
     text-decoration: none;
@@ -120,10 +119,6 @@
       --chips-wrap-indent: 0;
       align-items: center;
       text-align: center;
-    }
-
-    .page-title {
-      justify-content: center;
     }
 
     .page-heading :global(.chips-wrap) {

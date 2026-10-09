@@ -1,5 +1,5 @@
 export const site = {
   name: 'Void Scribe Studios',
-  tagline: 'Coming soon.',
+  socialName: 'Void Scribe',
   copyrightStartYear: 2026,
 } as const;

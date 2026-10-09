@@ -4,6 +4,10 @@ import Profile from '../components/Profile.svelte';
 import { kyleRudd } from '../content/kyle-rudd';
 ---
 
-<Layout title={kyleRudd.name} description={kyleRudd.tagline}>
+<Layout
+  title={kyleRudd.name}
+  socialTitle="Kyle Rudd | Software Engineer · Music Producer · Digital Artist"
+  description={kyleRudd.tagline}
+>
   <Profile client:load profile={kyleRudd} />
 </Layout>

@@ -1,7 +1,7 @@
+import { render } from 'svelte/server';
 import {
   githubIconPath,
   itchIoIconPath,
-  linkedinIconPath,
   soundcloudIconPath,
   youtubeIconPath,
 } from '../lib/simple-icons';
@@ -14,7 +14,6 @@ import { buildLoopingVideo } from '../lib/looping-video';
 import { aetherealArt } from './kyle-rudd/aethereal-art';
 import djingInCostaRicaPoster from './kyle-rudd/djing-in-costa-rica.jpg';
 import djingInCostaRicaVideoUrl from './kyle-rudd/djing-in-costa-rica.mp4?url';
-import linkedinImage from './kyle-rudd/linkedin.jpg';
 import voidScribeStudiosImage from './kyle-rudd/void-scribe-studios.jpg';
 import mtgSimulatorImage from './kyle-rudd/mtg-simulator.jpg';
 import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
@@ -26,7 +25,7 @@ import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import mtgSimulatorDescription from './kyle-rudd/mtg-simulator.html?raw';
 import newtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.html?raw';
 import generalBio from './kyle-rudd/bio/general.html?raw';
-import softwareEngineerBio from './kyle-rudd/bio/software-engineer.html?raw';
+import SoftwareEngineerBio from './kyle-rudd/bio/software-engineer.svelte';
 import musicProducerBio from './kyle-rudd/bio/music-producer.html?raw';
 import digitalArtistBio from './kyle-rudd/bio/digital-artist.html?raw';
 
@@ -35,7 +34,7 @@ const name = 'Kyle Rudd';
 const roles: Role[] = [
   {
     name: RoleName.softwareEngineer,
-    bio: softwareEngineerBio,
+    bio: render(SoftwareEngineerBio).body,
     skills: [
       Skill.softwareEngineering,
       Skill.architectureDesign,
@@ -77,21 +76,6 @@ const mtgSimulatorHref = withAccessCode(
 );
 
 const portfolio: PortfolioEntry[] = [
-  {
-    kind: 'link',
-    href: 'https://www.linkedin.com/in/kyle-n-rudd/',
-    callToAction: 'View profile',
-    icon: linkedinIconPath,
-    title: 'LinkedIn',
-    skills: [
-      Skill.softwareEngineering,
-      Skill.architectureDesign,
-      Skill.agenticCoding,
-    ],
-    description:
-      'See what I’ve been up to as a professional software engineer.',
-    preview: await buildPreview(linkedinImage),
-  },
   {
     kind: 'link',
     href: 'https://github.com/kyleruddbiz/voidscribe',

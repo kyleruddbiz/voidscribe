@@ -1,9 +1,21 @@
+<script lang="ts">
+  import InlineIcon from '../../../components/InlineIcon.svelte';
+  import { linkedinIconPath } from '../../../lib/simple-icons';
+</script>
+
 <p>
-  I have been a full-stack software engineer for 13+ years, working across web
-  and desktop, and more recently game development. I specialize in C# and .NET,
-  with TypeScript, Unity, and more mixed in. I have done everything from coding
-  to architecture to technical leadership. I'm happy as long as I'm slinging
-  code, learning, and mentoring.
+  I have been a
+  <a
+    href="https://www.linkedin.com/in/kyle-n-rudd/"
+    target="_blank"
+    rel="noopener"
+    aria-label="Full-Stack Software Engineer, LinkedIn profile (opens in a new tab)"
+    >Full-Stack Software Engineer<InlineIcon path={linkedinIconPath} /></a
+  >
+  for 13+ years, working across web and desktop, and more recently game development.
+  I specialize in C# and .NET, with TypeScript, Unity, and more mixed in. I have done
+  everything from coding to architecture to technical leadership. I’m happy as long
+  as I’m slinging code, learning, and mentoring.
 </p>
 <p>
   Coding is pure creation. It feels incredible to build something from nothing

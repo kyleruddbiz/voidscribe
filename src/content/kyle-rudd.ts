@@ -1,4 +1,3 @@
-import { render } from 'svelte/server';
 import {
   githubIconPath,
   itchIoIconPath,
@@ -7,6 +6,7 @@ import {
 } from '../lib/simple-icons';
 import { RoleName, Skill } from '../lib/portfolio';
 import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
+import { renderToHtml } from '../lib/render-to-html';
 import { withAccessCode } from '../lib/itch-access';
 import { aetherealArtIconPath } from '../lib/custom-icons';
 import { buildGallery, buildPreview } from '../lib/gallery-images';
@@ -19,22 +19,22 @@ import mtgSimulatorImage from './kyle-rudd/mtg-simulator.jpg';
 import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
 import synthesisImage from './kyle-rudd/synthesis.jpg';
 import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
-import voidScribeStudiosDescription from './kyle-rudd/void-scribe-studios.html?raw';
+import VoidScribeStudiosDescription from './kyle-rudd/void-scribe-studios.svelte';
 import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
-import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
-import mtgSimulatorDescription from './kyle-rudd/mtg-simulator.html?raw';
+import FamilyTripMixDescription from './kyle-rudd/family-trip-mix.svelte';
+import MtgSimulatorDescription from './kyle-rudd/mtg-simulator.svelte';
 import NewtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.svelte';
-import generalBio from './kyle-rudd/bio/general.html?raw';
+import GeneralBio from './kyle-rudd/bio/general.svelte';
 import SoftwareEngineerBio from './kyle-rudd/bio/software-engineer.svelte';
-import musicProducerBio from './kyle-rudd/bio/music-producer.html?raw';
-import digitalArtistBio from './kyle-rudd/bio/digital-artist.html?raw';
+import MusicProducerBio from './kyle-rudd/bio/music-producer.svelte';
+import DigitalArtistBio from './kyle-rudd/bio/digital-artist.svelte';
 
 const name = 'Kyle Rudd';
 
 const roles: Role[] = [
   {
     name: RoleName.softwareEngineer,
-    bio: render(SoftwareEngineerBio).body,
+    bio: renderToHtml(SoftwareEngineerBio),
     skills: [
       Skill.softwareEngineering,
       Skill.architectureDesign,
@@ -44,7 +44,7 @@ const roles: Role[] = [
   },
   {
     name: RoleName.musicProducer,
-    bio: musicProducerBio,
+    bio: renderToHtml(MusicProducerBio),
     video: await buildLoopingVideo({
       poster: djingInCostaRicaPoster,
       sources: [{ src: djingInCostaRicaVideoUrl, type: 'video/mp4' }],
@@ -59,7 +59,7 @@ const roles: Role[] = [
   },
   {
     name: RoleName.digitalArtist,
-    bio: digitalArtistBio,
+    bio: renderToHtml(DigitalArtistBio),
     skills: [
       Skill.gameDevelopment,
       Skill.videoEditing,
@@ -88,7 +88,7 @@ const portfolio: PortfolioEntry[] = [
     preview: await buildPreview(voidScribeStudiosImage),
     page: {
       slug: 'void-scribe-studios',
-      description: voidScribeStudiosDescription,
+      description: renderToHtml(VoidScribeStudiosDescription),
     },
   },
   {
@@ -99,7 +99,7 @@ const portfolio: PortfolioEntry[] = [
     icon: itchIoIconPath,
     title: '<cite>Magic: The Gathering</cite> Simulator',
     skills: [Skill.gameDevelopment, Skill.agenticCoding],
-    description: mtgSimulatorDescription,
+    description: renderToHtml(MtgSimulatorDescription),
     preview: await buildPreview(mtgSimulatorImage),
   },
   {
@@ -109,7 +109,7 @@ const portfolio: PortfolioEntry[] = [
     icon: soundcloudIconPath,
     title: 'Newton’s Flaming Laser Sword',
     skills: [Skill.musicProduction, Skill.mixingMastering, Skill.songwriting],
-    description: render(NewtonsFlamingLaserSwordDescription).body,
+    description: renderToHtml(NewtonsFlamingLaserSwordDescription),
     preview: await buildPreview(newtonsFlamingLaserSwordImage),
   },
   {
@@ -141,7 +141,7 @@ const portfolio: PortfolioEntry[] = [
     icon: youtubeIconPath,
     title: 'Family Trip Mix 2 (Sellout Edition)',
     skills: [Skill.videoEditing, Skill.mixtapeProduction],
-    description: familyTripMixDescription,
+    description: renderToHtml(FamilyTripMixDescription),
     preview: await buildPreview(familyTripMixImage),
   },
   {
@@ -160,7 +160,7 @@ const portfolio: PortfolioEntry[] = [
 
 export const kyleRudd: Profile = {
   name,
-  bio: generalBio,
+  bio: renderToHtml(GeneralBio),
   roles,
   defaultRole: RoleName.softwareEngineer,
   tagline: `${new Intl.ListFormat('en').format(roles.map((role) => role.name))}.`,

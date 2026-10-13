@@ -9,15 +9,15 @@
     href="https://soundcloud.com/aetherealize/the-darkest-places"
     target="_blank"
     rel="noopener"
-    aria-label="first song, on SoundCloud (opens in a new tab)"
-    >first song<InlineIcon path={soundcloudIconPath} /></a
+    aria-label="First Song, on SoundCloud (opens in a new tab)"
+    >First Song<InlineIcon path={soundcloudIconPath} /></a
   >. The incredible Drew Vespers mixed and mastered this song with me at his
   <a
     href="https://warpacademy.com/#our-studio"
     target="_blank"
     rel="noopener"
-    aria-label="custom-built studio (opens in a new tab)"
-    >custom-built studio&nbsp;&nearr;</a
+    aria-label="Custom-Built Studio (opens in a new tab)"
+    >Custom-Built Studio&nbsp;&nearr;</a
   >. Still one of the coolest experiences I’ve ever had!
 </p>
 <blockquote>

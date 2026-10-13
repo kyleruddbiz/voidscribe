@@ -6,17 +6,29 @@
   let { path }: Props = $props();
 </script>
 
-<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-  <path d={path} />
-</svg>
+<span class="icon"
+  ><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d={path} />
+  </svg></span
+>
 
 <style>
+  .icon {
+    position: relative;
+  }
+
+  .icon::before {
+    content: '00' / '';
+    color: transparent;
+  }
+
   svg {
-    display: inline-block;
+    position: absolute;
+    right: 0;
+    top: 50%;
     width: 0.8em;
     height: 0.8em;
-    margin-left: 0.25em;
-    vertical-align: -0.05em;
+    transform: translateY(-50%);
     fill: currentColor;
   }
 </style>

@@ -23,7 +23,7 @@ import voidScribeStudiosDescription from './kyle-rudd/void-scribe-studios.html?r
 import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
 import familyTripMixDescription from './kyle-rudd/family-trip-mix.html?raw';
 import mtgSimulatorDescription from './kyle-rudd/mtg-simulator.html?raw';
-import newtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.html?raw';
+import NewtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.svelte';
 import generalBio from './kyle-rudd/bio/general.html?raw';
 import SoftwareEngineerBio from './kyle-rudd/bio/software-engineer.svelte';
 import musicProducerBio from './kyle-rudd/bio/music-producer.html?raw';
@@ -109,7 +109,7 @@ const portfolio: PortfolioEntry[] = [
     icon: soundcloudIconPath,
     title: 'Newton’s Flaming Laser Sword',
     skills: [Skill.musicProduction, Skill.mixingMastering, Skill.songwriting],
-    description: newtonsFlamingLaserSwordDescription,
+    description: render(NewtonsFlamingLaserSwordDescription).body,
     preview: await buildPreview(newtonsFlamingLaserSwordImage),
   },
   {

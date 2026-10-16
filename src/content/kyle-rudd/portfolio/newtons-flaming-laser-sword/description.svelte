@@ -1,6 +1,6 @@
 <script lang="ts">
-  import InlineIcon from '../../components/InlineIcon.svelte';
-  import { soundcloudIconPath } from '../../lib/simple-icons';
+  import InlineIcon from '../../../../components/InlineIcon.svelte';
+  import { soundcloudIconPath } from '../../../../lib/simple-icons';
 </script>
 
 <p>

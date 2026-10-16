@@ -3,31 +3,31 @@ import {
   itchIoIconPath,
   soundcloudIconPath,
   youtubeIconPath,
-} from '../lib/simple-icons';
-import { RoleName, Skill } from '../lib/portfolio';
-import type { PortfolioEntry, Profile, Role } from '../lib/portfolio';
-import { renderToHtml } from '../lib/render-to-html';
-import { withAccessCode } from '../lib/itch-access';
-import { aetherealArtIconPath } from '../lib/custom-icons';
-import { buildGallery, buildPreview } from '../lib/gallery-images';
-import { buildLoopingVideo } from '../lib/looping-video';
-import { aetherealArt } from './kyle-rudd/aethereal-art';
-import djingInCostaRicaPoster from './kyle-rudd/djing-in-costa-rica.jpg';
-import djingInCostaRicaVideoUrl from './kyle-rudd/djing-in-costa-rica.mp4?url';
-import voidScribeStudiosImage from './kyle-rudd/void-scribe-studios.jpg';
-import mtgSimulatorImage from './kyle-rudd/mtg-simulator.jpg';
-import newtonsFlamingLaserSwordImage from './kyle-rudd/newtons-flaming-laser-sword.jpg';
-import synthesisImage from './kyle-rudd/synthesis.jpg';
-import theFoxKnowsImage from './kyle-rudd/the-fox-knows.jpg';
-import VoidScribeStudiosDescription from './kyle-rudd/void-scribe-studios.svelte';
-import familyTripMixImage from './kyle-rudd/family-trip-mix.jpg';
-import FamilyTripMixDescription from './kyle-rudd/family-trip-mix.svelte';
-import MtgSimulatorDescription from './kyle-rudd/mtg-simulator.svelte';
-import NewtonsFlamingLaserSwordDescription from './kyle-rudd/newtons-flaming-laser-sword.svelte';
-import GeneralBio from './kyle-rudd/bio/general.svelte';
-import SoftwareEngineerBio from './kyle-rudd/bio/software-engineer.svelte';
-import MusicProducerBio from './kyle-rudd/bio/music-producer.svelte';
-import DigitalArtistBio from './kyle-rudd/bio/digital-artist.svelte';
+} from '../../lib/simple-icons';
+import { RoleName, Skill } from '../../lib/portfolio';
+import type { PortfolioEntry, Profile, Role } from '../../lib/portfolio';
+import { renderToHtml } from '../../lib/render-to-html';
+import { withAccessCode } from '../../lib/itch-access';
+import { aetherealArtIconPath } from '../../lib/custom-icons';
+import { buildGallery, buildPreview } from '../../lib/gallery-images';
+import { buildLoopingVideo } from '../../lib/looping-video';
+import { aetherealArt } from './aethereal-art';
+import djingInCostaRicaPoster from './djing-in-costa-rica.jpg';
+import djingInCostaRicaVideoUrl from './djing-in-costa-rica.mp4?url';
+import voidScribeStudiosImage from './void-scribe-studios.jpg';
+import mtgSimulatorImage from './mtg-simulator.jpg';
+import newtonsFlamingLaserSwordImage from './newtons-flaming-laser-sword.jpg';
+import synthesisImage from './synthesis.jpg';
+import theFoxKnowsImage from './the-fox-knows.jpg';
+import VoidScribeStudiosDescription from './void-scribe-studios.svelte';
+import familyTripMixImage from './family-trip-mix.jpg';
+import FamilyTripMixDescription from './family-trip-mix.svelte';
+import MtgSimulatorDescription from './mtg-simulator.svelte';
+import NewtonsFlamingLaserSwordDescription from './newtons-flaming-laser-sword.svelte';
+import GeneralBio from './bio/general.svelte';
+import SoftwareEngineerBio from './bio/software-engineer.svelte';
+import MusicProducerBio from './bio/music-producer.svelte';
+import DigitalArtistBio from './bio/digital-artist.svelte';
 
 const name = 'Kyle Rudd';
 

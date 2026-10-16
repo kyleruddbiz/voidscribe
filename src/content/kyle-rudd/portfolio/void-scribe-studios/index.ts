@@ -13,8 +13,7 @@ export const voidScribeStudios: PortfolioEntry = {
   icon: githubIconPath,
   title: 'Void Scribe Studios',
   skills: [Skill.softwareEngineering, Skill.uiUxDesign, Skill.agenticCoding],
-  description:
-    'What is this website? I have a very eclectic skillset and this can look like chaos at first glance. My aim here is to remedy that chaos.',
+  description: 'Preview Coming Soon.',
   preview: await buildPreview(preview),
   page: {
     slug: 'void-scribe-studios',

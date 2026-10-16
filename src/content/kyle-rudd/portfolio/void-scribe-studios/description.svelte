@@ -1,5 +1,1 @@
-<p>
-  This website is my way of expressing my various skills, built with Astro,
-  Svelte, and TypeScript. Check out the code on GitHub.
-</p>
 <p>More details coming soon.</p>

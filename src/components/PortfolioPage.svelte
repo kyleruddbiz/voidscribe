@@ -75,7 +75,7 @@
   .page-title {
     margin: 0;
     font-family: var(--font-display);
-    font-size: 1.6rem;
+    font-size: clamp(1.75rem, 4vw, 2rem);
     font-weight: normal;
     color: var(--color-text);
   }
@@ -100,6 +100,30 @@
     max-width: var(--measure);
     color: var(--color-text-dim);
     line-height: 1.6;
+  }
+
+  .page-body :global(h2),
+  .page-body :global(h3),
+  .page-body :global(p) {
+    margin-block: 0;
+  }
+
+  .page-body :global(h2) {
+    margin-top: 2.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .page-body :global(h3) {
+    margin-top: 1.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .page-body :global(p + p) {
+    margin-top: 0.75rem;
+  }
+
+  .page-body :global(:first-child) {
+    margin-top: 0;
   }
 
   @media (max-width: 480px) {

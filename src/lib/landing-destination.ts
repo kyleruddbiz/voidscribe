@@ -1,4 +1,4 @@
-import { landingSlugs } from '../content/landing-slugs';
+import { landingSlugs } from '../content/site/landing-slugs';
 import { readRememberedRole } from './remembered-role';
 
 export const landingHref = (slug: string) =>

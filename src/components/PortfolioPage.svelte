@@ -109,12 +109,12 @@
   }
 
   .page-body :global(h2) {
-    margin-top: 2.5rem;
-    margin-bottom: 0.4rem;
+    margin-top: 2.25rem;
+    margin-bottom: 0.3rem;
   }
 
   .page-body :global(h3) {
-    margin-top: 1.5rem;
+    margin-top: 1.2rem;
     margin-bottom: 0.3rem;
   }
 

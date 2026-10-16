@@ -29,14 +29,15 @@ A Claude Code hook runs `scripts/tidy.mjs` on every edited file, so agent edits 
 
 Page content lives in `src/content/`:
 
-- `site.ts` — strings shared site-wide (name, tagline).
-- `<page>.ts` — content for one page, named after its route (`kyle-rudd.ts` for `/kyle-rudd`).
-- `<page>/*.html` — markup too complex to inline in a content string, such as a multi-paragraph
-  portfolio description. Import it with `?raw` (e.g. `import x from './kyle-rudd/x.html?raw'`) and
-  use it as a value in the page's `.ts` file. Prettier formats these files, so `npm run format`
-  will catch malformed markup.
-- `<page>/<gallery>.ts` — image list for a gallery portfolio entry; its images live in a folder of
-  the same name.
+- `site/` — content shared site-wide: `index.ts` (name, social name) and `landing-slugs.ts`.
+- `<page>/index.ts` — assembles the content for one page, named after its route (`kyle-rudd/` for
+  `/kyle-rudd`).
+- `<page>/bio/` — Svelte components holding the profile and role bios.
+- `<page>/roles/` — the roles (`index.ts`) plus any media they use.
+- `<page>/portfolio/` — `index.ts` lists the entries in display order. Each entry has its own
+  folder holding `index.ts` (the entry), `preview.jpg`, and `description.svelte` when the
+  description is too complex to inline in a content string. Gallery entries keep their images in
+  the same folder.
 
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.

@@ -3,7 +3,7 @@ export const landingSlugs = [
   'out-of-bed',
   'with-the-punches',
   'up-your-sleeves',
-  "in' ;D",
+  'in%27%20%3BD',
   'shameless-reimagineer',
   'silent-cartographer',
   'watcher-on-the-wall',

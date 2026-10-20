@@ -1,0 +1,33 @@
+---
+import type { ImageMetadata } from 'astro';
+import { buildVideoPoster } from '../lib/looping-video';
+
+interface Props {
+  poster: ImageMetadata;
+  src: string;
+  label: string;
+}
+
+const { poster, src, label } = Astro.props;
+const { poster: posterSrc, width, height } = await buildVideoPoster(poster);
+---
+
+<video
+  controls
+  preload="metadata"
+  playsinline
+  poster={posterSrc}
+  width={width}
+  height={height}
+  aria-label={label}
+>
+  <source src={src} type="video/mp4" />
+</video>
+
+<style>
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+</style>

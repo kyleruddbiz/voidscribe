@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import PortfolioPage from '../../components/PortfolioPage.svelte';
 import { kyleRudd } from '../../content/kyle-rudd';
-import { firstLandingHref } from '../../lib/landing-destination';
+import BackToPortfolioLink from '../../components/BackToPortfolioLink.astro';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 import type { LinkPortfolioEntry } from '../../lib/portfolio';
 
@@ -42,34 +42,8 @@ const plainTitle = entry.title.replace(/<[^>]*>/g, '');
 ---
 
 <Layout title={plainTitle} description={entry.description}>
-  <a
-    slot="header-end"
-    class="back-link"
-    data-back-link
-    href={firstLandingHref()}
-  >
-    &larr; Portfolio
-  </a>
+  <BackToPortfolioLink slot="header-end" />
   <PortfolioPage {entry}>
     <Details />
   </PortfolioPage>
 </Layout>
-
-<script>
-  import { returnLandingHref } from '../../lib/landing-destination';
-
-  const backLink =
-    document.querySelector<HTMLAnchorElement>('[data-back-link]');
-
-  if (backLink) {
-    backLink.href = returnLandingHref();
-  }
-</script>
-
-<style>
-  .back-link {
-    color: var(--color-accent-bright);
-    font-size: 0.9rem;
-    text-decoration: none;
-  }
-</style>

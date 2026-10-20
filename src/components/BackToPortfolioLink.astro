@@ -1,0 +1,26 @@
+---
+import { firstLandingHref } from '../lib/landing-destination';
+---
+
+<a class="back-link" data-back-link href={firstLandingHref()}>
+  &larr; Portfolio
+</a>
+
+<script>
+  import { returnLandingHref } from '../lib/landing-destination';
+
+  const backLink =
+    document.querySelector<HTMLAnchorElement>('[data-back-link]');
+
+  if (backLink) {
+    backLink.href = returnLandingHref();
+  }
+</script>
+
+<style>
+  .back-link {
+    color: var(--color-accent-bright);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+</style>

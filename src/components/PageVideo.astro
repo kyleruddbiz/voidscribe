@@ -1,0 +1,20 @@
+---
+import type { ImageMetadata } from 'astro';
+import LoopingVideo from './LoopingVideo.svelte';
+import { buildLoopingVideo } from '../lib/looping-video';
+
+interface Props {
+  poster: ImageMetadata;
+  src: string;
+  alt: string;
+}
+
+const { poster, src, alt } = Astro.props;
+const video = await buildLoopingVideo({
+  poster,
+  sources: [{ src, type: 'video/mp4' }],
+  alt,
+});
+---
+
+<LoopingVideo client:visible {...video} />

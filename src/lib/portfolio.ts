@@ -31,17 +31,13 @@ export interface ResponsiveImage {
   sizes: string;
 }
 
-export type PageMedia =
-  | { kind: 'image'; alt: string; image: ResponsiveImage }
-  | { kind: 'video'; video: LoopingVideo };
-
 export interface LinkPortfolioEntry extends PortfolioEntryBase {
   kind: 'link';
   preview?: ResponsiveImage;
   href: string;
   rel?: string;
   callToAction: string;
-  page?: { slug: string; details: string; media?: PageMedia[] };
+  page?: { slug: string };
 }
 
 export interface GalleryImage {

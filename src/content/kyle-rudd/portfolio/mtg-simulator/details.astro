@@ -1,0 +1,29 @@
+---
+import PageImage from '../../../../components/PageImage.astro';
+import PageVideo from '../../../../components/PageVideo.astro';
+import physicalDecks from './physical-decks.jpg';
+import playCardsPoster from './play-cards.jpg';
+import playCardsUrl from './play-cards.mp4?url';
+import browseLibraryPoster from './browse-library.jpg';
+import browseLibraryUrl from './browse-library.mp4?url';
+import mulliganPoster from './mulligan.jpg';
+import mulliganUrl from './mulligan.mp4?url';
+import configsPoster from './configs.jpg';
+import configsUrl from './configs.mp4?url';
+import ciCd from './ci-cd.jpg';
+import joinGamePoster from './join-game.jpg';
+import joinGameUrl from './join-game.mp4?url';
+---
+
+<p>Details coming soon.</p>
+<PageImage src={physicalDecks} alt="Physical decks" />
+<PageVideo poster={playCardsPoster} src={playCardsUrl} alt="Playing cards" />
+<PageVideo
+  poster={browseLibraryPoster}
+  src={browseLibraryUrl}
+  alt="Browsing the library"
+/>
+<PageVideo poster={mulliganPoster} src={mulliganUrl} alt="Taking a mulligan" />
+<PageVideo poster={configsPoster} src={configsUrl} alt="Game configuration" />
+<PageImage src={ciCd} alt="Continuous integration and deployment pipeline" />
+<PageVideo poster={joinGamePoster} src={joinGameUrl} alt="Joining a game" />

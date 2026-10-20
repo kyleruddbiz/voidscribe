@@ -36,8 +36,9 @@ Page content lives in `src/content/`:
 - `<page>/roles/` — the roles (`index.ts`) plus any media they use.
 - `<page>/portfolio/` — `index.ts` lists the entries in display order. Each entry has its own
   folder holding `index.ts` (the entry), `preview.jpg`, `description.svelte` when the
-  description is too complex to inline in a content string, and `details.svelte` for the full
-  page content of entries that have a page. Gallery entries keep their images in the same
+  description is too complex to inline in a content string, and `details.astro` for the full
+  page content of entries that have a page: plain HTML mixed with the shared `PageImage` and
+  `PageVideo` components. The folder name must equal the entry’s `page.slug`. Gallery entries keep their images in the same
   folder.
 
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe

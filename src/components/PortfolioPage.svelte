@@ -45,10 +45,8 @@
   </header>
 
   <div class="page-body">
-    {@html entry.page?.details}
+    {@render children?.()}
   </div>
-
-  {@render children?.()}
 </article>
 
 <style>
@@ -124,6 +122,10 @@
 
   .page-body :global(p + p) {
     margin-top: 0.75rem;
+  }
+
+  .page-body :global(:is(img, astro-island)) {
+    margin-top: 1.25rem;
   }
 
   .page-body :global(:first-child) {

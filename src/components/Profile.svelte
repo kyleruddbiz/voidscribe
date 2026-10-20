@@ -7,6 +7,7 @@
   } from '../lib/selected-roles.svelte';
   import Bio from './Bio.svelte';
   import PortfolioList from './PortfolioList.svelte';
+  import ProfilePhoto from './ProfilePhoto.svelte';
   import RoleFilter from './RoleFilter.svelte';
 
   interface Props {
@@ -27,7 +28,10 @@
 </script>
 
 <section class="profile">
-  <h1>{profile.name}</h1>
+  <header class="identity">
+    <ProfilePhoto photo={profile.photo} />
+    <h1>{profile.name}</h1>
+  </header>
   <RoleFilter roles={profile.roles} />
 
   <Bio bio={profile.bio} roles={profile.roles} />
@@ -50,9 +54,16 @@
     }
   }
 
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
   h1 {
     font-size: clamp(1.75rem, 4vw, 2.25rem);
-    margin: 0 0 0.25rem;
+    margin: 0;
   }
 
   .portfolio {

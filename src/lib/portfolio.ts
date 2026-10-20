@@ -70,6 +70,7 @@ export interface Role {
 
 export interface Profile {
   name: string;
+  photo: GalleryImage;
   tagline: string;
   bio: string;
   roles: Role[];

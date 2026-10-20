@@ -128,14 +128,6 @@
 </PortfolioCard>
 
 <style>
-  :global(.pswp) {
-    --pswp-bg: var(--color-bg);
-    --pswp-icon-color: var(--color-text);
-    --pswp-icon-color-secondary: var(--color-bg);
-    --pswp-icon-stroke-color: var(--color-bg);
-    --pswp-placeholder-bg: var(--color-bg-raised);
-  }
-
   .item-description {
     --collapsed-lines: 3;
     margin: 0.4rem 0 0;

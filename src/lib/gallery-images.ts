@@ -25,15 +25,16 @@ const buildResponsiveImage = async (
 export const buildPreview = (image: ImageMetadata) =>
   buildResponsiveImage(image, previewWidths, '(max-width: 480px) 100vw, 40rem');
 
-const buildImage = async ({
-  image,
-  alt,
-}: GalleryEntry): Promise<GalleryImage> => {
-  const thumbnail = await buildResponsiveImage(
-    image,
-    thumbnailWidths,
-    thumbnailSizes,
-  );
+interface ThumbnailOptions {
+  widths?: number[];
+  sizes?: string;
+}
+
+export const buildGalleryImage = async (
+  { image, alt }: GalleryEntry,
+  { widths = thumbnailWidths, sizes = thumbnailSizes }: ThumbnailOptions = {},
+): Promise<GalleryImage> => {
+  const thumbnail = await buildResponsiveImage(image, widths, sizes);
   const full = await getImage({
     src: image,
     format: 'webp',
@@ -52,4 +53,4 @@ const buildImage = async ({
 };
 
 export const buildGallery = (entries: GalleryEntry[]) =>
-  Promise.all(entries.map(buildImage));
+  Promise.all(entries.map((entry) => buildGalleryImage(entry)));

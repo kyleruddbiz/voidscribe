@@ -8,7 +8,13 @@ const site = 'https://voidscribestudios.com';
 export default defineConfig({
   site,
   build: { format: 'file' },
-  integrations: [svelte(), sitemap({ filter: (page) => page !== `${site}/` })],
+  integrations: [
+    svelte(),
+    sitemap({
+      filter: (page) =>
+        page !== `${site}/` && page !== `${site}/kyle-rudd/hard-problems`,
+    }),
+  ],
   env: {
     schema: {
       ITCH_ACCESS_CODE: envField.string({

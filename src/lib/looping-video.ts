@@ -22,22 +22,30 @@ export interface LoopingVideoEntry {
   alt: string;
 }
 
-export const buildLoopingVideo = async ({
-  poster,
-  sources,
-  alt,
-}: LoopingVideoEntry): Promise<LoopingVideo> => {
+export interface VideoPoster {
+  poster: string;
+  width: number;
+  height: number;
+}
+
+export const buildVideoPoster = async (
+  poster: ImageMetadata,
+): Promise<VideoPoster> => {
   const built = await getImage({
     src: poster,
     format: 'webp',
     width: Math.min(poster.width, maxPosterWidth),
   });
 
-  return {
-    alt,
-    poster: built.src,
-    width: poster.width,
-    height: poster.height,
-    sources,
-  };
+  return { poster: built.src, width: poster.width, height: poster.height };
 };
+
+export const buildLoopingVideo = async ({
+  poster,
+  sources,
+  alt,
+}: LoopingVideoEntry): Promise<LoopingVideo> => ({
+  alt,
+  ...(await buildVideoPoster(poster)),
+  sources,
+});

@@ -35,9 +35,10 @@ Page content lives in `src/content/`:
 - `<page>/bio/` — Svelte components holding the profile and role bios.
 - `<page>/roles/` — the roles (`index.ts`) plus any media they use.
 - `<page>/portfolio/` — `index.ts` lists the entries in display order. Each entry has its own
-  folder holding `index.ts` (the entry), `preview.jpg`, and `description.svelte` when the
-  description is too complex to inline in a content string. Gallery entries keep their images in
-  the same folder.
+  folder holding `index.ts` (the entry), `preview.jpg`, `description.svelte` when the
+  description is too complex to inline in a content string, and `details.svelte` for the full
+  page content of entries that have a page. Gallery entries keep their images in the same
+  folder.
 
 Portfolio `title` and `description` values are HTML strings, rendered with `{@html}`. That's safe
 because the content is authored in this repo, but don't feed it anything user-supplied.

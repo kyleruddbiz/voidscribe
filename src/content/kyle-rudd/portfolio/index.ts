@@ -8,8 +8,8 @@ import { familyTripMix } from './family-trip-mix';
 import { aetherealArt } from './aethereal-art';
 
 export const portfolio: PortfolioEntry[] = [
-  voidScribeStudios,
   mtgSimulator,
+  voidScribeStudios,
   newtonsFlamingLaserSword,
   synthesis,
   theFoxKnows,

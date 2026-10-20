@@ -4,7 +4,7 @@ import type { PortfolioEntry } from '../../../../lib/portfolio';
 import { renderToHtml } from '../../../../lib/render-to-html';
 import { buildPreview } from '../../../../lib/gallery-images';
 import preview from './preview.jpg';
-import Description from './description.svelte';
+import Details from './details.svelte';
 
 export const voidScribeStudios: PortfolioEntry = {
   kind: 'link',
@@ -12,12 +12,11 @@ export const voidScribeStudios: PortfolioEntry = {
   callToAction: 'View on GitHub',
   icon: githubIconPath,
   title: 'Void Scribe Studios',
-  skills: [Skill.softwareEngineering, Skill.uiUxDesign, Skill.agenticCoding],
-  description:
-    'What is this website? I have a very eclectic skillset and this can look like chaos at first glance. My aim here is to remedy that chaos.',
+  skills: [Skill.softwareEngineering, Skill.agenticCoding, Skill.uiUxDesign],
+  description: 'You are here.',
   preview: await buildPreview(preview),
   page: {
     slug: 'void-scribe-studios',
-    description: renderToHtml(Description),
+    details: renderToHtml(Details),
   },
 };

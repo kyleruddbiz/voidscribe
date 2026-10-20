@@ -129,7 +129,7 @@
   }
 
   .page-body :global(:is(img, astro-island)) {
-    margin-top: 2.25rem;
+    margin-top: 1.75rem;
   }
 
   .page-body :global(:first-child) {

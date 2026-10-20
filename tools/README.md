@@ -34,7 +34,7 @@ It writes `<name>.mp4` and a matching `<name>.jpg` poster (the clip's first fram
 ## Converting a long video for `PageVideoPlayer`
 
 ```
-node tools/convert-video.mjs <input> <output-path-without-extension> [--poster-at s]
+node tools/convert-video.mjs <input> <output-path-without-extension> [--poster-at s] [--crf n]
 ```
 
 Example:
@@ -48,6 +48,6 @@ controls. It keeps the audio (AAC, 96 kbps), encodes up to 1080p, and writes `<n
 `<name>.jpg` poster taken at `--poster-at` (default `0`).
 
 - The tool fails if the MP4 is over 25 MiB, the per-file limit on Cloudflare Pages and Workers static
-  assets. If that happens, raise the CRF or scale down to 1280 wide.
+  assets. If that happens, raise `--crf` (default 26) or scale down to 1280 wide.
 - There is no Git LFS. The committed MP4 stays under the limit, and the source video is never committed.
 - If long videos become routine, host them on Cloudflare R2 or Stream instead.

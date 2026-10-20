@@ -8,7 +8,7 @@ const maxWidth = 1920;
 // Cloudflare Pages and Workers static assets reject files over 25 MiB.
 const cloudflareMaxFileBytes = 25 * 1024 * 1024;
 const usage =
-  'Usage: node tools/convert-video.mjs <input> <output-path-without-extension> [--poster-at s]';
+  'Usage: node tools/convert-video.mjs <input> <output-path-without-extension> [--poster-at s] [--crf n]';
 
 const loadFfmpeg = () => {
   try {
@@ -39,6 +39,7 @@ const main = () => {
     allowPositionals: true,
     options: {
       'poster-at': { type: 'string', default: '0' },
+      crf: { type: 'string', default: '26' },
     },
   });
 
@@ -69,7 +70,7 @@ const main = () => {
     '-profile:v',
     'high',
     '-crf',
-    '26',
+    options.crf,
     '-preset',
     'slow',
     '-g',

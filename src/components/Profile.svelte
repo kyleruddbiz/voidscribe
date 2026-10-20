@@ -62,7 +62,7 @@
   }
 
   h1 {
-    font-size: clamp(1.75rem, 9vw, 3rem);
+    font-size: clamp(1.75rem, 9vw, 3.25rem);
     margin: 0;
   }
 

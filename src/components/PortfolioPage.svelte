@@ -124,8 +124,12 @@
     margin-top: 0.75rem;
   }
 
+  .page-body :global(astro-island) {
+    display: block;
+  }
+
   .page-body :global(:is(img, astro-island)) {
-    margin-top: 1.25rem;
+    margin-top: 2.25rem;
   }
 
   .page-body :global(:first-child) {

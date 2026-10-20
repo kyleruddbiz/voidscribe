@@ -37,7 +37,7 @@ export interface LinkPortfolioEntry extends PortfolioEntryBase {
   href: string;
   rel?: string;
   callToAction: string;
-  page?: { slug: string; details: string };
+  page?: { slug: string };
 }
 
 export interface GalleryImage {

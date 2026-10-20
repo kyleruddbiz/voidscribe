@@ -6,7 +6,6 @@ import { withAccessCode } from '../../../../lib/itch-access';
 import { buildPreview } from '../../../../lib/gallery-images';
 import preview from './preview.jpg';
 import Description from './description.svelte';
-import Details from './details.svelte';
 
 export const mtgSimulator: PortfolioEntry = {
   kind: 'link',
@@ -18,8 +17,5 @@ export const mtgSimulator: PortfolioEntry = {
   skills: [Skill.gameDevelopment, Skill.agenticCoding],
   description: renderToHtml(Description),
   preview: await buildPreview(preview),
-  page: {
-    slug: 'mtg-simulator',
-    details: renderToHtml(Details),
-  },
+  page: { slug: 'mtg-simulator' },
 };

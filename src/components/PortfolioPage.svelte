@@ -1,12 +1,14 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { LinkPortfolioEntry } from '../lib/portfolio';
   import SkillChips from './SkillChips.svelte';
 
   interface Props {
     entry: LinkPortfolioEntry;
+    children?: Snippet;
   }
 
-  const { entry }: Props = $props();
+  const { entry, children }: Props = $props();
   const {
     icon,
     title,
@@ -43,7 +45,7 @@
   </header>
 
   <div class="page-body">
-    {@html entry.page?.details}
+    {@render children?.()}
   </div>
 </article>
 
@@ -120,6 +122,14 @@
 
   .page-body :global(p + p) {
     margin-top: 0.75rem;
+  }
+
+  .page-body :global(astro-island) {
+    display: block;
+  }
+
+  .page-body :global(:is(img, astro-island)) {
+    margin-top: 1.75rem;
   }
 
   .page-body :global(:first-child) {

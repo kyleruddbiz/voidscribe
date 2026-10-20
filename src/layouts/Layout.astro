@@ -14,14 +14,14 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
 
 const canonical = new URL(
   Astro.url.pathname.replace(/\.html$/, ''),
-  Astro.site,
+  site.url,
 );
 const currentYear = new Date().getFullYear();
 const copyrightYears =
   currentYear > site.copyrightStartYear
     ? `${site.copyrightStartYear}-${currentYear}`
     : `${site.copyrightStartYear}`;
-const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
+const ogImage = new URL('/images/og-voidscribe.png', site.url);
 ---
 
 <!doctype html>

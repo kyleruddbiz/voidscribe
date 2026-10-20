@@ -3,7 +3,9 @@ import { defineConfig, envField } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 
-const site = 'https://voidscribestudios.com';
+import { site as siteContent } from './src/content/site/index.ts';
+
+const site = siteContent.url;
 
 export default defineConfig({
   site,

@@ -6,9 +6,10 @@ interface Props {
   title?: string;
   description?: string;
   socialTitle?: string;
+  noindex?: boolean;
 }
 
-const { title, description, socialTitle } = Astro.props;
+const { title, description, socialTitle, noindex } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : site.name;
 
 const canonical = new URL(
@@ -42,6 +43,7 @@ const ogImage = new URL('/images/og-voidscribe.png', Astro.site);
     />
     <meta name="theme-color" content="#0d0e12" />
     {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex" />}
     <script is:inline>
       const root = document.documentElement;
       root.classList.add('js', 'role-pending');

@@ -83,7 +83,7 @@
     --role-separator-width: 1.119rem;
     --focus-ring-width: 1px;
     --focus-ring-reach: 4px;
-    --role-row-gap: 0.5rem;
+    --role-row-gap: 0.2rem;
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -94,7 +94,7 @@
     font-size: 1.1em;
     font-variant-caps: all-small-caps;
     letter-spacing: 0.08em;
-    margin: 0 0 2rem;
+    margin: 0 0 0.75rem;
   }
 
   .secondary-roles {

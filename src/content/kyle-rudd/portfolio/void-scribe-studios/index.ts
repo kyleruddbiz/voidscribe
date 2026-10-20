@@ -4,7 +4,7 @@ import type { PortfolioEntry } from '../../../../lib/portfolio';
 import { renderToHtml } from '../../../../lib/render-to-html';
 import { buildPreview } from '../../../../lib/gallery-images';
 import preview from './preview.jpg';
-import Description from './description.svelte';
+import Details from './details.svelte';
 
 export const voidScribeStudios: PortfolioEntry = {
   kind: 'link',
@@ -17,6 +17,6 @@ export const voidScribeStudios: PortfolioEntry = {
   preview: await buildPreview(preview),
   page: {
     slug: 'void-scribe-studios',
-    description: renderToHtml(Description),
+    details: renderToHtml(Details),
   },
 };

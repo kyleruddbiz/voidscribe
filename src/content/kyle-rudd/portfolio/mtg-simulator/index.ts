@@ -5,7 +5,7 @@ import { renderToHtml } from '../../../../lib/render-to-html';
 import { withAccessCode } from '../../../../lib/itch-access';
 import { buildPreview } from '../../../../lib/gallery-images';
 import preview from './preview.jpg';
-import Description from './description.svelte';
+import Details from './details.svelte';
 
 export const mtgSimulator: PortfolioEntry = {
   kind: 'link',
@@ -20,6 +20,6 @@ export const mtgSimulator: PortfolioEntry = {
   preview: await buildPreview(preview),
   page: {
     slug: 'mtg-simulator',
-    description: renderToHtml(Description),
+    details: renderToHtml(Details),
   },
 };

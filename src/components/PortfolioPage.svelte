@@ -43,7 +43,7 @@
   </header>
 
   <div class="page-body">
-    {@html entry.page?.description}
+    {@html entry.page?.details}
   </div>
 </article>
 

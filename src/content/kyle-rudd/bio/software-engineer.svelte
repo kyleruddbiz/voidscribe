@@ -13,9 +13,9 @@
     >Full-Stack Software Engineer<InlineIcon path={linkedinIconPath} /></a
   >
   for 13+ years, working across web and desktop, and more recently game development.
-  I specialize in C# and .NET, with TypeScript, Unity, and more mixed in. I have done
-  everything from coding to architecture to technical leadership. I’m happy as long
-  as I’m slinging code, learning, and mentoring.
+  I specialize in C# and .NET, with TypeScript, Unity, and more mixed in. I excel
+  at everything from coding to architecture to technical leadership. I’m happy as
+  long as I’m slinging code, learning, and mentoring.
 </p>
 <p>
   Coding is pure creation. It feels incredible to build something from nothing

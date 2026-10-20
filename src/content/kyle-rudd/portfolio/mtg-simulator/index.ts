@@ -15,7 +15,8 @@ export const mtgSimulator: PortfolioEntry = {
   icon: itchIoIconPath,
   title: '<cite>Magic: The Gathering</cite> Simulator',
   skills: [Skill.gameDevelopment, Skill.agenticCoding],
-  description: 'Preview Coming Soon.',
+  description:
+    'I wondered if the excellent game feel of <a href="https://store.steampowered.com/app/1092790/Inscryption/" target="_blank" rel="noopener" aria-label="Inscryption (opens in a new tab)">Inscryption</a> could survive in a more complex card game. This Unity project aims to find out.',
   preview: await buildPreview(preview),
   page: {
     slug: 'mtg-simulator',

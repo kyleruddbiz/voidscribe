@@ -12,8 +12,8 @@ export const voidScribeStudios: PortfolioEntry = {
   callToAction: 'View on GitHub',
   icon: githubIconPath,
   title: 'Void Scribe Studios',
-  skills: [Skill.softwareEngineering, Skill.uiUxDesign, Skill.agenticCoding],
-  description: 'Preview Coming Soon.',
+  skills: [Skill.softwareEngineering, Skill.agenticCoding, Skill.uiUxDesign],
+  description: 'You are here.',
   preview: await buildPreview(preview),
   page: {
     slug: 'void-scribe-studios',

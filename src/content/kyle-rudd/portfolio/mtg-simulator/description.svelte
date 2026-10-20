@@ -1,1 +1,1 @@
-<p>More details coming soon.</p>
+<p>Details coming soon.</p>

@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PortfolioPage from '../../components/PortfolioPage.svelte';
+import LoopingVideo from '../../components/LoopingVideo.svelte';
 import { kyleRudd } from '../../content/kyle-rudd';
 import { firstLandingHref } from '../../lib/landing-destination';
 import type { LinkPortfolioEntry } from '../../lib/portfolio';
@@ -27,7 +28,26 @@ const plainTitle = entry.title.replace(/<[^>]*>/g, '');
   >
     &larr; Portfolio
   </a>
-  <PortfolioPage {entry} />
+  <PortfolioPage {entry}>
+    {
+      entry.page.media?.map((item) => (
+        <div class="page-media">
+          {item.kind === 'image' ? (
+            <img
+              src={item.image.src}
+              srcset={item.image.srcset}
+              sizes={item.image.sizes}
+              alt={item.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <LoopingVideo client:visible {...item.video} />
+          )}
+        </div>
+      ))
+    }
+  </PortfolioPage>
 </Layout>
 
 <script>
@@ -42,6 +62,17 @@ const plainTitle = entry.title.replace(/<[^>]*>/g, '');
 </script>
 
 <style>
+  .page-media {
+    max-width: var(--measure);
+    margin-top: 1.25rem;
+  }
+
+  .page-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   .back-link {
     color: var(--color-accent-bright);
     font-size: 0.9rem;

@@ -1,12 +1,14 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { LinkPortfolioEntry } from '../lib/portfolio';
   import SkillChips from './SkillChips.svelte';
 
   interface Props {
     entry: LinkPortfolioEntry;
+    children?: Snippet;
   }
 
-  const { entry }: Props = $props();
+  const { entry, children }: Props = $props();
   const {
     icon,
     title,
@@ -45,6 +47,8 @@
   <div class="page-body">
     {@html entry.page?.details}
   </div>
+
+  {@render children?.()}
 </article>
 
 <style>

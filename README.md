@@ -5,9 +5,11 @@ Astro static site using Svelte for components.
 ## Getting started
 
 ```
-npm install
+sh scripts/setup.sh
 npm run dev
 ```
+
+`scripts/setup.sh` is the one-time setup: it installs the Node version in `.node-version` and the npm dependencies, and creates `.env`. Add any future one-time installs to it.
 
 Dev server: `http://localhost:4321`.
 

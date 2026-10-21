@@ -61,6 +61,9 @@ peer dependency below 7: `@astrojs/check` and `svelte-check` (`^5 || ^6`, both u
 `@astrojs/svelte` (`^5.3.3 || ^6`) and `typescript-eslint` (`<6.1.0`). Upgrading to TypeScript 7 breaks
 the build and lint until they all add support for it.
 
+`npm audit` reports `braces` (GHSA-vfj7-8cjw-p6xm) through `stylelint` → `micromatch`. No patched
+`braces` exists and no `stylelint` release drops the dependency. It is dev-only and doesn’t ship.
+
 ## Testing changes
 
 No automated tests. Check changes by hand in a browser:

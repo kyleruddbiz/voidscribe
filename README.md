@@ -56,9 +56,10 @@ See [AGENTS.md](./AGENTS.md) for the branching model and the checks to run befor
 
 ## Dependencies
 
-TypeScript is pinned to `^6.0.3` rather than the latest major. Both type-checkers used by
-`npm run build` — `@astrojs/check` and `svelte-check` — cap their `typescript` peer dependency at
-`^5.0.0 || ^6.0.0`, so upgrading to TypeScript 7 breaks the build until they add support for it.
+TypeScript is pinned to `^6.0.3` rather than the latest major. Four packages cap their `typescript`
+peer dependency below 7: `@astrojs/check` and `svelte-check` (`^5 || ^6`, both used by `npm run build`),
+`@astrojs/svelte` (`^5.3.3 || ^6`) and `typescript-eslint` (`<6.1.0`). Upgrading to TypeScript 7 breaks
+the build and lint until they all add support for it.
 
 ## Testing changes
 

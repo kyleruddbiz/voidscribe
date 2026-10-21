@@ -12,10 +12,7 @@ interface Props {
 const { title, description, socialTitle, noindex } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : site.name;
 
-const canonical = new URL(
-  Astro.url.pathname.replace(/\.html$/, ''),
-  site.url,
-);
+const canonical = new URL(Astro.url.pathname.replace(/\.html$/, ''), site.url);
 const currentYear = new Date().getFullYear();
 const copyrightYears =
   currentYear > site.copyrightStartYear

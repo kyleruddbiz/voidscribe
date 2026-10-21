@@ -16,13 +16,13 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
-    "@astrojs/svelte": "^9.0.1",
-    "astro": "^7.3.3",
+    "@astrojs/svelte": "^9.1.1",
+    "astro": "^7.4.2",
     "photoswipe": "^5.4.4",
-    "svelte": "^5.57.0"
+    "svelte": "^5.57.2"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
+    "@astrojs/check": "^0.9.12",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
@@ -36,7 +36,7 @@
     "stylelint": "^17.15.0",
     "stylelint-config-html": "^2.0.0",
     "stylelint-config-recommended": "^18.0.0",
-    "svelte-check": "^4.7.6",
+    "svelte-check": "^4.7.7",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.0"
   },

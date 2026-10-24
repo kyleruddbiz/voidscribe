@@ -26,10 +26,15 @@
 
             if (!slide) {return;}
 
+            const { x: viewportWidth, y: viewportHeight } = pswp.viewportSize;
             const left = Math.max(0, slide.pan.x);
+            const top = Math.max(0, slide.pan.y);
             const imageWidth = slide.width * slide.currZoomLevel;
+            const imageHeight = slide.height * slide.currZoomLevel;
+
             element.style.left = `${left}px`;
-            element.style.right = `${Math.max(0, pswp.viewportSize.x - left - imageWidth)}px`;
+            element.style.right = `${Math.max(0, viewportWidth - left - imageWidth)}px`;
+            element.style.bottom = `${Math.max(0, viewportHeight - top - imageHeight)}px`;
           };
 
           for (const event of ['change', 'resize', 'zoomPanUpdate'] as const) {

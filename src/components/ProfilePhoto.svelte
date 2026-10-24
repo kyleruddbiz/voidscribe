@@ -20,6 +20,24 @@
         isButton: false,
         appendTo: 'root',
         html: caption,
+        onInit: (element, pswp) => {
+          const fitToImage = () => {
+            const slide = pswp.currSlide;
+
+            if (!slide) {return;}
+
+            const left = Math.max(0, slide.pan.x);
+            const imageWidth = slide.width * slide.currZoomLevel;
+            element.style.left = `${left}px`;
+            element.style.right = `${Math.max(0, pswp.viewportSize.x - left - imageWidth)}px`;
+          };
+
+          for (const event of ['change', 'resize', 'zoomPanUpdate'] as const) {
+            pswp.on(event, fitToImage);
+          }
+
+          fitToImage();
+        },
       });
     });
   };

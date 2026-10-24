@@ -105,6 +105,7 @@ img {
 
 .pswp__caption {
   position: absolute;
+  z-index: 10;
   right: 0;
   bottom: 0;
   left: 0;
@@ -112,6 +113,7 @@ img {
   text-align: center;
   color: var(--color-text);
   background: color-mix(in srgb, var(--color-bg-raised) 75%, transparent);
+  will-change: opacity;
 }
 
 .pswp .pswp__caption:not(.pswp__caption--visible) {

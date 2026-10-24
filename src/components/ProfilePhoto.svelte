@@ -84,21 +84,6 @@
     transform-origin: 32% 57%;
   }
 
-  :global(.pswp__caption) {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 0.75rem 1rem;
-    text-align: center;
-    color: var(--color-text);
-    background: rgb(0 0 0 / 0.6);
-  }
-
-  :global(.pswp__caption a) {
-    color: var(--color-accent-bright);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .photo {
       transition: none;

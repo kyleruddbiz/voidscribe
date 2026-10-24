@@ -102,3 +102,14 @@ img {
   --pswp-icon-stroke-color: var(--color-bg);
   --pswp-placeholder-bg: var(--color-bg-raised);
 }
+
+.pswp__caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-bg-raised) 75%, transparent);
+}

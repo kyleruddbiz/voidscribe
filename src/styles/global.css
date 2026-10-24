@@ -118,6 +118,13 @@ img {
   opacity: 0;
 }
 
-.pswp--ui-visible .pswp__caption--visible {
+.pswp--ui-visible .pswp__caption.pswp__caption--visible {
   opacity: 1;
+  transition-duration: 0.8s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pswp--ui-visible .pswp__caption.pswp__caption--visible {
+    transition-duration: var(--pswp-transition-duration);
+  }
 }

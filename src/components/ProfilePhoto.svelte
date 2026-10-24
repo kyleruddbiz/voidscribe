@@ -20,12 +20,6 @@
         isButton: false,
         appendTo: 'root',
         html: caption,
-        onInit: (element) => {
-          for (const link of element.querySelectorAll('a')) {
-            link.target = '_blank';
-            link.rel = 'noreferrer';
-          }
-        },
       });
     });
   };

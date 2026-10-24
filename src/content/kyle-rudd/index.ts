@@ -10,7 +10,12 @@ import { portfolio } from './portfolio';
 export const kyleRudd: Profile = {
   name: 'Kyle Rudd',
   photo: await buildGalleryImage(
-    { image: profilePicture, alt: 'Kyle Rudd' },
+    {
+      image: profilePicture,
+      alt: 'Kyle Rudd',
+      caption:
+        'Photo and color correction by <a href="https://example.com">Photographer Name</a>',
+    },
     { widths: [320, 640], sizes: '10rem' },
   ),
   bio: renderToHtml(GeneralBio),

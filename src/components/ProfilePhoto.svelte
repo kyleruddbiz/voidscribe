@@ -12,11 +12,34 @@
 
   let anchorElement: HTMLAnchorElement;
 
+  const registerCaption = (lightbox: PhotoSwipeLightbox, caption: string) => {
+    lightbox.on('uiRegister', () => {
+      lightbox.pswp?.ui?.registerElement({
+        name: 'caption',
+        order: 9,
+        isButton: false,
+        appendTo: 'root',
+        html: caption,
+        onInit: (element) => {
+          for (const link of element.querySelectorAll('a')) {
+            link.target = '_blank';
+            link.rel = 'noreferrer';
+          }
+        },
+      });
+    });
+  };
+
   onMount(() => {
     const lightbox = new PhotoSwipeLightbox({
       gallery: anchorElement,
       pswpModule: () => import('photoswipe'),
     });
+
+    if (photo.caption) {
+      registerCaption(lightbox, photo.caption);
+    }
+
     lightbox.init();
 
     return () => lightbox.destroy();
@@ -65,6 +88,21 @@
     object-fit: cover;
     transform: translate(18%, -7%) scale(2);
     transform-origin: 32% 57%;
+  }
+
+  :global(.pswp__caption) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    color: var(--color-text);
+    background: rgb(0 0 0 / 0.6);
+  }
+
+  :global(.pswp__caption a) {
+    color: var(--color-accent-bright);
   }
 
   @media (prefers-reduced-motion: reduce) {

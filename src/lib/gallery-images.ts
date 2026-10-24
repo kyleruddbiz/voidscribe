@@ -5,6 +5,7 @@ import type { GalleryImage, ResponsiveImage } from './portfolio';
 export interface GalleryEntry {
   image: ImageMetadata;
   alt: string;
+  caption?: string;
 }
 
 const thumbnailWidths = [320, 640];
@@ -31,7 +32,7 @@ interface ThumbnailOptions {
 }
 
 export const buildGalleryImage = async (
-  { image, alt }: GalleryEntry,
+  { image, alt, caption }: GalleryEntry,
   { widths = thumbnailWidths, sizes = thumbnailSizes }: ThumbnailOptions = {},
 ): Promise<GalleryImage> => {
   const thumbnail = await buildResponsiveImage(image, widths, sizes);
@@ -43,6 +44,7 @@ export const buildGalleryImage = async (
 
   return {
     alt,
+    caption,
     thumbnail,
     full: {
       src: full.src,

@@ -41,6 +41,11 @@
             pswp.on(event, fitToImage);
           }
 
+          pswp.on('openingAnimationEnd', () => {
+            fitToImage();
+            element.classList.add('pswp__caption--visible');
+          });
+
           fitToImage();
         },
       });

@@ -113,3 +113,11 @@ img {
   color: var(--color-text);
   background: color-mix(in srgb, var(--color-bg-raised) 75%, transparent);
 }
+
+.pswp .pswp__caption:not(.pswp__caption--visible) {
+  opacity: 0;
+}
+
+.pswp--ui-visible .pswp__caption--visible {
+  opacity: 1;
+}

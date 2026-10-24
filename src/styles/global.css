@@ -125,6 +125,12 @@ img {
   transition-duration: 0.8s;
 }
 
+@media (hover: none) {
+  .pswp--ui-visible .pswp__caption.pswp__caption--visible {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pswp--ui-visible .pswp__caption.pswp__caption--visible {
     transition-duration: var(--pswp-transition-duration);

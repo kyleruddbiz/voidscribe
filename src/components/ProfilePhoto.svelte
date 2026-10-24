@@ -40,7 +40,10 @@
 
           pswp.on('openingAnimationEnd', () => {
             fitToImage();
-            element.classList.add('pswp__caption--visible');
+            requestAnimationFrame(() => {
+              fitToImage();
+              element.classList.add('pswp__caption--visible');
+            });
           });
 
           fitToImage();

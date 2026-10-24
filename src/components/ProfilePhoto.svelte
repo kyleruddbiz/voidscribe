@@ -22,19 +22,16 @@
         html: caption,
         onInit: (element, pswp) => {
           const fitToImage = () => {
-            const slide = pswp.currSlide;
+            const image = pswp.currSlide?.content.element;
 
-            if (!slide) {return;}
+            if (!image || !pswp.element) {return;}
 
-            const { x: viewportWidth, y: viewportHeight } = pswp.viewportSize;
-            const left = Math.max(0, slide.pan.x);
-            const top = Math.max(0, slide.pan.y);
-            const imageWidth = slide.width * slide.currZoomLevel;
-            const imageHeight = slide.height * slide.currZoomLevel;
+            const imageBounds = image.getBoundingClientRect();
+            const rootBounds = pswp.element.getBoundingClientRect();
 
-            element.style.left = `${left}px`;
-            element.style.right = `${Math.max(0, viewportWidth - left - imageWidth)}px`;
-            element.style.bottom = `${Math.max(0, viewportHeight - top - imageHeight)}px`;
+            element.style.left = `${Math.max(0, imageBounds.left - rootBounds.left)}px`;
+            element.style.right = `${Math.max(0, rootBounds.right - imageBounds.right)}px`;
+            element.style.bottom = `${Math.max(0, rootBounds.bottom - imageBounds.bottom)}px`;
           };
 
           for (const event of ['change', 'resize', 'zoomPanUpdate'] as const) {

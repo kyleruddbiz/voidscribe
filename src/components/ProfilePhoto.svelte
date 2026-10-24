@@ -39,7 +39,6 @@
           }
 
           pswp.on('openingAnimationEnd', () => {
-            fitToImage();
             requestAnimationFrame(() => {
               fitToImage();
               element.classList.add('pswp__caption--visible');

@@ -11,7 +11,8 @@ export const voidScribeStudios: PortfolioEntry = {
   icon: githubIconPath,
   title: 'Void Scribe Studios',
   skills: [Skill.softwareEngineering, Skill.agenticCoding, Skill.uiUxDesign],
-  description: 'You are here.',
+  description:
+    'You are here. This is my portfolio website built with Astro, Svelte & Typescript.',
   preview: await buildPreview(preview),
   page: { slug: 'void-scribe-studios' },
 };

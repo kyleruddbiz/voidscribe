@@ -115,7 +115,7 @@
     pointer-events: none;
     translate: -50% -50%;
     transition-property: opacity, top, left, width, height, padding;
-    transition-duration: 0.2s;
+    transition-duration: 0.35s;
     transition-timing-function: ease;
   }
 

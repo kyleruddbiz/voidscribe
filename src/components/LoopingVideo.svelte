@@ -70,9 +70,6 @@
       <span class="icon icon-pause" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
       </span>
-      <span class="badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-      </span>
     </button>
   {/if}
 </div>
@@ -109,46 +106,47 @@
     fill: currentcolor;
   }
 
-  .icon,
-  .badge {
+  .icon {
     position: absolute;
     display: grid;
     place-items: center;
     border-radius: 50%;
     background: color-mix(in srgb, var(--color-bg) 75%, transparent);
     pointer-events: none;
-  }
-
-  .icon {
-    top: 50%;
-    left: 50%;
-    width: 4.5rem;
-    height: 4.5rem;
-    padding: 1.1rem;
     translate: -50% -50%;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    transition-property: opacity, top, left, width, height, padding;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
   }
 
-  .icon-pause {
-    opacity: 0;
-  }
-
-  .badge {
-    right: 0.5rem;
-    bottom: 0.5rem;
+  .icon-play {
+    top: calc(100% - 1.5rem);
+    left: calc(100% - 1.5rem);
     width: 2rem;
     height: 2rem;
     padding: 0.45rem;
   }
 
-  button.playing .badge {
-    display: none;
+  .icon-pause {
+    top: 50%;
+    left: 50%;
+    width: 4.5rem;
+    height: 4.5rem;
+    padding: 1.1rem;
+    opacity: 0;
+  }
+
+  button.playing .icon-play {
+    opacity: 0;
   }
 
   @media (hover: hover) {
     button:not(.playing):is(:hover, :focus-visible) .icon-play {
-      opacity: 1;
+      top: 50%;
+      left: 50%;
+      width: 4.5rem;
+      height: 4.5rem;
+      padding: 1.1rem;
     }
 
     button.playing:is(:hover, :focus-visible) .icon-pause {

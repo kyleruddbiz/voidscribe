@@ -140,7 +140,6 @@
     width: 2rem;
     height: 2rem;
     padding: 0.45rem;
-    display: none;
   }
 
   button.playing .badge {
@@ -154,12 +153,6 @@
 
     button.playing:is(:hover, :focus-visible) .icon-pause {
       opacity: 0.6;
-    }
-  }
-
-  @media (hover: none) {
-    button:not(.playing) .badge {
-      display: grid;
     }
   }
 

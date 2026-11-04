@@ -141,7 +141,7 @@
   }
 
   @media (hover: hover) {
-    button:not(.playing):is(:hover, :focus-visible) .icon-play {
+    button:is(:hover, :focus-visible) .icon-play {
       top: 50%;
       left: 50%;
       width: 4.5rem;

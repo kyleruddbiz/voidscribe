@@ -62,7 +62,7 @@ peer dependency below 7: `@astrojs/check` and `svelte-check` (`^5 || ^6`, both u
 the build and lint until they all add support for it.
 
 `npm audit` reports `picomatch` (GHSA-fc5q-39xc-vjpf, ReDoS via extglobs) ≤ 4.0.7 through `astro`, `vite`,
-`svelte-check` and `stylelint`. No patched `picomatch` exists yet. Only build- and dev-time globs we author
+and `svelte-check`. No patched `picomatch` exists yet. Only build- and dev-time globs we author
 reach it, and nothing ships to the static site.
 
 ## Testing changes

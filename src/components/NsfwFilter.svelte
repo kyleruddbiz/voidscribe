@@ -45,6 +45,14 @@
     border-radius: 2px;
   }
 
+  .content {
+    transition: filter 0.2s ease;
+  }
+
+  .nsfw-filter:has(.cover:hover) .content {
+    filter: blur(0.5rem);
+  }
+
   .cover {
     position: absolute;
     inset: 0;
@@ -101,6 +109,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .content,
     .cover {
       transition: none;
     }

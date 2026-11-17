@@ -46,10 +46,6 @@
   }
 
   .content {
-    transition: filter 0.2s ease;
-  }
-
-  .nsfw-filter:has(.cover:hover) .content {
     filter: blur(0.5rem);
   }
 
@@ -69,11 +65,12 @@
     font: inherit;
     text-align: center;
     cursor: pointer;
-    transition: opacity 0.2s ease;
+    opacity: 0.9;
+    transition: color 0.2s ease;
   }
 
   .cover:hover {
-    opacity: 0.9;
+    color: var(--color-accent-bright);
   }
 
   .cover:focus-visible {
@@ -109,7 +106,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .content,
     .cover {
       transition: none;
     }

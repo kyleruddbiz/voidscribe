@@ -93,6 +93,11 @@
   .hint {
     color: var(--color-text-dim);
     font-size: 0.7rem;
+    transition: color 0.2s ease;
+  }
+
+  .cover:hover .hint {
+    color: var(--color-accent-bright);
   }
 
   .hint::before {
@@ -106,7 +111,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cover {
+    .cover,
+    .hint {
       transition: none;
     }
   }

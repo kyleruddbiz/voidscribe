@@ -22,7 +22,7 @@ const images: GalleryEntry[] = [
   { image: coloradoFlag, alt: 'Colorado Flag' },
   { image: coloradoShirtFront, alt: 'Colorado Shirt Front' },
   { image: coloradoShirtBack, alt: 'Colorado Shirt Back' },
-  { image: aetherealize, alt: 'Ætherealize' },
+  { image: aetherealize, alt: 'Ætherealize', isNsfw: true },
   { image: theGreatBird, alt: 'The Great Bird' },
   { image: thorns, alt: 'Thorns' },
 ];

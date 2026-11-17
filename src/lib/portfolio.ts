@@ -43,6 +43,7 @@ export interface LinkPortfolioEntry extends PortfolioEntryBase {
 export interface GalleryImage {
   alt: string;
   caption?: string;
+  isNsfw?: boolean;
   thumbnail: ResponsiveImage;
   full: { src: string; width: number; height: number };
 }

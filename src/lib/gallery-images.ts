@@ -6,6 +6,7 @@ export interface GalleryEntry {
   image: ImageMetadata;
   alt: string;
   caption?: string;
+  isNsfw?: boolean;
 }
 
 const thumbnailWidths = [320, 640];
@@ -32,7 +33,7 @@ interface ThumbnailOptions {
 }
 
 export const buildGalleryImage = async (
-  { image, alt, caption }: GalleryEntry,
+  { image, alt, caption, isNsfw }: GalleryEntry,
   { widths = thumbnailWidths, sizes = thumbnailSizes }: ThumbnailOptions = {},
 ): Promise<GalleryImage> => {
   const thumbnail = await buildResponsiveImage(image, widths, sizes);
@@ -45,6 +46,7 @@ export const buildGalleryImage = async (
   return {
     alt,
     caption,
+    isNsfw,
     thumbnail,
     full: {
       src: full.src,

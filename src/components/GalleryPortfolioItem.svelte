@@ -5,6 +5,7 @@
   import type { GalleryPortfolioEntry, Skill } from '../lib/portfolio';
   import ExpandableText from './ExpandableText.svelte';
   import PortfolioCard from './PortfolioCard.svelte';
+  import NsfwFilter from './NsfwFilter.svelte';
   import PortfolioItemHeading from './PortfolioItemHeading.svelte';
 
   interface Props extends Omit<GalleryPortfolioEntry, 'kind'> {
@@ -89,24 +90,26 @@
       onfocusin={() => (isExpanded = true)}
     >
       {#each images as image (image.full.src)}
-        <a
-          class="thumbnail"
-          href={image.full.src}
-          data-pswp-width={image.full.width}
-          data-pswp-height={image.full.height}
-          data-cropped="true"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <img
-            src={image.thumbnail.src}
-            srcset={image.thumbnail.srcset}
-            sizes={image.thumbnail.sizes}
-            alt={image.alt}
-            loading="lazy"
-            decoding="async"
-          />
-        </a>
+        <NsfwFilter isNsfw={image.isNsfw} label={image.alt}>
+          <a
+            class="thumbnail"
+            href={image.full.src}
+            data-pswp-width={image.full.width}
+            data-pswp-height={image.full.height}
+            data-cropped="true"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img
+              src={image.thumbnail.src}
+              srcset={image.thumbnail.srcset}
+              sizes={image.thumbnail.sizes}
+              alt={image.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+        </NsfwFilter>
       {/each}
     </div>
   </div>

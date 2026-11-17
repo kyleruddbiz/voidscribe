@@ -61,8 +61,9 @@ peer dependency below 7: `@astrojs/check` and `svelte-check` (`^5 || ^6`, both u
 `@astrojs/svelte` (`^5.3.3 || ^6`) and `typescript-eslint` (`<6.1.0`). Upgrading to TypeScript 7 breaks
 the build and lint until they all add support for it.
 
-`npm audit` reports `braces` (GHSA-vfj7-8cjw-p6xm) through `stylelint` → `micromatch`. No patched
-`braces` exists and no `stylelint` release drops the dependency. It is dev-only and doesn’t ship.
+`npm audit` reports `picomatch` (GHSA-fc5q-39xc-vjpf, ReDoS via extglobs) ≤ 4.0.7 through `astro`, `vite`,
+`svelte-check` and `stylelint`. No patched `picomatch` exists yet. Only build- and dev-time globs we author
+reach it, and nothing ships to the static site.
 
 ## Testing changes
 

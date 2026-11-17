@@ -14,7 +14,7 @@
 
 {#if isNsfw}
   <div class="nsfw-filter">
-    <div class="content" inert={!isRevealed}>
+    <div class="content" class:blurred={!isRevealed} inert={!isRevealed}>
       {@render children()}
     </div>
     {#if !isRevealed}
@@ -45,7 +45,7 @@
     border-radius: 2px;
   }
 
-  .content {
+  .content.blurred {
     filter: blur(0.5rem);
   }
 

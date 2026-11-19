@@ -5,7 +5,7 @@
   import type { GalleryPortfolioEntry, Skill } from '../lib/portfolio';
   import ExpandableText from './ExpandableText.svelte';
   import PortfolioCard from './PortfolioCard.svelte';
-  import NsfwFilter from './NsfwFilter.svelte';
+  import MatureFilter from './MatureFilter.svelte';
   import PortfolioItemHeading from './PortfolioItemHeading.svelte';
 
   interface Props extends Omit<GalleryPortfolioEntry, 'kind'> {
@@ -90,7 +90,7 @@
       onfocusin={() => (isExpanded = true)}
     >
       {#each images as image (image.full.src)}
-        <NsfwFilter isNsfw={image.isNsfw} label={image.alt}>
+        <MatureFilter isMature={image.isMature} label={image.alt}>
           <a
             class="thumbnail"
             href={image.full.src}
@@ -109,7 +109,7 @@
               decoding="async"
             />
           </a>
-        </NsfwFilter>
+        </MatureFilter>
       {/each}
     </div>
   </div>
